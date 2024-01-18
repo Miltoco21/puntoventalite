@@ -36,6 +36,8 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import BoxRecuperarVenta from "./BoxRecuperarVenta";
 import BoxDevolucion from "./BoxDevolucion";
 import BoxIngreso from "./BoxIngreso";
+import BoxStock from "./BoxStock";
+import IngresoClientes from "./IngresoClientes";
 const BoxGestionCaja = () => {
   const {
     grandTotal,
@@ -68,7 +70,8 @@ const BoxGestionCaja = () => {
   const [description, setDescription] = useState("");
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openRecoveryDialog, setOpenRecoveryDialog] = useState(false);
-  const [openIngresoDialog, setOpenIngresoDialog] = useState(false);
+  const [openClienteDialog, setopenClienteDialog] = useState(false);
+  const [openStockDialog, setOpenStockDialog] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [openDevolucionDialog, setOpenDevolucionDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -431,10 +434,16 @@ const BoxGestionCaja = () => {
     setOpenDevolucionDialog(false);
   };
   const handleOpenIngreso = ()=>{
-    setOpenIngresoDialog(true);
+    setopenClienteDialog(true);
   };
   const handleCloseIngreso = ()=>{
-    setOpenIngresoDialog(false);
+    setopenClienteDialog(false);
+  };
+  const handleOpenStock = ()=>{
+    setOpenStockDialog(true);
+  };
+  const handleCloseStock = ()=>{
+    setOpenStockDialog(false);
   };
   
   const [openCategoria, setOpenCategoria] = useState(false);
@@ -508,10 +517,10 @@ const BoxGestionCaja = () => {
               },
               margin:"5px"
             }}
-            onClick={() => clearSalesData(null, 3)}
+            onClick={handleOpenStock}
           >
             {/* <EditIcon /> */}
-            <Typography variant="h7">Buscar</Typography>
+            <Typography variant="h7">Stock</Typography>
           </Button>
         </Grid>
         <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
@@ -532,41 +541,10 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Familias</Typography>
           </Button>
         </Grid>
+        
 
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: "lightSalmon",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
-                color: "white",
-              }, margin:"5px"
-            }}
-            onClick={handleSuspenderVenta}
-          >
-            <Typography variant="h7">Suspender Venta</Typography>
-          </Button>
-        </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: "lightSalmon",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
-                color: "white",
-              }, margin:"5px"
-            }}
-            onClick={handleButtonRecuperarVenta}
-          >
-            <Typography variant="h7">Recuperar Venta</Typography>
-          </Button>
-        </Grid>
+        
+        
         <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
@@ -600,7 +578,7 @@ const BoxGestionCaja = () => {
             onClick={handleOpenIngreso}
           >
             {/* <CoffeeIcon /> */}
-            <Typography variant="h7">Ingresos</Typography>
+            <Typography variant="h7">Crear Cliente</Typography>
           </Button>
         </Grid>
         <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
@@ -618,7 +596,7 @@ const BoxGestionCaja = () => {
             onClick={() => handleNavigationChange(null, 8)}
           >
             {/* <CoffeeIcon /> */}
-            <Typography variant="h7">Retiros</Typography>
+            <Typography variant="h7">Deudas</Typography>
           </Button>
         </Grid>
         <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
@@ -636,26 +614,10 @@ const BoxGestionCaja = () => {
             onClick={() => handleNavigationChange(null, 9)}
           >
             {/* <CoffeeIcon /> */}
-            <Typography variant="h7">Otros</Typography>
+            <Typography variant="h7">Precios</Typography>
           </Button>
         </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: "lightSalmon",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
-                color: "white",
-              }, margin:"5px"
-            }}
-            onClick={() => handleNavigationChange(null, 10)}
-          >
-            <Typography variant="h7">Búsqueda Rápida</Typography>
-          </Button>
-        </Grid>
+       
         {/* <Grid item xs={6} sm={6} md={4} lg={3} xl={2}>
           <Button
             sx={{
@@ -1137,14 +1099,25 @@ const BoxGestionCaja = () => {
           <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={openIngresoDialog} onClose={handleCloseIngreso}>
-        <DialogTitle>Ingresos</DialogTitle>
+      <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
+        <DialogTitle>Crear Cliente</DialogTitle>
         <DialogContent >
           
-          <BoxIngreso onClose={handleCloseIngreso} />
+          <IngresoClientes onClose={handleCloseIngreso} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseIngreso}>Cancelar</Button>
+          
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openStockDialog} onClose={handleCloseStock}>
+        <DialogTitle>Stock</DialogTitle>
+        <DialogContent >
+          
+          <BoxStock onClose={handleCloseStock} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseStock}>Cancelar</Button>
           <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
         </DialogActions>
       </Dialog>
