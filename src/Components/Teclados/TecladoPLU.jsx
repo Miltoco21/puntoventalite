@@ -65,12 +65,12 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
   };
 
   return (
-    <Container>
-      <Grid container justifyContent="center">
+    <Container >
+      <Grid  justifyContent="center">
         <Grid item xs={12} sm={12} md={12} lg={12}>
-          <Paper elevation={22} style={{ height: "300px", width: "107%" }}>
-            <Grid container justifyContent="center" spacing={1}>
-              <Grid item xs={12} sm={11}md={11}lg={11}>
+          <Paper elevation={22} >
+            <Grid container  fullWidth justifyContent="center" spacing={1}>
+              <Grid item xs={11} sm={8}md={11}lg={11}>
                 <TextField
                   label="Ingresa Plu "
                   variant="outlined"
@@ -80,7 +80,7 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
                 />
               </Grid>
               {Array.from({ length: 10 }, (_, i) => (
-                <Grid container justifyContent="center" item xs={3} lg={3} key={i}>
+                <Grid container justifyContent="center" item xs={4} lg={3} key={i}>
                   <Button
                     variant="outlined"
                     onClick={() => handleNumberClick((9 - i).toString())}
@@ -100,7 +100,7 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
                 </Grid>
               ))} */}
 
-              <Grid item xs={3} lg={3}>
+              <Grid item xs={4} lg={3}>
                 <Grid sx={{ display: "flex" }}>
                   <Button
                     variant="outlined"
@@ -111,7 +111,7 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
                   </Button>
                 </Grid>
               </Grid>
-              <Grid item xs={3} lg={3}>
+              <Grid item xs={4} lg={3}>
                 <Grid>
                   <Button
                     sx={{ marginLeft: "-10px" }}

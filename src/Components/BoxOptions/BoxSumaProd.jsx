@@ -207,7 +207,7 @@ const BoxSumaProd = () => {
         </Paper>
       </Grid>
 
-      <Dialog sx={{ width: "500px" }} open={open} onClose={handleClose}>
+      <Dialog  open={open} onClose={handleClose}>
         <DialogContent>
           <TecladoPLU
             plu={plu}
@@ -217,7 +217,7 @@ const BoxSumaProd = () => {
           />
         </DialogContent>
       </Dialog>
-      <Dialog sx={{ width: "500px" }} open={openPeso} onClose={handleClosePeso}>
+      <Dialog open={openPeso} onClose={handleClosePeso}>
         <DialogContent>
           <TecladoPeso
             peso={peso}

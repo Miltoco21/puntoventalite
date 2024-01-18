@@ -47,35 +47,38 @@ const IngresoClientes = () => {
     apellido: "",
     direccion: "",
     telefono: "",
-    region:"",
+    region: "",
+    comuna: "",
     correo: "",
     giro: "",
     urlPagina: "",
     formaPago: "",
     usaCuentaCorriente: 0,
-    fechaIngreso: new Date().toISOString(),
-    fechaUltAct: new Date().toISOString(),
-    bajaLogica: true,
-    clientesSucursalAdd: {
-      rutResponsable: "",
-      nombreResponsable: "",
-      apellidoResponsable: "",
-      direccion: "",
-      telefono: "",
-      region: "",
-      comuna: "",
-      correo: "",
-      giro: "",
-      urlPagina: "",
-      formaPago: "",
-      usaCuentaCorriente: 0,
-      fechaIngreso: new Date().toISOString(),
-      fechaUltAct: new Date().toISOString(),
-      bajaLogica: true,
-    },
+    // fechaIngreso: new Date().toISOString(),
+    // fechaUltAct: new Date().toISOString(),
+    // bajaLogica: true,
+    clientesSucursalAdd: [
+      {
+        rutResponsable: "",
+        nombreResponsable: "",
+        apellidoResponsable: "",
+        direccion: "",
+        telefono: "",
+        region: "",
+        comuna: "",
+        correo: "",
+        giro: "",
+        urlPagina: "",
+        formaPago: "",
+        usaCuentaCorriente: 0,
+        // fechaIngreso: new Date().toISOString(),
+        // fechaUltAct: new Date().toISOString(),
+        // bajaLogica: true,
+      },
+    ],
   });
   const [openDialog, setOpenDialog] = useState(false);
- 
+
   const [dialogMessage, setDialogMessage] = useState("");
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedComuna, setSelectedComuna] = useState(null);
@@ -109,13 +112,15 @@ const IngresoClientes = () => {
           const response = await axios.get(
             `https://www.easyposdev.somee.com/api/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedRegion}`
           );
-          setComunaOptions(response.data.comunas.map((comuna) => comuna.comunaNombre));
+          setComunaOptions(
+            response.data.comunas.map((comuna) => comuna.comunaNombre)
+          );
         } catch (error) {
           console.error(error);
         }
       }
     };
-  
+
     fetchComunas();
   }, [selectedRegion]);
 
@@ -142,16 +147,17 @@ const IngresoClientes = () => {
           const response = await axios.get(
             `https://www.easyposdev.somee.com/api/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedSucursalRegion}`
           );
-          setSucursalComunaOptions(response.data.comunas.map((comuna) => comuna.comunaNombre));
+          setSucursalComunaOptions(
+            response.data.comunas.map((comuna) => comuna.comunaNombre)
+          );
         } catch (error) {
           console.error(error);
         }
       }
     };
-  
+
     fetchSucursalComunas();
   }, [selectedSucursalRegion]);
-  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -164,15 +170,15 @@ const IngresoClientes = () => {
     setFormData((prevData) => {
       const updatedData = { ...prevData };
       let currentLevel = updatedData;
-  
-      const fieldArray = field.split('.');
+
+      const fieldArray = field.split(".");
       for (let i = 0; i < fieldArray.length - 1; i++) {
         currentLevel[fieldArray[i]] = { ...currentLevel[fieldArray[i]] };
         currentLevel = currentLevel[fieldArray[i]];
       }
-  
+
       currentLevel[fieldArray[fieldArray.length - 1]] = value;
-  
+
       return updatedData;
     });
   };
@@ -180,10 +186,7 @@ const IngresoClientes = () => {
     const { name, value } = e.target;
     updateNestedField(nestedFields, value);
   };
-  
-  
 
-  
   const handleSubmit = async () => {
     const formDataToSend = {
       ...formData,
@@ -194,18 +197,16 @@ const IngresoClientes = () => {
         region: String(formData.clientesSucursalAdd.region),
         comuna: String(formData.clientesSucursalAdd.comuna),
       },
-
-
     };
     console.log("Form Data before submission:", formDataToSend);
-  
+
     try {
       const response = await axios.post(apiUrl, formDataToSend);
       if (response.status === 200) {
         const responseData = response.data;
         console.log("Form Data after submission:", responseData);
-  
-        if (responseData ) {
+
+        if (responseData) {
           alert("Operación exitosa");
           // setOpenSnackbar(true);
           // Puedes hacer más cosas en caso de éxito, como limpiar el formulario
@@ -223,12 +224,10 @@ const IngresoClientes = () => {
       setOpenSnackbar(true);
     }
   };
-  
 
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
-
 
   return (
     <Paper>
@@ -296,7 +295,6 @@ const IngresoClientes = () => {
                 region: regionID,
               }));
             }}
-          
           >
             {regionOptions.map((option) => (
               <MenuItem key={option.id} value={option.id}>
@@ -466,9 +464,11 @@ const IngresoClientes = () => {
               const comunaValueSucursal = e.target.value;
               setSelectedSucursalComuna(comunaValueSucursal);
               // Actualizar el valor en formData.clientesSucursalAdd.comuna
-              updateNestedField("clientesSucursalAdd.comuna", comunaValueSucursal);
+              updateNestedField(
+                "clientesSucursalAdd.comuna",
+                comunaValueSucursal
+              );
             }}
-          
           >
             {sucursalComunaOptions.map((option) => (
               <MenuItem key={option} value={option}>
@@ -590,7 +590,6 @@ const IngresoClientes = () => {
             </Button>
           </DialogActions>
         </Dialog>
-
       </Grid>
     </Paper>
   );

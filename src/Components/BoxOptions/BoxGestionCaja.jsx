@@ -433,19 +433,19 @@ const BoxGestionCaja = () => {
   const handleCloseDevolucion = () => {
     setOpenDevolucionDialog(false);
   };
-  const handleOpenIngreso = ()=>{
+  const handleOpenIngreso = () => {
     setopenClienteDialog(true);
   };
-  const handleCloseIngreso = ()=>{
+  const handleCloseIngreso = () => {
     setopenClienteDialog(false);
   };
-  const handleOpenStock = ()=>{
+  const handleOpenStock = () => {
     setOpenStockDialog(true);
   };
-  const handleCloseStock = ()=>{
+  const handleCloseStock = () => {
     setOpenStockDialog(false);
   };
-  
+
   const [openCategoria, setOpenCategoria] = useState(false);
   const handleOpenCategoria = () => {
     setOpenCategoria(true);
@@ -478,6 +478,7 @@ const BoxGestionCaja = () => {
         maxWidth: "1000px",
         margin: "0 auto",
         alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <Grid
@@ -485,7 +486,7 @@ const BoxGestionCaja = () => {
         spacing={2}
         // sx={{ marginLeft: "5px", marginTop: "5px", }}
       >
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={3} >
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={3}>
           <Button
             elevation={8}
             sx={{
@@ -496,15 +497,15 @@ const BoxGestionCaja = () => {
               "&:hover": {
                 backgroundColor: "coral",
                 color: "white",
-               
-              }, margin:"5px"
+              },
+              margin: "5px",
             }}
             onClick={handleClearSalesData}
           >
             <Typography variant="h7">Borrar Ventas</Typography>
           </Button>
         </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "90%",
@@ -515,7 +516,7 @@ const BoxGestionCaja = () => {
                 backgroundColor: "coral",
                 color: "white",
               },
-              margin:"5px"
+              margin: "5px",
             }}
             onClick={handleOpenStock}
           >
@@ -523,7 +524,7 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Stock</Typography>
           </Button>
         </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "90%",
@@ -533,7 +534,8 @@ const BoxGestionCaja = () => {
               "&:hover": {
                 backgroundColor: "coral",
                 color: "white",
-              }, margin:"5px"
+              },
+              margin: "5px",
             }}
             onClick={handleOpenCategoria}
           >
@@ -541,11 +543,8 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Familias</Typography>
           </Button>
         </Grid>
-        
 
-        
-        
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "90%",
@@ -555,7 +554,8 @@ const BoxGestionCaja = () => {
               "&:hover": {
                 backgroundColor: "coral",
                 color: "white",
-              }, margin:"5px"
+              },
+              margin: "5px",
             }}
             onClick={handleOpenDevolucion}
           >
@@ -563,7 +563,7 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Devolución</Typography>
           </Button>
         </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "90%",
@@ -573,7 +573,8 @@ const BoxGestionCaja = () => {
               "&:hover": {
                 backgroundColor: "coral",
                 color: "white",
-              }, margin:"5px"
+              },
+              margin: "5px",
             }}
             onClick={handleOpenIngreso}
           >
@@ -581,7 +582,7 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Crear Cliente</Typography>
           </Button>
         </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "90%",
@@ -591,7 +592,8 @@ const BoxGestionCaja = () => {
               "&:hover": {
                 backgroundColor: "coral",
                 color: "white",
-              }, margin:"5px"
+              },
+              margin: "5px",
             }}
             onClick={() => handleNavigationChange(null, 8)}
           >
@@ -599,7 +601,7 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Deudas</Typography>
           </Button>
         </Grid>
-        <Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "90%",
@@ -609,7 +611,8 @@ const BoxGestionCaja = () => {
               "&:hover": {
                 backgroundColor: "coral",
                 color: "white",
-              }, margin:"5px"
+              },
+              margin: "5px",
             }}
             onClick={() => handleNavigationChange(null, 9)}
           >
@@ -617,7 +620,7 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Precios</Typography>
           </Button>
         </Grid>
-       
+
         {/* <Grid item xs={6} sm={6} md={4} lg={3} xl={2}>
           <Button
             sx={{
@@ -636,66 +639,86 @@ const BoxGestionCaja = () => {
           </Button>
         </Grid> */}
         <Grid item xs={12} sm={10} md={12} lg={12} xl={10}>
-          <Grid 
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width:"100%"
-            }}
+          <Grid
+         
           >
             <Box
-              
               sx={{
-             
-               borderRadius: "8px",
+                borderRadius: "8px",
                 border: "4px solid #ccc",
-                width:"90%",
-              //   justifyContent: "center",
-               margin: "5px",
+                display: "flex",
+
+                //   justifyContent: "center",
+                margin: "5px",
               }}
             >
-              <p>
-                TOTAL:$<span>{grandTotal}</span>{" "}
-              </p>
-              <Button
-                sx={{
-                  
-                  margin: "7px",
-                  width: "200px",
-                  height: "60px",
-                  backgroundColor: "green",
-                  color: "whitesmoke",
-                  "&:hover": {
-                    backgroundColor: "red",
-                    color: "white",
-                  },
-                }}
-                onClick={handleOpenDialog}
-                // onClick={() => handleNavigationChange(null, 12)}
-              >
-                <Typography variant="h7">Pagar Boleta</Typography>
-              </Button>
-              <Button
-                sx={{
-                  margin: "7px",
-                  width: "200px",
-                  height: "60px",
-                  backgroundColor: "green",
-                  color: "whitesmoke",
-                  "&:hover": {
-                    backgroundColor: "red",
-                    color: "white",
-                  },
-                }}
-                onClick={handleOpenDialog}
-                // onClick={() => handleNavigationChange(null, 12)}
-              >
-                <Typography variant="h7">Pagar Factura</Typography>
-              </Button>
+              <Grid container item xs={12}>
+                <Grid item xs={12}>
+                  <p>
+                    TOTAL:$<span>{grandTotal}</span>{" "}
+                  </p>
+                </Grid>
+
+                <Grid item xs={4}>
+                  <Button
+                    sx={{
+                      margin: "7px",
+
+                      height: "60px",
+                      backgroundColor: "green",
+                      color: "whitesmoke",
+                      "&:hover": {
+                        backgroundColor: "red",
+                        color: "white",
+                      },
+                    }}
+                    onClick={handleOpenDialog}
+                    // onClick={() => handleNavigationChange(null, 12)}
+                  >
+                    <Typography variant="h7">Pagar Boletaa</Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    sx={{
+                      margin: "7px",
+
+                      height: "60px",
+                      backgroundColor: "green",
+                      color: "whitesmoke",
+                      "&:hover": {
+                        backgroundColor: "red",
+                        color: "white",
+                      },
+                    }}
+                    onClick={handleOpenDialog}
+                    // onClick={() => handleNavigationChange(null, 12)}
+                  >
+                    <Typography variant="h7">Pagar Factura</Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    sx={{
+                      margin: "7px",
+
+                      height: "60px",
+                      backgroundColor: "green",
+                      color: "whitesmoke",
+                      "&:hover": {
+                        backgroundColor: "red",
+                        color: "white",
+                      },
+                    }}
+                    onClick={handleOpenDialog}
+                    // onClick={() => handleNavigationChange(null, 12)}
+                  >
+                    <Typography variant="h7">cuenta corriente</Typography>
+                  </Button>
+                </Grid>
+              </Grid>
             </Box>
           </Grid>
-          <Grid item xs={5} sm={2}></Grid>
         </Grid>
       </Grid>
 
@@ -1078,8 +1101,7 @@ const BoxGestionCaja = () => {
 
       <Dialog open={openRecoveryDialog} onClose={handleCloseRecoveryDialog}>
         <DialogTitle>Seleccionar Venta</DialogTitle>
-        <DialogContent >
-          
+        <DialogContent>
           <BoxRecuperarVenta onClose={handleCloseRecoveryDialog} />
         </DialogContent>
         <DialogActions>
@@ -1090,8 +1112,7 @@ const BoxGestionCaja = () => {
 
       <Dialog open={openDevolucionDialog} onClose={handleCloseDevolucion}>
         <DialogTitle>Devolución</DialogTitle>
-        <DialogContent >
-          
+        <DialogContent>
           <BoxDevolucion onClose={handleCloseDevolucion} />
         </DialogContent>
         <DialogActions>
@@ -1101,19 +1122,16 @@ const BoxGestionCaja = () => {
       </Dialog>
       <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
         <DialogTitle>Crear Cliente</DialogTitle>
-        <DialogContent >
-          
+        <DialogContent>
           <IngresoClientes onClose={handleCloseIngreso} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseIngreso}>Cancelar</Button>
-          
         </DialogActions>
       </Dialog>
       <Dialog open={openStockDialog} onClose={handleCloseStock}>
         <DialogTitle>Stock</DialogTitle>
-        <DialogContent >
-          
+        <DialogContent>
           <BoxStock onClose={handleCloseStock} />
         </DialogContent>
         <DialogActions>
