@@ -250,18 +250,14 @@ const BotonesCategorias = ({ onClose }) => {
         }}
       >
         <Grid container spacing={1} sx={{ margin: "0 auto" }}>
-          <Grid item xs={6} sm={6} md={2} lg={12} xl={2}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+          <Grid item xs={12} sm={12} md={8} lg={12} xl={2}>
+            <Grid sx={{display:"flex"}}><Box
+              
             >
               <Typography>Categorias</Typography>
             </Box>
 
-            <Button
+            {/* <Button
               onClick={handleCloseCategoria}
               elevation={8}
               sx={{
@@ -277,15 +273,17 @@ const BotonesCategorias = ({ onClose }) => {
               }}
             >
               <Typography variant="h7">Cerrar </Typography> <HighlightOffIcon />
-            </Button>
+            </Button> */}
+            </Grid>
+            
           </Grid>
 
-          {categories.map((category) => (
-            <Grid
+          <Grid container sx={{display:"flex"}}> {categories.map((category) => (
+            <Grid 
               item
               xs={12}
-              sm={6}
-              md={3}
+              sm={3}
+              md={4}
               lg={3}
               xl={2}
               key={category.idCategoria}
@@ -315,7 +313,9 @@ const BotonesCategorias = ({ onClose }) => {
                 {category.descripcion}
               </Button>
             </Grid>
-          ))}
+          ))}</Grid>
+
+         
         </Grid>
         <Dialog open={open} onClose={handleCloseDialog}>
           <DialogTitle> Selecciona Subcategorias</DialogTitle>

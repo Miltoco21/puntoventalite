@@ -12,7 +12,7 @@ import {
   Typography,
   Button,
   DialogContent,
-  Dialog,
+  Dialog, 
   Table,
   TableBody,
   TableCell,
@@ -38,6 +38,7 @@ import BoxDevolucion from "./BoxDevolucion";
 import BoxIngreso from "./BoxIngreso";
 import BoxStock from "./BoxStock";
 import IngresoClientes from "./IngresoClientes";
+
 const BoxGestionCaja = () => {
   const {
     grandTotal,
@@ -72,6 +73,7 @@ const BoxGestionCaja = () => {
   const [openRecoveryDialog, setOpenRecoveryDialog] = useState(false);
   const [openClienteDialog, setopenClienteDialog] = useState(false);
   const [openStockDialog, setOpenStockDialog] = useState(false);
+ 
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [openDevolucionDialog, setOpenDevolucionDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -445,6 +447,10 @@ const BoxGestionCaja = () => {
   const handleCloseStock = () => {
     setOpenStockDialog(false);
   };
+
+ 
+  
+
 
   const [openCategoria, setOpenCategoria] = useState(false);
   const handleOpenCategoria = () => {
@@ -1123,6 +1129,7 @@ const BoxGestionCaja = () => {
       <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
         <DialogTitle>Crear Cliente</DialogTitle>
         <DialogContent>
+         
           <IngresoClientes onClose={handleCloseIngreso} />
         </DialogContent>
         <DialogActions>
@@ -1136,9 +1143,10 @@ const BoxGestionCaja = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseStock}>Cancelar</Button>
-          <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
+         
         </DialogActions>
       </Dialog>
+      
     </Paper>
   );
 };

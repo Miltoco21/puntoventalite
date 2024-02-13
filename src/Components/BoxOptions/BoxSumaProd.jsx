@@ -90,13 +90,12 @@ const BoxSumaProd = () => {
         flexDirection: "column",
         maxWidth: "1200px",
         margin: "0 auto",
-       
+
         justifyContent: "center",
       }}
     >
       <Grid container item xs={12} md={12} lg={16}>
         <Paper
-        
           elevation={15}
           sx={{
             display: "flex",
@@ -105,10 +104,10 @@ const BoxSumaProd = () => {
             padding: "5px",
             margin: "5px",
             marginTop: isMobile ? "-6px" : "0",
-            width: "100%"
+            width: "100%",
           }}
         >
-          <Grid item xs={12} lg={14}sx={{ minWidth: 200, width: "80%" }}> 
+          <Grid item xs={12} lg={14} sx={{ minWidth: 200, width: "80%" }}>
             <div style={{ display: "flex" }}>
               <TextField
                 fullWidth
@@ -120,17 +119,11 @@ const BoxSumaProd = () => {
               <Button size="large" variant="outlined" onClick={handleOpen}>
                 PLU
               </Button>
-              <Button
-                size="large"
-                variant="outlined"
-                onClick={handleOpenPeso}
-              >
+              <Button size="large" variant="outlined" onClick={handleOpenPeso}>
                 Peso
               </Button>
             </div>
-           
           </Grid>
-         
         </Paper>
       </Grid>
 
@@ -143,7 +136,6 @@ const BoxSumaProd = () => {
             alignItems: "center",
             margin: "5px",
             marginTop: isMobile ? "-6px" : "0",
-           
           }}
         >
           <TableContainer component={Paper}>
@@ -207,7 +199,7 @@ const BoxSumaProd = () => {
         </Paper>
       </Grid>
 
-      <Dialog  open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose}>
         <DialogContent>
           <TecladoPLU
             plu={plu}

@@ -13,11 +13,17 @@ import {
   Button,
   DialogContent,
   Dialog,
+  Tab,
+  Tabs,
+  Card,
+  CardActions,
+  CardContent,
+  Autocomplete,
   Table,
   TableBody,
   TableCell,
-  Autocomplete,
   TableContainer,
+  TablePagination,
   TableHead,
   DialogActions,
   DialogTitle,
@@ -28,13 +34,13 @@ import {
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
+import BuscadorClientes from "./BuscadorClientes";
 
 import MuiAlert from "@mui/material/Alert";
 
 import axios from "axios";
 
-const apiUrl =
-  "https://www.easyposdev.somee.com/api/Clientes/AddClienteCliente";
+const apiUrl = "https://www.easyposdev.somee.com/api/Clientes/AddCliente";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -78,8 +84,9 @@ const IngresoClientes = () => {
     ],
   });
   const [openDialog, setOpenDialog] = useState(false);
-
   const [dialogMessage, setDialogMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [selectedRegion, setSelectedRegion] = useState(null);
   const [selectedComuna, setSelectedComuna] = useState(null);
   const [selectedSucursalRegion, setSelectedSucursalRegion] = useState(null);
@@ -89,6 +96,139 @@ const IngresoClientes = () => {
   const [comunaOptions, setComunaOptions] = useState([]);
   const [sucursalRegionOptions, setSucursalRegionOptions] = useState([]);
   const [sucursalComunaOptions, setSucursalComunaOptions] = useState([]);
+
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const [customers, setCustomers] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [branchData, setBranchData] = useState({
+    codigoCliente: 0,
+    rutResponsable: "",
+    nombreResponsable: "",
+    apellidoResponsable: "",
+    direccion: "",
+    telefono: "",
+    region: "",
+    comuna: "",
+    correo: "",
+    giro: "",
+    urlPagina: "",
+    formaPago: "",
+    usaCuentaCorriente: 0,
+    // Add other branch data fields
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+        );
+        setCustomers(response.data.cliente);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+  };
+
+  const handleOpenModal = (customerId) => {
+    setSelectedCustomerId(customerId);
+    setBranchData({
+      ...branchData,
+      codigoCliente: customerId,
+    });
+    setOpenModal(true);
+  };
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+  const handleAddBranch = async () => {
+    try {
+      console.log("Before formatting:", branchData);
+
+      // Format branch data according to the URL schema
+      const formattedBranchData = {
+        codigoCliente: branchData.codigoCliente,
+        rutResponsable: branchData.rutResponsable,
+        nombreResponsable: branchData.nombreResponsable,
+        apellidoResponsable: branchData.apellidoResponsable,
+        direccion: branchData.direccion,
+        telefono: branchData.telefono,
+        region: branchData.region,
+        comuna: branchData.comuna,
+        correo: branchData.correo,
+        giro: branchData.giro,
+        urlPagina: branchData.urlPagina,
+        formaPago: branchData.formaPago,
+        usaCuentaCorriente: branchData.usaCuentaCorriente,
+      };
+
+      console.log("After formatting:", formattedBranchData);
+
+      // Make API request to add branch using formattedBranchData
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/Clientes/AddClienteSucursal",
+        formattedBranchData
+      );
+      console.log("Response:", response.data);
+
+      // Close the modal and update data
+      setOpenModal(false);
+      const fetchResponse = await axios.get(
+        "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+      );
+      setCustomers(fetchResponse.data.cliente);
+    } catch (error) {
+      console.error("Error adding branch:", error);
+    }
+  };
+
+  const handleBranchDataChange = (event) => {
+    setBranchData({
+      ...branchData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  /////////Buscador////////
+  const handleChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  ///////////Fin Buscador///////
+  /////////sucursalClientes////////////
+
+  const filteredCustomers = customers.filter((customer) => {
+    const { nombre, apellido, rut, codigoCliente } = customer;
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return (
+      nombre.toLowerCase().includes(lowerSearchTerm) ||
+      apellido.toLowerCase().includes(lowerSearchTerm) ||
+      rut.toLowerCase().includes(lowerSearchTerm) ||
+      codigoCliente.toString().includes(lowerSearchTerm)
+    );
+  });
+
+  //////////fin suursalcleinte///////////
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -166,37 +306,12 @@ const IngresoClientes = () => {
       [name]: value,
     }));
   };
-  const updateNestedField = (field, value) => {
-    setFormData((prevData) => {
-      const updatedData = { ...prevData };
-      let currentLevel = updatedData;
-
-      const fieldArray = field.split(".");
-      for (let i = 0; i < fieldArray.length - 1; i++) {
-        currentLevel[fieldArray[i]] = { ...currentLevel[fieldArray[i]] };
-        currentLevel = currentLevel[fieldArray[i]];
-      }
-
-      currentLevel[fieldArray[fieldArray.length - 1]] = value;
-
-      return updatedData;
-    });
-  };
-  const handleNestedInputChange = (e, nestedFields) => {
-    const { name, value } = e.target;
-    updateNestedField(nestedFields, value);
-  };
 
   const handleSubmit = async () => {
     const formDataToSend = {
       ...formData,
       region: String(formData.region),
       comuna: String(formData.comuna),
-      clientesSucursalAdd: {
-        ...formData.clientesSucursalAdd,
-        region: String(formData.clientesSucursalAdd.region),
-        comuna: String(formData.clientesSucursalAdd.comuna),
-      },
     };
     console.log("Form Data before submission:", formDataToSend);
 
@@ -207,9 +322,8 @@ const IngresoClientes = () => {
         console.log("Form Data after submission:", responseData);
 
         if (responseData) {
-          alert("Operación exitosa");
-          // setOpenSnackbar(true);
-          // Puedes hacer más cosas en caso de éxito, como limpiar el formulario
+          setSnackbarMessage(responseData.descripcion);
+          setOpenSnackbar(true);
         } else {
           setSnackbarMessage("Error en la operación");
           setOpenSnackbar(true);
@@ -228,368 +342,576 @@ const IngresoClientes = () => {
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
+  //////Manejo de sucursales//////
+
+  // const [sucursalData, setSucursalData] = useState(null);
+  const [selectedBranchData, setSelectedBranchData] = useState(null);
+  const handleShowBranch = async (codigoCliente) => {
+    try {
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/Clientes/GetClientesSucursalByCodigoCliente?codigocliente=${codigoCliente}`
+      );
+  
+      const sucursales = response.data.clienteSucursal;
+  
+      // Objeto para almacenar las sucursales agrupadas por código de cliente
+      const sucursalesPorCliente = {};
+  
+      sucursales.forEach((sucursal) => {
+        // Verificar si ya existe una entrada para este código de cliente
+        if (sucursalesPorCliente[sucursal.codigoCliente]) {
+          // Si ya existe, agregar la sucursal al arreglo existente
+          sucursalesPorCliente[sucursal.codigoCliente].push(sucursal);
+        } else {
+          // Si no existe, crear una nueva entrada con un arreglo que contenga la sucursal
+          sucursalesPorCliente[sucursal.codigoCliente] = [sucursal];
+        }
+      });
+  
+      console.log("Sucursales por cliente:", sucursalesPorCliente);
+  
+      // Aquí puedes manejar la lógica para mostrar las sucursales según sea necesario
+      // Por ejemplo, podrías llamar a una función que muestre las sucursales en la interfaz de usuario
+  
+      // Suponiendo que tienes una función llamada renderMultipleBranches que toma como argumento las sucursales
+      renderMultipleBranches(sucursalesPorCliente[codigoCliente]);
+  
+    } catch (error) {
+      console.error("Error al obtener los datos de la sucursal:", error);
+      // Manejar errores, por ejemplo, mostrar un mensaje al usuario.
+    }
+  };
+  
+  // Función para renderizar las sucursales en forma de tarjetas (cards)
+  const renderMultipleBranches = (sucursales) => {
+    // Renderizar las tarjetas de sucursales debajo de la tarjeta del cliente correspondiente
+    // Puedes utilizar un mapeo para generar una tarjeta por cada sucursal
+    const branchCards = sucursales.map((sucursal, index) => (
+      <Card key={index} sx={{ margin: "10px", padding: "10px" }}>
+        <CardContent>
+          <Typography variant="h6" component="h2">
+            Datos de Sucursal {index + 1}
+          </Typography>
+          <Typography variant="body1" component="p">
+            Nombre Responsable: {sucursal.nombreResponsable}
+          </Typography>
+          <Typography variant="body1" component="p">
+            Apellido Responsable: {sucursal.apellidoResponsable}
+          </Typography>
+          <Typography variant="body1" component="p">
+            Dirección: {sucursal.direccion}
+          </Typography>
+          {/* Agregar otros campos según sea necesario */}
+        </CardContent>
+      </Card>
+    ));
+  
+    // Aquí puedes manejar cómo quieres mostrar las tarjetas de sucursales en tu interfaz
+    // Por ejemplo, puedes agregarlas a un contenedor div o renderizarlas directamente debajo de la tarjeta del cliente correspondiente
+  
+    // Por ahora, supongamos que tienes un contenedor div con id "branch-cards-container"
+    const branchCardsContainer = document.getElementById("branch-cards-container");
+    branchCardsContainer.innerHTML = ""; // Limpiar el contenedor antes de agregar las nuevas tarjetas
+    branchCards.forEach((card) => branchCardsContainer.appendChild(card));
+  };
+
+  // Renderizar las cards de las sucursales debajo de cada card de cliente
+  // const renderMultipleBranches = (sucursales) => {
+  //   return sucursales.map((sucursal, index) => (
+  //     <Card key={index} sx={{ margin: "10px", padding: "10px" }}>
+  //       <CardContent>
+  //         <Typography variant="h6" component="h2">
+  //           Datos de Sucursal {index + 1}
+  //         </Typography>
+  //         <Typography variant="body1" component="p">
+  //           Nombre Responsable: {sucursal.nombreResponsable}
+  //         </Typography>
+  //         <Typography variant="body1" component="p">
+  //           Apellido Responsable: {sucursal.apellidoResponsable}
+  //         </Typography>
+  //         <Typography variant="body1" component="p">
+  //           Dirección: {sucursal.direccion}
+  //         </Typography>
+  //         {/* Agregar otros campos según sea necesario */}
+  //       </CardContent>
+  //     </Card>
+  //   ));
+  // };
+
+  // const handleShowBranch = async (codigoCliente) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesSucursalByCodigoCliente?codigocliente=${codigoCliente}`
+  //     );
+
+  //     const sucursales = response.data.clienteSucursal;
+  //     if (sucursales.length === 1) {
+  //       // Si solo hay una sucursal, renderiza sus datos
+  //       renderSingleBranch(sucursales[0]);
+  //     } else if (sucursales.length > 1) {
+  //       // Si hay más de una sucursal, renderiza una lista de sucursales
+  //       renderMultipleBranches(sucursales);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al obtener los datos de la sucursal:", error);
+  //     // Manejar errores, por ejemplo, mostrar un mensaje al usuario.
+  //   }
+  // };
+
+  // const renderSingleBranch = (sucursal) => {
+  //   // Renderizar los datos de la sucursal como desees
+  //   console.log("Datos de la sucursal:", sucursal);
+  //   // Aquí podrías mostrar los datos en un diálogo o en algún otro componente
+  // };
+
+  // // Función para renderizar una lista de sucursales
+  // const renderMultipleBranches = (sucursales) => {
+  //   // Renderizar una lista de sucursales
+  //   sucursales.map((sucursal, index) => {
+  //     console.log(`Datos de la sucursal ${index + 1}:`, sucursal);
+  //     // Aquí podrías renderizar cada sucursal en un componente de lista
+  //     return null;
+  //   });
+  // };
 
   return (
     <Paper>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Rut"
-            name="rut"
-            fullWidth
-            value={formData.rut}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Nombre"
-            name="nombre"
-            fullWidth
-            value={formData.nombre}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Apellido"
-            name="apellido"
-            fullWidth
-            value={formData.apellido}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Dirección"
-            name="direccion"
-            fullWidth
-            value={formData.direccion}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Teléfono"
-            name="telefono"
-            fullWidth
-            value={formData.telefono}
-            onChange={handleInputChange}
-          />
-        </Grid>
+      <Grid container item xs={12} sm={11} md={10} lg={12} spacing={2}>
+        <Tabs
+          sx={{ margin: "auto" }}
+          centered
+          value={selectedTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+        >
+          <Tab label="Crear Cliente" />
+          <Tab label="Ver Clientes" />
+        </Tabs>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            sx={{ marginTop: 2 }}
-            fullWidth
-            id="region"
-            select
-            label="Región"
-            value={selectedRegion}
-            onChange={(e) => {
-              const regionID = e.target.value;
-              setSelectedRegion(regionID);
-              // Actualizar el valor en formData
-              setFormData((prevFormData) => ({
-                ...prevFormData,
-                region: regionID,
-              }));
-            }}
+        {selectedTab === 0 && (
+          <Grid
+            container
+            sx={{ margin: "auto", display: "flex", justifyContent: "center" }}
+            item
+            xs={12}
+            sm={11}
+            md={10}
+            lg={8}
+            spacing={2}
           >
-            {regionOptions.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.regionNombre}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
+            <Grid item xs={12} sm={6} md={6}>
+              <TextField
+                label="Rut"
+                name="rut"
+                fullWidth
+                value={formData.rut}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Nombre"
+                name="nombre"
+                fullWidth
+                value={formData.nombre}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Apellido"
+                name="apellido"
+                fullWidth
+                value={formData.apellido}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Dirección"
+                name="direccion"
+                fullWidth
+                value={formData.direccion}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Teléfono"
+                name="telefono"
+                fullWidth
+                value={formData.telefono}
+                onChange={handleInputChange}
+              />
+            </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            sx={{ marginTop: 2 }}
-            id="comuna"
-            select
-            fullWidth
-            label="Comuna"
-            value={selectedComuna}
-            onChange={(e) => {
-              const comunaValue = e.target.value;
-              setSelectedComuna(comunaValue);
-              // Actualizar el valor en formData.comuna (sin sucursal)
-              setFormData((prevFormData) => ({
-                ...prevFormData,
-                comuna: comunaValue,
-              }));
-            }}
+            <Grid item xs={12} sm={6}>
+              <TextField
+                sx={{ marginTop: 2 }}
+                fullWidth
+                id="region"
+                select
+                label="Región"
+                value={selectedRegion}
+                onChange={(e) => {
+                  const regionID = e.target.value;
+                  setSelectedRegion(regionID);
+                  // Actualizar el valor en formData
+                  setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    region: regionID,
+                  }));
+                }}
+              >
+                {regionOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.regionNombre}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                sx={{ marginTop: 2 }}
+                id="comuna"
+                select
+                fullWidth
+                label="Comuna"
+                value={selectedComuna}
+                onChange={(e) => {
+                  const comunaValue = e.target.value;
+                  setSelectedComuna(comunaValue);
+                  // Actualizar el valor en formData.comuna (sin sucursal)
+                  setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    comuna: comunaValue,
+                  }));
+                }}
+              >
+                {comunaOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Correo"
+                name="correo"
+                fullWidth
+                value={formData.correo}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Giro"
+                name="giro"
+                fullWidth
+                value={formData.giro}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="URL Página"
+                name="urlPagina"
+                fullWidth
+                value={formData.urlPagina}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                label="Forma de Pago"
+                name="formaPago"
+                fullWidth
+                value={formData.formaPago}
+                onChange={handleInputChange}
+              />
+            </Grid>
+            {/* Campos de clientesSucursalAdd */}
+
+            <Grid item sx={{ marginBottom: "10px" }} xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmit}
+              >
+                Enviar
+              </Button>
+            </Grid>
+
+            <Snackbar
+              open={openSnackbar}
+              autoHideDuration={6000}
+              onClose={handleSnackbarClose}
+            >
+              <Alert onClose={handleSnackbarClose} severity="success">
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+          </Grid>
+        )}
+
+        {selectedTab === 1 && (
+          <Grid
+            container
+            sx={{ margin: "auto" }}
+            item
+            xs={12}
+            sm={11}
+            md={12}
+            lg={12}
+            xl={12}
+            xspacing={2}
           >
-            {comunaOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
+            <Grid item xs={12} sm={6} md={12} lg={12}>
+              <Paper>
+                <Grid
+                  container
+                  spacing={2}
+                  itemlg={12}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  <div>
+                    <Grid item lg={10}>
+                      {" "}
+                      <TextField
+                        label="Buscar cliente..."
+                        variant="outlined"
+                        fullWidth
+                        value={searchTerm}
+                        margin="dense"
+                        onChange={handleChange}
+                      />
+                    </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Correo"
-            name="correo"
-            fullWidth
-            value={formData.correo}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Giro"
-            name="giro"
-            fullWidth
-            value={formData.giro}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="URL Página"
-            name="urlPagina"
-            fullWidth
-            value={formData.urlPagina}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Forma de Pago"
-            name="formaPago"
-            fullWidth
-            value={formData.formaPago}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        {/* Campos de clientesSucursalAdd */}
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Rut Responsable"
-            name="clientesSucursalAdd.rutResponsable"
-            fullWidth
-            value={formData.clientesSucursalAdd.rutResponsable}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.rutResponsable")
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Nombre Responsable"
-            name="clientesSucursalAdd.nombreResponsable"
-            fullWidth
-            value={formData.clientesSucursalAdd.nombreResponsable}
-            onChange={(e) =>
-              handleNestedInputChange(
-                e,
-                "clientesSucursalAdd.nombreResponsable"
-              )
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Apellido Responsable"
-            name="clientesSucursalAdd.apellidoResponsable"
-            fullWidth
-            value={formData.clientesSucursalAdd.apellidoResponsable}
-            onChange={(e) =>
-              handleNestedInputChange(
-                e,
-                "clientesSucursalAdd.apellidoResponsable"
-              )
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Dirección Sucursal"
-            name="clientesSucursalAdd.direccion"
-            fullWidth
-            value={formData.clientesSucursalAdd.direccion}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.direccion")
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Teléfono Sucursal"
-            name="clientesSucursalAdd.telefono"
-            fullWidth
-            value={formData.clientesSucursalAdd.telefono}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.telefono")
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            sx={{ marginTop: 2 }}
-            fullWidth
-            id="sucursalRegion"
-            select
-            label="Región Sucursal"
-            value={selectedSucursalRegion}
-            // value={formData.clientesSucursalAdd.region}
-            onChange={(e) => {
-              const regionIDSucursal = e.target.value;
-              setSelectedSucursalRegion(regionIDSucursal);
-              // Actualizar el valor en formData.clientesSucursalAdd.region
-              updateNestedField("clientesSucursalAdd.region", regionIDSucursal);
-            }}
-          >
-            {sucursalRegionOptions.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.regionNombre}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            sx={{ marginTop: 2 }}
-            id="sucursalComuna"
-            select
-            fullWidth
-            label="Comuna Sucursal"
-            value={selectedSucursalComuna}
-            // value={formData.clientesSucursalAdd.comuna}
-            onChange={(e) => {
-              const comunaValueSucursal = e.target.value;
-              setSelectedSucursalComuna(comunaValueSucursal);
-              // Actualizar el valor en formData.clientesSucursalAdd.comuna
-              updateNestedField(
-                "clientesSucursalAdd.comuna",
-                comunaValueSucursal
-              );
-            }}
-          >
-            {sucursalComunaOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Correo Sucursal"
-            name="clientesSucursalAdd.correo"
-            fullWidth
-            value={formData.clientesSucursalAdd.correo}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.correo")
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Giro Sucursal"
-            name="clientesSucursalAdd.giro"
-            fullWidth
-            value={formData.clientesSucursalAdd.giro}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.giro")
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="URL Página Sucursal"
-            name="clientesSucursalAdd.urlPagina"
-            fullWidth
-            value={formData.clientesSucursalAdd.urlPagina}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.urlPagina")
-            }
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Forma de Pago Sucursal"
-            name="clientesSucursalAdd.formaPago"
-            fullWidth
-            value={formData.clientesSucursalAdd.formaPago}
-            onChange={(e) =>
-              handleNestedInputChange(e, "clientesSucursalAdd.formaPago")
-            }
-          />
-        </Grid>
-        {/* <Grid item xs={12} sm={6}>
-          <TextField
-            label="Usa Cuenta Corriente Sucursal"
-            name="clientesSucursalAdd.usaCuentaCorriente"
-            fullWidth
-            value={formData.clientesSucursalAdd.usaCuentaCorriente}
-            onChange={(e) => handleNestedInputChange(e, 'clientesSucursalAdd.usaCuentaCorriente')}
+                    <Grid container spacing={2}>
+                      {filteredCustomers.map((customer) => (
+                        <Grid
+                          item
+                          sx={{ display: "flex", justifyContent: "center" }}
+                          xs={12}
+                          sm={6}
+                          md={4}
+                          lg={6}
+                          key={customer.codigoCliente}
+                        >
+                          <Card
+                            sx={{
+                              margin: "5px",
+                              background: "rgb(238, 174, 202)",
+                              backgroundImage:
+                                "radial-gradient(linear, rgba(238, 174, 202, 1) 33%, rgba(148, 187, 233, 1) 100%)",
+                            }}
+                          >
+                            <CardContent>
+                              <Typography variant="h7" component="h4">
+                                ID Cliente: {customer.codigoCliente}
+                              </Typography>
+                              <Typography variant="body1" component="p">
+                                Nombre: {customer.nombre} {customer.apellido}
+                                <br /> <hr />
+                                Rut: {customer.rut}
+                                <br />
+                                <hr />
+                                Dirección:{customer.direccion},<br />
+                                {customer.comuna}
+                              </Typography>
+                            </CardContent>
+                            <CardActions>
+                              <Button
+                                size="small"
+                                color="primary"
+                                variant="contained"
+                                onClick={() =>
+                                  handleOpenModal(customer.codigoCliente)
+                                }
+                              >
+                                Agregar Sucursal
+                              </Button>
+                              <Button
+                                size="small"
+                                color="primary"
+                                variant="contained"
+                                onClick={() =>
+                                  handleShowBranch(customer.codigoCliente)
+                                }
+                              >
+                                Mostrar Sucursal
+                              </Button>
+                              {selectedBranchData && (
+                                <div>
+                                  <Card>
+                                    <CardContent>
+                                      <Typography variant="h6" component="h2">
+                                        Datos de la Sucursal
+                                      </Typography>
+                                      <Typography variant="body1" component="p">
+                                        Nombre Responsable:{" "}
+                                        {selectedBranchData.nombreResponsable}
+                                      </Typography>
+                                      <Typography variant="body1" component="p">
+                                        Apellido Responsable:{" "}
+                                        {selectedBranchData.apellidoResponsable}
+                                      </Typography>
+                                      <Typography variant="body1" component="p">
+                                        Dirección:{" "}
+                                        {selectedBranchData.direccion}
+                                      </Typography>
+                                      {/* Agregar otros campos según sea necesario */}
+                                    </CardContent>
+                                  </Card>
+                                </div>
+                              )}
+                            </CardActions>
+                          </Card>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </div>
+                </Grid>
+              </Paper>
 
-          />
-        </Grid> */}
-        {/* <Grid item xs={12} sm={6}>
-          <TextField
-            label="Fecha de Ingreso Sucursal"
-            name="clientesSucursalAdd.fechaIngreso"
-            fullWidth
-            value={formData.clientesSucursalAdd.fechaIngreso}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Fecha de Última Act. Sucursal"
-            name="clientesSucursalAdd.fechaUltAct"
-            fullWidth
-            value={formData.clientesSucursalAdd.fechaUltAct}
-            onChange={handleInputChange}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Baja Lógica Sucursal"
-            name="clientesSucursalAdd.bajaLogica"
-            fullWidth
-            value={formData.clientesSucursalAdd.bajaLogica}
-            onChange={handleInputChange}
-          />
-        </Grid> */}
+              {/* Add Branch Modal */}
+              <Dialog open={openModal} onClose={handleCloseModal}>
+                <DialogTitle>
+                  Ingresa Sucursal {selectedCustomerId}{" "}
+                </DialogTitle>
+                <DialogContent>
+                  {/* Add form fields for branch data */}
+                  <TextField
+                    label="RUT Responsable"
+                    name="rutResponsable"
+                    margin="dense"
+                    value={branchData.rutResponsable}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    label="Nombre Responsable"
+                    name="nombreResponsable"
+                    margin="dense"
+                    value={branchData.nombreResponsable}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    label="Apellido Responsable"
+                    name="apellidoResponsable"
+                    margin="dense"
+                    value={branchData.apellidoResponsable}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    label="Dirección"
+                    name="direccion"
+                    margin="dense"
+                    value={branchData.direccion}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    margin="dense"
+                    label="Teléfono"
+                    name="telefono"
+                    value={branchData.telefono}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    margin="dense"
+                    label="Giro"
+                    name="giro"
+                    value={branchData.giro}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    margin="dense"
+                    label="urlPagina"
+                    name="urlPagina"
+                    value={branchData.urlPagina}
+                    onChange={handleBranchDataChange}
+                  />
+                  <TextField
+                    margin="dense"
+                    id="region"
+                    fullWidth
+                    select
+                    label="Región"
+                    name="region"
+                    value={branchData.region}
+                    onChange={(e) => {
+                      const regionID = e.target.value;
+                      handleBranchDataChange(e); // Usamos el mismo controlador de cambio
+                      console.log("Región seleccionada:", regionID); // Imprimir en consola
+                      setSelectedRegion(regionID);
+                      // Actualizar el valor en formData
+                      setFormData((prevFormData) => ({
+                        ...prevFormData,
+                        region: regionID,
+                      }));
+                    }}
+                  >
+                    {regionOptions.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.regionNombre}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    sx={{ marginTop: 2 }}
+                    id="comuna"
+                    select
+                    fullWidth
+                    label="Comuna"
+                    name="comuna"
+                    value={branchData.comuna}
+                    onChange={(e) => {
+                      const comunaValue = e.target.value;
+                      handleBranchDataChange(e); // Usamos el mismo controlador de cambio
+                      console.log("Comuna seleccionada:", comunaValue); // Imprimir en consola
+                      setSelectedComuna(comunaValue);
+                      // Actualizar el valor en formData.comuna (sin sucursal)
+                      setFormData((prevFormData) => ({
+                        ...prevFormData,
+                        comuna: comunaValue,
+                      }));
+                    }}
+                  >
+                    {comunaOptions.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    margin="dense"
+                    label="Forma de Pago"
+                    name="formaPago"
+                    value={branchData.formaPago}
+                    onChange={handleBranchDataChange}
+                  />
 
-        {/* <Grid item xs={12} sm={6}>
-        <TextField label="Usa Cuenta Corriente" name="usaCuentaCorriente" fullWidth value={formData.usaCuentaCorriente} onChange={handleInputChange} />
-      </Grid> */}
-        {/* <Grid item xs={12} sm={6}>
-        <TextField label="Fecha de Ingreso" name="fechaIngreso" fullWidth value={formData.fechaIngreso} onChange={handleInputChange} />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField label="Fecha de Última Act." name="fechaUltAct" fullWidth value={formData.fechaUltAct} onChange={handleInputChange} />
-      </Grid> */}
-        {/* <Grid item xs={12} sm={6}>
-        <TextField label="Baja Lógica" name="bajaLogica" fullWidth value={formData.bajaLogica} onChange={handleInputChange} />
-      </Grid> */}
-        {/* Agrega más campos según tus necesidades */}
-
-        <Grid item xs={12}>
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Enviar
-          </Button>
-        </Grid>
-
-        <Dialog open={openDialog} onClose={handleDialogClose}>
-          <DialogTitle>Resultado de la Operación</DialogTitle>
-          <DialogContent>
-            <Typography>{dialogMessage}</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose} color="primary">
-              Cerrar
-            </Button>
-          </DialogActions>
-        </Dialog>
+                  {/* Add other form fields based on your branch data */}
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseModal} color="primary">
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleAddBranch}
+                    variant="contained"
+                    color="primary"
+                  >
+                    Agregar Sucursal
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </Grid>
+          </Grid>
+        )}
       </Grid>
     </Paper>
   );
