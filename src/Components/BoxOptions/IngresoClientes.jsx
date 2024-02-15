@@ -211,14 +211,17 @@ const IngresoClientes = () => {
   /////////sucursalClientes////////////
 
   const filteredCustomers = customers.filter((customer) => {
-    const { nombre, apellido, rut, codigoCliente } = customer;
-    const lowerSearchTerm = searchTerm.toLowerCase();
-    return (
-      nombre.toLowerCase().includes(lowerSearchTerm) ||
-      apellido.toLowerCase().includes(lowerSearchTerm) ||
-      rut.toLowerCase().includes(lowerSearchTerm) ||
-      codigoCliente.toString().includes(lowerSearchTerm)
-    );
+    if (customer) {
+      const { nombre, apellido, rut, codigoCliente } = customer;
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      return (
+        nombre.toLowerCase().includes(lowerSearchTerm) ||
+        apellido.toLowerCase().includes(lowerSearchTerm) ||
+        rut.toLowerCase().includes(lowerSearchTerm) ||
+        codigoCliente.toString().includes(lowerSearchTerm)
+      );
+    }
+    return false; // or handle the case when customer is null or undefined
   });
 
   //////////fin suursalcleinte///////////
@@ -345,135 +348,50 @@ const IngresoClientes = () => {
   //////Manejo de sucursales//////
 
   // const [sucursalData, setSucursalData] = useState(null);
-  const [selectedBranchData, setSelectedBranchData] = useState(null);
+  const [selectedBranchData, setSelectedBranchData] = useState({});
+
   const handleShowBranch = async (codigoCliente) => {
     try {
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesSucursalByCodigoCliente?codigocliente=${codigoCliente}`
       );
-  
+
       const sucursales = response.data.clienteSucursal;
-  
-      // Objeto para almacenar las sucursales agrupadas por código de cliente
-      const sucursalesPorCliente = {};
-  
-      sucursales.forEach((sucursal) => {
-        // Verificar si ya existe una entrada para este código de cliente
-        if (sucursalesPorCliente[sucursal.codigoCliente]) {
-          // Si ya existe, agregar la sucursal al arreglo existente
-          sucursalesPorCliente[sucursal.codigoCliente].push(sucursal);
-        } else {
-          // Si no existe, crear una nueva entrada con un arreglo que contenga la sucursal
-          sucursalesPorCliente[sucursal.codigoCliente] = [sucursal];
-        }
+      setSelectedBranchData({
+        ...selectedBranchData,
+        [codigoCliente]: sucursales,
       });
-  
-      console.log("Sucursales por cliente:", sucursalesPorCliente);
-  
-      // Aquí puedes manejar la lógica para mostrar las sucursales según sea necesario
-      // Por ejemplo, podrías llamar a una función que muestre las sucursales en la interfaz de usuario
-  
-      // Suponiendo que tienes una función llamada renderMultipleBranches que toma como argumento las sucursales
-      renderMultipleBranches(sucursalesPorCliente[codigoCliente]);
-  
+
+      toggleBranchDetails(codigoCliente);
     } catch (error) {
       console.error("Error al obtener los datos de la sucursal:", error);
       // Manejar errores, por ejemplo, mostrar un mensaje al usuario.
     }
   };
-  
-  // Función para renderizar las sucursales en forma de tarjetas (cards)
-  const renderMultipleBranches = (sucursales) => {
-    // Renderizar las tarjetas de sucursales debajo de la tarjeta del cliente correspondiente
-    // Puedes utilizar un mapeo para generar una tarjeta por cada sucursal
-    const branchCards = sucursales.map((sucursal, index) => (
-      <Card key={index} sx={{ margin: "10px", padding: "10px" }}>
-        <CardContent>
-          <Typography variant="h6" component="h2">
-            Datos de Sucursal {index + 1}
-          </Typography>
-          <Typography variant="body1" component="p">
-            Nombre Responsable: {sucursal.nombreResponsable}
-          </Typography>
-          <Typography variant="body1" component="p">
-            Apellido Responsable: {sucursal.apellidoResponsable}
-          </Typography>
-          <Typography variant="body1" component="p">
-            Dirección: {sucursal.direccion}
-          </Typography>
-          {/* Agregar otros campos según sea necesario */}
-        </CardContent>
-      </Card>
-    ));
-  
-    // Aquí puedes manejar cómo quieres mostrar las tarjetas de sucursales en tu interfaz
-    // Por ejemplo, puedes agregarlas a un contenedor div o renderizarlas directamente debajo de la tarjeta del cliente correspondiente
-  
-    // Por ahora, supongamos que tienes un contenedor div con id "branch-cards-container"
-    const branchCardsContainer = document.getElementById("branch-cards-container");
-    branchCardsContainer.innerHTML = ""; // Limpiar el contenedor antes de agregar las nuevas tarjetas
-    branchCards.forEach((card) => branchCardsContainer.appendChild(card));
+  ///////////togle resultados/////
+  const [showResults, setShowResults] = useState(false);
+  //////deatleas mostara surscal button///
+  const [showDetails, setShowDetails] = useState(false);
+  const toggleShowDetails = () => {
+    setShowDetails(!showDetails);
   };
 
-  // Renderizar las cards de las sucursales debajo de cada card de cliente
-  // const renderMultipleBranches = (sucursales) => {
-  //   return sucursales.map((sucursal, index) => (
-  //     <Card key={index} sx={{ margin: "10px", padding: "10px" }}>
-  //       <CardContent>
-  //         <Typography variant="h6" component="h2">
-  //           Datos de Sucursal {index + 1}
-  //         </Typography>
-  //         <Typography variant="body1" component="p">
-  //           Nombre Responsable: {sucursal.nombreResponsable}
-  //         </Typography>
-  //         <Typography variant="body1" component="p">
-  //           Apellido Responsable: {sucursal.apellidoResponsable}
-  //         </Typography>
-  //         <Typography variant="body1" component="p">
-  //           Dirección: {sucursal.direccion}
-  //         </Typography>
-  //         {/* Agregar otros campos según sea necesario */}
-  //       </CardContent>
-  //     </Card>
-  //   ));
-  // };
 
-  // const handleShowBranch = async (codigoCliente) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesSucursalByCodigoCliente?codigocliente=${codigoCliente}`
-  //     );
+  const handleToggleResults = () => {
+    setShowResults(!showResults);
+  };
 
-  //     const sucursales = response.data.clienteSucursal;
-  //     if (sucursales.length === 1) {
-  //       // Si solo hay una sucursal, renderiza sus datos
-  //       renderSingleBranch(sucursales[0]);
-  //     } else if (sucursales.length > 1) {
-  //       // Si hay más de una sucursal, renderiza una lista de sucursales
-  //       renderMultipleBranches(sucursales);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al obtener los datos de la sucursal:", error);
-  //     // Manejar errores, por ejemplo, mostrar un mensaje al usuario.
-  //   }
-  // };
+  ///Manejo de toglesursal////////
+  const [showBranchDetails, setShowBranchDetails] = useState({});
 
-  // const renderSingleBranch = (sucursal) => {
-  //   // Renderizar los datos de la sucursal como desees
-  //   console.log("Datos de la sucursal:", sucursal);
-  //   // Aquí podrías mostrar los datos en un diálogo o en algún otro componente
-  // };
 
-  // // Función para renderizar una lista de sucursales
-  // const renderMultipleBranches = (sucursales) => {
-  //   // Renderizar una lista de sucursales
-  //   sucursales.map((sucursal, index) => {
-  //     console.log(`Datos de la sucursal ${index + 1}:`, sucursal);
-  //     // Aquí podrías renderizar cada sucursal en un componente de lista
-  //     return null;
-  //   });
-  // };
 
+  const toggleBranchDetails = (customerId) => {
+    setShowBranchDetails((prevState) => ({
+      ...prevState,
+      [customerId]: !prevState[customerId] // Invierte el estado anterior
+    }));
+  };
   return (
     <Paper>
       <Grid container item xs={12} sm={11} md={10} lg={12} spacing={2}>
@@ -634,7 +552,6 @@ const IngresoClientes = () => {
                 onChange={handleInputChange}
               />
             </Grid>
-            {/* Campos de clientesSucursalAdd */}
 
             <Grid item sx={{ marginBottom: "10px" }} xs={12}>
               <Button
@@ -668,7 +585,7 @@ const IngresoClientes = () => {
             md={12}
             lg={12}
             xl={12}
-            xspacing={2}
+            spacing={2}
           >
             <Grid item xs={12} sm={6} md={12} lg={12}>
               <Paper>
@@ -680,7 +597,6 @@ const IngresoClientes = () => {
                 >
                   <div>
                     <Grid item lg={10}>
-                      {" "}
                       <TextField
                         label="Buscar cliente..."
                         variant="outlined"
@@ -705,9 +621,9 @@ const IngresoClientes = () => {
                           <Card
                             sx={{
                               margin: "5px",
-                              background: "rgb(238, 174, 202)",
+                              background: "rgb(174,238,229)",
                               backgroundImage:
-                                "radial-gradient(linear, rgba(238, 174, 202, 1) 33%, rgba(148, 187, 233, 1) 100%)",
+                                "radial-gradient(linear, rgba(174,238,229,1) 33%, rgba(238, 174, 202, 1) 100%)",
                             }}
                           >
                             <CardContent>
@@ -736,40 +652,64 @@ const IngresoClientes = () => {
                                 Agregar Sucursal
                               </Button>
                               <Button
-                                size="small"
-                                color="primary"
-                                variant="contained"
-                                onClick={() =>
-                                  handleShowBranch(customer.codigoCliente)
-                                }
-                              >
-                                Mostrar Sucursal
-                              </Button>
-                              {selectedBranchData && (
-                                <div>
-                                  <Card>
+                  size="small"
+                  color="primary"
+                  variant="contained"
+                  onClick={() => handleShowBranch(customer.codigoCliente)}
+                >
+                  {/* Cambiar el texto del botón según si se están mostrando o no los detalles */}
+                  {showBranchDetails[customer.codigoCliente]
+                    ? "Ocultar Sucursal"
+                    : "Mostrar Sucursal"}
+                </Button>
+                            </CardActions>
+                            {selectedBranchData[customer.codigoCliente] &&
+                              selectedBranchData[customer.codigoCliente].map(
+                                (sucursal, index) => (
+                                  <Card
+                                    key={index}
+                                    sx={{ margin: "10px", padding: "10px" }}
+                                  >
                                     <CardContent>
                                       <Typography variant="h6" component="h2">
-                                        Datos de la Sucursal
+                                        Sucursal : {index + 1}
                                       </Typography>
+                                      
+                                      {/* Agregar otros campos según sea necesario */}
+                                    </CardContent>
+                                    <CardActions>
+                                      
+                                      <Button
+                                        size="small"
+                                        color="primary"
+                                        onClick={() =>
+                                          setShowDetails(!showDetails)
+                                        }
+                                      >
+                                        {showDetails
+                                          ? "Ocultar Detalles"
+                                          : "Mostrar Detalles"}
+                                      </Button>
+                                    </CardActions>
+                                    {showDetails && (
+                                      <CardContent>
                                       <Typography variant="body1" component="p">
-                                        Nombre Responsable:{" "}
-                                        {selectedBranchData.nombreResponsable}
+                                        Responsable:{" "}
+                                        {sucursal.nombreResponsable}
                                       </Typography>
                                       <Typography variant="body1" component="p">
                                         Apellido Responsable:{" "}
-                                        {selectedBranchData.apellidoResponsable}
+                                        {sucursal.apellidoResponsable}
                                       </Typography>
                                       <Typography variant="body1" component="p">
-                                        Dirección:{" "}
-                                        {selectedBranchData.direccion}
+                                        Dirección: {sucursal.direccion}
                                       </Typography>
-                                      {/* Agregar otros campos según sea necesario */}
-                                    </CardContent>
+                                        {/* Otros detalles específicos de la sucursal */}
+                                      </CardContent>
+                                    )}
                                   </Card>
-                                </div>
+                                )
                               )}
-                            </CardActions>
                           </Card>
                         </Grid>
                       ))}
@@ -910,6 +850,8 @@ const IngresoClientes = () => {
                 </DialogActions>
               </Dialog>
             </Grid>
+
+            {/* Aquí mostrar sucursales seleccionadas */}
           </Grid>
         )}
       </Grid>
