@@ -669,7 +669,7 @@ const BoxGestionCaja = () => {
                   <Button
                     sx={{
                       margin: "7px",
-
+                      width:"80%",
                       height: "60px",
                       backgroundColor: "green",
                       color: "whitesmoke",
@@ -681,14 +681,14 @@ const BoxGestionCaja = () => {
                     onClick={handleOpenDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
-                    <Typography variant="h7">Pagar Boletaa</Typography>
+                    <Typography variant="h7"> Boleta</Typography>
                   </Button>
                 </Grid>
                 <Grid item xs={4}>
                   <Button
                     sx={{
                       margin: "7px",
-
+                      width:"80%",
                       height: "60px",
                       backgroundColor: "green",
                       color: "whitesmoke",
@@ -700,14 +700,14 @@ const BoxGestionCaja = () => {
                     onClick={handleOpenDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
-                    <Typography variant="h7">Pagar Factura</Typography>
+                    <Typography variant="h7">Factura</Typography>
                   </Button>
                 </Grid>
                 <Grid item xs={4}>
                   <Button
                     sx={{
                       margin: "7px",
-
+                      width:"80%",
                       height: "60px",
                       backgroundColor: "green",
                       color: "whitesmoke",
@@ -719,7 +719,7 @@ const BoxGestionCaja = () => {
                     onClick={handleOpenDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
-                    <Typography variant="h7">cuenta corriente</Typography>
+                    <Typography variant="h7">Ticket</Typography>
                   </Button>
                 </Grid>
               </Grid>
@@ -729,7 +729,7 @@ const BoxGestionCaja = () => {
       </Grid>
 
       <Dialog
-        sx={{ width: "1300px" }}
+     
         open={openCategoria}
         onClose={handleCloseCategoria}
       >
@@ -738,7 +738,7 @@ const BoxGestionCaja = () => {
         </DialogContent>
       </Dialog>
       <Dialog
-        sx={{ width: "100%", maxWidth: "1500px" }}
+        sx={{ width: "100%", }}
         open={openDialog}
         onClose={handleCloseDialog}
       >

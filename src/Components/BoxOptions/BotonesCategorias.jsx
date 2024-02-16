@@ -278,11 +278,18 @@ const BotonesCategorias = ({ onClose }) => {
             
           </Grid>
 
-          <Grid container sx={{display:"flex"}}> {categories.map((category) => (
+          <Grid container item
+              xs={12} 
+              sm={12} 
+              md={12} 
+              lg={12} 
+
+              sx={{display:"flex"}}> {categories.map((category) => (
             <Grid 
+            sx={{display:"flex",justifyContent:"center"}}
               item
               xs={12}
-              sm={3}
+              sm={6}
               md={4}
               lg={3}
               xl={2}
@@ -300,8 +307,8 @@ const BotonesCategorias = ({ onClose }) => {
                 }}
                 sx={{
                   margin: 1,
-                  width: "90px",
-                  height: "60px",
+                  width: "80%",
+                  height: "80%",
                   backgroundColor: "lightSalmon",
                   color: "white",
                   "&:hover": {
@@ -310,7 +317,7 @@ const BotonesCategorias = ({ onClose }) => {
                   },
                 }}
               >
-                {category.descripcion}
+                <span style={{ fontSize: '60%' }}>{category.descripcion}</span>
               </Button>
             </Grid>
           ))}</Grid>
