@@ -6,6 +6,7 @@ import {
   Typography,
   IconButton,
   Menu,
+  Box,
   MenuItem,
   Dialog,
   DialogTitle,
@@ -59,51 +60,46 @@ const NavBar = () => {
 
   return (
     <Paper elevation={3} style={{ backgroundColor: "blue", padding: "6px" }}>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={3} sm={2} md={2}>
-          <Typography variant="h4" color="white">
-            EasyPOS
-          </Typography>
-        </Grid>
-        <Grid item xs={12} sm={9} md={9}>
-          {/* <ToggleButtonGroup
-            value={isEstablishmentVisible ? "show" : "hide"}
-            exclusive
-            onChange={handleEstablishmentToggle}
-          >
-            <ToggleButton value="show">Mostrar Establecimiento</ToggleButton>
-            <ToggleButton value="hide">Ocultar Establecimiento</ToggleButton>
-          </ToggleButtonGroup> */}
-          {isEstablishmentVisible && (
-            <Paper elevation={3} >
-              <Typography variant="h4">NOMBRE ESTABLECIMIENTO</Typography>
+      <Grid container item  xs={12} >
+        <Grid item xs={12} sx={{display:"flex"}} >
+          <Grid item xs={3} sm={2} md={2}>
+            <Box variant="h5" color="white">
+              EasyPOS
+            </Box>
+          </Grid>
+          <Grid item xs={8} sm={9} md={9}>
+            <Paper elevation={3}>
+              <Box> ESTABLECIMIENTO</Box>
             </Paper>
-          )}
+          </Grid>
+          <Grid item xs={1} sm={1} md={1}>
+            <IconButton onClick={handleMenuOpen} style={{ padding: "8px" }}>
+              <Settings fontSize="large" />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
+                Cerrar sesión
+              </MenuItem>
+              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
+                Configuración
+              </MenuItem>
+              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
+                Más
+              </MenuItem>
+            </Menu>
+          </Grid>
         </Grid>
-        <Grid item xs={6} sm={1} md={1}>
-          <IconButton onClick={handleMenuOpen} style={{ padding: "8px" }}>
-            <Settings fontSize="large" />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
-              Cerrar sesión
-            </MenuItem>
-            <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
-              Configuración
-            </MenuItem>
-            <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>Más</MenuItem>
-          </Menu>
+
+        <Grid item xs={12} sm={12} md={10} spacing={3}
+        sx={{display:"flex",margin:"1%"}} 
+        >
+          <Typography variant="h5">Fecha: {formattedDate}</Typography>
+          <Typography variant="h5">  Hora: {formattedTime}</Typography>
         </Grid>
-        <Grid sx={{display:"flex"}} item xs={12} sm={12} md={10}>
-          <Typography variant="h5">Fecha: {formattedDate}</Typography> 
-          <Typography variant="h5">Hora: {formattedTime}</Typography>
-        </Grid>
-        
-        
       </Grid>
       <Dialog
         open={isLogoutDialogOpen}

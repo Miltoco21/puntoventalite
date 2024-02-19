@@ -17,14 +17,20 @@ export const SelectedOptionsProvider = ({ children }) => {
   });
   const [productInfo, setProductInfo] = useState(/* initial value */);
   const [selectedQuantity, setSelectedQuantity] = useState(/* initial value */);
- 
-  const[description,setDescription]=useState(/* initial value */);
+
+  const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
- 
+
   const [salesData, setSalesData] = useState([]);
   const [grandTotal, setGrandTotal] = useState(0);
   const [products, setProducts] = useState([]);
   const [salesDataTimestamp, setSalesDataTimestamp] = useState(Date.now());
+
+  const [userData, setUserData] = useState([]);
+  const updateUserData = (data) => {
+    setUserData(data);
+  };
+
   const calculateTotalPrice = (quantity, price) => {
     return quantity * price;
   };
@@ -44,15 +50,13 @@ export const SelectedOptionsProvider = ({ children }) => {
     // Do additional actions if needed after salesData is cleared
     // This block of code will run after the state is updated
     // ...
-  
+
     // Example: Log a message
     console.log("Sales data cleared!");
-  
-  }, [salesData]); 
- const addToSalesData = (product, quantity) => {
+  }, [salesData]);
+  const addToSalesData = (product, quantity) => {
     const precioVenta = product.precioVenta || 0;
     const newSale = {
-      
       cantidad: quantity,
       descripcion: product.nombre,
       precio: precioVenta,
@@ -65,6 +69,41 @@ export const SelectedOptionsProvider = ({ children }) => {
       return updatedSalesData;
     });
   };
+
+  //////LOGIN//////
+  const handleLogin = async () => {
+    try {
+      // Lógica de inicio de sesión
+
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/Usuarios/LoginUsuario",
+        {
+          codigoUsuario: 0,
+          rut: rutOrCode,
+          clave: password,
+        }
+      );
+      console.log("Respuesta del servidor:", response.data);
+      // const usuario = respuesta.responseUsuario;
+      // console.log(usuario.codigoUsuario); // 1
+      // console.log(usuario.rol); // Administrador
+      // console.log(usuario.nombres); // Milton
+      // console.log(usuario.apellidos); // Pena
+      // console.log(usuario.rut); // 61955000-2
+
+      if (response.responseUsuario) {
+        // Almacena los datos del usuario en el estado
+        setUserData(response.responseUsuario);
+
+        // Resto del código para el inicio de sesión exitoso
+      } else {
+        setError("Error de inicio de sesión. Verifica tus credenciales.");
+      }
+    } catch (error) {
+      setError("Error de inicio de sesión. Verifica tus credenciales.");
+    }
+  };
+
   // const addToSalesData = (product, quantity) => {
   //   const precioVenta = product.precioVenta || "";
   //   const newSale = {
@@ -75,14 +114,13 @@ export const SelectedOptionsProvider = ({ children }) => {
   //     quantity: 1,
   //     idProducto: product.idProducto,
   //   };
-  
+
   //   setSalesData((prevSalesData) => {
   //     const updatedSalesData = [...prevSalesData, newSale];
   //     return updatedSalesData;
   //   });
   // };
   const clearSalesData = () => {
-    
     setSalesData([]);
     setGrandTotal(0);
     // Update the timestamp to trigger a re-render
@@ -93,21 +131,17 @@ export const SelectedOptionsProvider = ({ children }) => {
   };
   const [selectedButtons, setSelectedButtons] = useState([]);
 
-const handleNumberClick = (value) => {
-  // Existing code...
+  const handleNumberClick = (value) => {
+    // Existing code...
 
-  // Add the selected button and its amount to the state
-  setSelectedButtons([...selectedButtons, { value, amount: payment }]);
-};
+    // Add the selected button and its amount to the state
+    setSelectedButtons([...selectedButtons, { value, amount: payment }]);
+  };
 
-// Function to calculate the total amount from selected buttons
-const calculateTotalAmount = () => {
-  return selectedButtons.reduce((total, button) => total + button.amount, 0);
-};
-
-  
-
-  
+  // Function to calculate the total amount from selected buttons
+  const calculateTotalAmount = () => {
+    return selectedButtons.reduce((total, button) => total + button.amount, 0);
+  };
 
   const removeFromSalesData = (index) => {
     setSalesData((prevSalesData) =>
@@ -123,14 +157,14 @@ const calculateTotalAmount = () => {
       }
       return sale;
     });
-  
+
     setSalesData(updatedSalesData);
-  
+
     if (productInfo) {
       addToSalesData(productInfo, selectedQuantity);
     }
   };
-  
+
   const decrementQuantity = (index, productInfo) => {
     const updatedSalesData = salesData.map((sale, i) => {
       if (i === index && sale.quantity > 1) {
@@ -139,9 +173,9 @@ const calculateTotalAmount = () => {
       }
       return sale;
     });
-  
+
     setSalesData(updatedSalesData);
-  
+
     if (productInfo) {
       addToSalesData(productInfo, setQuantity);
     }
@@ -164,20 +198,23 @@ const calculateTotalAmount = () => {
           },
         ],
       };
-  
+
       // Send the request to the API
-      const response = await axios.post('https://www.easyposdev.somee.com/api/Ventas/SuspenderVenta', data);
-  
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/Ventas/SuspenderVenta",
+        data
+      );
+
       // Handle the API response according to your needs
-      console.log('API Response:', response.data);
-  
+      console.log("API Response:", response.data);
+
       // You can also perform other actions after suspending the sale if necessary
       clearSalesData(); // Clear sales data after suspending the sale
       setPlu(""); // Clear the PLU code
       setPeso(""); // Clear the weight value
     } catch (error) {
       // Handle errors in case the request fails
-      console.error('Error suspending sale:', error);
+      console.error("Error suspending sale:", error);
     }
   };
 
@@ -198,14 +235,16 @@ const calculateTotalAmount = () => {
         products,
         setProducts,
         salesDataTimestamp,
-        suspenderVenta,productInfo,
+        suspenderVenta,
+        productInfo,
         setProductInfo,
         selectedQuantity,
         setSelectedQuantity,
-        calculateTotalPrice,    description,
+        calculateTotalPrice,
+        description,
         setDescription,
-    
-
+        userData,
+        updateUserData,
       }}
     >
       {children}

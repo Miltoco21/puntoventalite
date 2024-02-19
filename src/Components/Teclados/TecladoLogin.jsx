@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { TextField, Button, Container, Typography, Box, Grid } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider"
 
 
 const Login = () => {
@@ -9,8 +10,10 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [activeInput, setActiveInput] = useState("rutOrCode");
-
+  
   const navigate = useNavigate();
+
+  const { updateUserData } = useContext(SelectedOptionsContext);
 
   const handleLogin = async () => {
     try {
@@ -27,11 +30,13 @@ const Login = () => {
           clave: password,
         }
       );
+      console.log("Respuesta del servidor:", response.data.responseUsuario);
 
-      // Assuming the response contains a token or some indication of a successful login
-      // You may need to adjust this based on your server's response
-      if (response.data) {
-        // Redirect to the home page
+      if (response.data.responseUsuario) {
+        // Actualizar userData después del inicio de sesión exitoso
+        updateUserData(response.data.responseUsuario);
+
+        // Redirigir a la página de inicio
         navigate("/home");
       } else {
         setError("Error de inicio de sesión. Verifica tus credenciales.");

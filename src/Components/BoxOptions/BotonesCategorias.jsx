@@ -251,7 +251,7 @@ const BotonesCategorias = ({ onClose }) => {
       >
         <Grid container spacing={1} sx={{ margin: "0 auto" }}>
           <Grid item xs={12} sm={12} md={8} lg={12} xl={2}>
-            <Grid sx={{display:"flex"}}><Box
+            <Grid sx={{display:"flex",justifyContent:"center"}}><Box
               
             >
               <Typography>Categorias</Typography>
@@ -290,9 +290,9 @@ const BotonesCategorias = ({ onClose }) => {
               item
               xs={12}
               sm={6}
-              md={4}
-              lg={3}
-              xl={2}
+              md={6}
+              lg={6}
+              xl={6}
               key={category.idCategoria}
             >
               <Button
@@ -306,7 +306,7 @@ const BotonesCategorias = ({ onClose }) => {
                   }));
                 }}
                 sx={{
-                  margin: 1,
+                  margin: 3,
                   width: "80%",
                   height: "80%",
                   backgroundColor: "lightSalmon",
