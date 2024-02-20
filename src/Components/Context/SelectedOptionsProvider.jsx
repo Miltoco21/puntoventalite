@@ -54,6 +54,7 @@ export const SelectedOptionsProvider = ({ children }) => {
     // Example: Log a message
     console.log("Sales data cleared!");
   }, [salesData]);
+  
   const addToSalesData = (product, quantity) => {
     const precioVenta = product.precioVenta || 0;
     const newSale = {
@@ -84,12 +85,7 @@ export const SelectedOptionsProvider = ({ children }) => {
         }
       );
       console.log("Respuesta del servidor:", response.data);
-      // const usuario = respuesta.responseUsuario;
-      // console.log(usuario.codigoUsuario); // 1
-      // console.log(usuario.rol); // Administrador
-      // console.log(usuario.nombres); // Milton
-      // console.log(usuario.apellidos); // Pena
-      // console.log(usuario.rut); // 61955000-2
+    
 
       if (response.responseUsuario) {
         // Almacena los datos del usuario en el estado

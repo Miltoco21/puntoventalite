@@ -94,7 +94,7 @@ const NavBar = () => {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={10} spacing={3}
+        <Grid item xs={12} sm={12} md={10} 
         sx={{display:"flex",margin:"1%"}} 
         >
           <Typography variant="h5">Fecha: {formattedDate}</Typography>
