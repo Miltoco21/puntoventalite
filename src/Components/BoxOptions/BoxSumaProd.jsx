@@ -158,13 +158,13 @@ const BoxSumaProd = () => {
               <TableBody style={{ maxHeight: "300px", overflowY: "auto" }}>
                 {salesData.map((sale, index) => (
                   <TableRow key={index}>
-                    <TableCell>
+                    <TableCell sx={{display:"flex",alignItems: "center"}}>
                       <IconButton
                         onClick={() => incrementQuantity(index, productInfo)}
                       >
                         <AddIcon />
                       </IconButton>
-                      {sale.cantidad}
+                      {sale.quantity}
                       <IconButton
                         onClick={() => decrementQuantity(index, productInfo)}
                       >
@@ -174,7 +174,7 @@ const BoxSumaProd = () => {
                     <TableCell>{sale.descripcion}</TableCell>
                     <TableCell>{sale.precio}</TableCell>
                     <TableCell>
-                      {calculateTotalPrice(sale.cantidad, sale.precio)}//sale.quantity
+                      {calculateTotalPrice(sale.quantity, sale.precio)}
                     </TableCell>
                     <TableCell>
                       <IconButton

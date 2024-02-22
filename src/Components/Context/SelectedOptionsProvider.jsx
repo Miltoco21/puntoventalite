@@ -54,22 +54,25 @@ export const SelectedOptionsProvider = ({ children }) => {
     // Example: Log a message
     console.log("Sales data :",salesData);
   }, [salesData]);
-  const addToSalesData = (product, quantity = 1) => {
-    const precioVenta = product.precioVenta || 0;
-  
-    const newSale = {
-      cantidad: quantity,
-      descripcion: product.nombre,
-      precio: precioVenta,
-      total: quantity * precioVenta,
-      idProducto: product.idProducto,
-    };
-  
-    setSalesData((prevSalesData) => {
-      const updatedSalesData = [...prevSalesData, newSale];
-      return updatedSalesData;
-    });
+
+
+ const addToSalesData = (product, quantity = 1) => {
+  const precioVenta = product.precioVenta || 0;
+
+  const newSale = {
+    quantity: quantity, // Cambiar 'cantidad' a 'quantity'
+    descripcion: product.nombre,
+    precio: precioVenta,
+    total: calculateTotalPrice(quantity, precioVenta),
+    idProducto: product.idProducto,
   };
+
+  setSalesData((prevSalesData) => {
+    const updatedSalesData = [...prevSalesData, newSale];
+    return updatedSalesData;
+    setGrandTotal((prevTotal) => prevTotal + newSale.total);
+  });
+};
 
   //////LOGIN//////
   const handleLogin = async () => {
@@ -133,32 +136,32 @@ export const SelectedOptionsProvider = ({ children }) => {
   const incrementQuantity = (index, productInfo) => {
     const updatedSalesData = salesData.map((sale, i) => {
       if (i === index) {
-        const newQuantity = sale.cantidad + 1;
+        const newQuantity = sale.quantity + 1; // Usar 'quantity' en lugar de 'cantidad'
         return { ...sale, quantity: isNaN(newQuantity) ? 1 : newQuantity };
       }
       return sale;
     });
-
+  
     setSalesData(updatedSalesData);
-
+  
     if (productInfo) {
-      addToSalesData(productInfo, selectedQuantity);
+      addToSalesData(productInfo, selectedQuantity); // Usar 'quantity' en lugar de 'cantidad'
     }
   };
-
+  
   const decrementQuantity = (index, productInfo) => {
     const updatedSalesData = salesData.map((sale, i) => {
       if (i === index && sale.quantity > 1) {
-        const newQuantity = sale.cantidad - 1;
+        const newQuantity = sale.quantity - 1; // Usar 'quantity' en lugar de 'cantidad'
         return { ...sale, quantity: isNaN(newQuantity) ? 1 : newQuantity };
       }
       return sale;
     });
-
+  
     setSalesData(updatedSalesData);
-
+  
     if (productInfo) {
-      addToSalesData(productInfo, setQuantity);
+      addToSalesData(productInfo, setQuantity); // Usar 'quantity' en lugar de 'cantidad'
     }
   };
 
