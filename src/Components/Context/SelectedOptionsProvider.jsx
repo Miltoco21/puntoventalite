@@ -16,7 +16,7 @@ export const SelectedOptionsProvider = ({ children }) => {
     selectedProduct: null,
   });
   const [productInfo, setProductInfo] = useState(/* initial value */);
-  const [selectedQuantity, setSelectedQuantity] = useState(/* initial value */);
+ 
 
   const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
@@ -52,11 +52,11 @@ export const SelectedOptionsProvider = ({ children }) => {
     // ...
 
     // Example: Log a message
-    console.log("Sales data cleared!");
+    console.log("Sales data :",salesData);
   }, [salesData]);
-  
-  const addToSalesData = (product, quantity) => {
+  const addToSalesData = (product, quantity = 1) => {
     const precioVenta = product.precioVenta || 0;
+  
     const newSale = {
       cantidad: quantity,
       descripcion: product.nombre,
@@ -64,7 +64,7 @@ export const SelectedOptionsProvider = ({ children }) => {
       total: quantity * precioVenta,
       idProducto: product.idProducto,
     };
-
+  
     setSalesData((prevSalesData) => {
       const updatedSalesData = [...prevSalesData, newSale];
       return updatedSalesData;
@@ -100,22 +100,7 @@ export const SelectedOptionsProvider = ({ children }) => {
     }
   };
 
-  // const addToSalesData = (product, quantity) => {
-  //   const precioVenta = product.precioVenta || "";
-  //   const newSale = {
-  //     cantidad: quantity,
-  //     descripcion: product.nombre,
-  //     precio: precioVenta,
-  //     total: quantity * precioVenta,
-  //     quantity: 1,
-  //     idProducto: product.idProducto,
-  //   };
-
-  //   setSalesData((prevSalesData) => {
-  //     const updatedSalesData = [...prevSalesData, newSale];
-  //     return updatedSalesData;
-  //   });
-  // };
+  
   const clearSalesData = () => {
     setSalesData([]);
     setGrandTotal(0);
@@ -148,7 +133,7 @@ export const SelectedOptionsProvider = ({ children }) => {
   const incrementQuantity = (index, productInfo) => {
     const updatedSalesData = salesData.map((sale, i) => {
       if (i === index) {
-        const newQuantity = sale.quantity + 1;
+        const newQuantity = sale.cantidad + 1;
         return { ...sale, quantity: isNaN(newQuantity) ? 1 : newQuantity };
       }
       return sale;
@@ -164,7 +149,7 @@ export const SelectedOptionsProvider = ({ children }) => {
   const decrementQuantity = (index, productInfo) => {
     const updatedSalesData = salesData.map((sale, i) => {
       if (i === index && sale.quantity > 1) {
-        const newQuantity = sale.quantity - 1;
+        const newQuantity = sale.cantidad - 1;
         return { ...sale, quantity: isNaN(newQuantity) ? 1 : newQuantity };
       }
       return sale;
@@ -177,9 +162,7 @@ export const SelectedOptionsProvider = ({ children }) => {
     }
   };
 
-  const handleQuantityChange = (event) => {
-    setQuantity(parseInt(event.target.value, 10));
-  };
+ 
 
   const suspenderVenta = async (salesData) => {
     try {
@@ -234,8 +217,8 @@ export const SelectedOptionsProvider = ({ children }) => {
         suspenderVenta,
         productInfo,
         setProductInfo,
-        selectedQuantity,
-        setSelectedQuantity,
+        quantity,
+      
         calculateTotalPrice,
         description,
         setDescription,

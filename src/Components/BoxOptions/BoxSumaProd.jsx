@@ -37,6 +37,8 @@ const BoxSumaProd = () => {
     removeFromSalesData,
     incrementQuantity,
     decrementQuantity,
+    quantity,
+    setQuantity,
     clearSalesData,
   } = useContext(SelectedOptionsContext);
 
@@ -56,9 +58,11 @@ const BoxSumaProd = () => {
     setPlu(productInfo.idProducto);
     handleClose();
     if (productInfo) {
-      addToSalesData(productInfo, 1);
+      addToSalesData(productInfo, quantity); // Utiliza la cantidad del estado
+      setQuantity(1); // Restablece la cantidad a 1 después de agregar el producto
     }
   };
+
 
   const handleOpen = () => setOpen(true);
   const handleOpenPeso = () => setOpenPeso(true);
@@ -68,7 +72,7 @@ const BoxSumaProd = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     if (productInfo) {
-      addToSalesData(productInfo, 1);
+      addToSalesData(productInfo, );
     }
   };
 
@@ -76,9 +80,11 @@ const BoxSumaProd = () => {
     setPeso(pesoValue);
     handleClose();
     if (productInfo) {
-      addToSalesData(productInfo, 1);
+      addToSalesData(productInfo, quantity); // Utiliza la cantidad del estado
+      setQuantity(1); // Restablece la cantidad a 1 después de agregar el producto
     }
   };
+
 
   const handleClearSalesData = () => clearSalesData();
 
@@ -158,7 +164,7 @@ const BoxSumaProd = () => {
                       >
                         <AddIcon />
                       </IconButton>
-                      {sale.quantity}
+                      {sale.cantidad}
                       <IconButton
                         onClick={() => decrementQuantity(index, productInfo)}
                       >
@@ -168,7 +174,7 @@ const BoxSumaProd = () => {
                     <TableCell>{sale.descripcion}</TableCell>
                     <TableCell>{sale.precio}</TableCell>
                     <TableCell>
-                      {calculateTotalPrice(sale.quantity, sale.precio)}
+                      {calculateTotalPrice(sale.cantidad, sale.precio)}//sale.quantity
                     </TableCell>
                     <TableCell>
                       <IconButton

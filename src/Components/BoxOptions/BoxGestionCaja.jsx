@@ -752,53 +752,8 @@ const BoxGestionCaja = () => {
       </Dialog>
 
       {/* Dialog for entering description */}
-      <Dialog
-        open={openDescriptionDialog}
-        onClose={handleCloseDescriptionDialog}
-        onExited={() => setOpenSuccessSnackbar(true)}
-      >
-        <DialogTitle>Ingrese la descripción de la venta</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Descripción"
-            value={description}
-            onChange={handleDescriptionChange}
-          />
-          {salesData.map((sale, index) => {
-            console.log("Sales Entryyyyyy:", {
-              idProducto: sale.idProducto,
-              cantidad: sale.quantity,
-              description: sale.descripcion,
-              price: sale.precio,
-              total: sale.quantity * sale.precio,
-            });
-            return (
-              <TableRow key={index}>
-                {/* ... other table cells */}
-                <TableCell>
-                  {salesData && (
-                    <div>
-                      <Typography>ID: {sale.idProducto}</Typography>
-                      <Typography>Cantidad: {sale.quantity}</Typography>
-                      {/* <Typography>Nombre: {sale.descripcion}</Typography> */}
-                      {/* ... other sale entry information */}
-                    </div>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDescriptionDialog} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={handlePostSuspenderVentaDetalle} color="primary">
-            Suspender Venta
-          </Button>
-        </DialogActions>
-      </Dialog>
+     
+      
       <Snackbar
         open={openSuccessSnackbar}
         autoHideDuration={5000}

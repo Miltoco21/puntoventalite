@@ -23,7 +23,7 @@ const Login = () => {
       }
 
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/Usuarios/LoginUsuario",
+        "https://www.easyposdev.somee.com/api/Usuarios/LoginUsuario",
         {
           codigoUsuario: 0,
           rut: rutOrCode,
