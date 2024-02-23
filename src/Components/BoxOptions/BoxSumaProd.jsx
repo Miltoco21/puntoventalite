@@ -17,6 +17,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Slider,
   Dialog,
   DialogContent,
 } from "@mui/material";
@@ -32,6 +33,7 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 const BoxSumaProd = () => {
   const {
     salesData,
+    setSalesData,
     grandTotal,
     addToSalesData,
     removeFromSalesData,
@@ -51,6 +53,7 @@ const BoxSumaProd = () => {
   const [peso, setPeso] = useState("");
   const [open, setOpen] = useState(false);
   const [openPeso, setOpenPeso] = useState(false);
+  const [sliderValue, setSliderValue] = useState(1);
 
   const calculateTotalPrice = (quantity, price) => quantity * price;
 
@@ -63,7 +66,6 @@ const BoxSumaProd = () => {
     }
   };
 
-
   const handleOpen = () => setOpen(true);
   const handleOpenPeso = () => setOpenPeso(true);
   const handleClose = () => setOpen(false);
@@ -72,7 +74,7 @@ const BoxSumaProd = () => {
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
     if (productInfo) {
-      addToSalesData(productInfo, );
+      addToSalesData(productInfo);
     }
   };
 
@@ -84,7 +86,9 @@ const BoxSumaProd = () => {
       setQuantity(1); // Restablece la cantidad a 1 después de agregar el producto
     }
   };
-
+  const handleQuantityInputChange = (event) => {
+    setQuantity(event.target.value);
+  };
 
   const handleClearSalesData = () => clearSalesData();
 
@@ -158,18 +162,43 @@ const BoxSumaProd = () => {
               <TableBody style={{ maxHeight: "300px", overflowY: "auto" }}>
                 {salesData.map((sale, index) => (
                   <TableRow key={index}>
-                    <TableCell sx={{display:"flex",alignItems: "center"}}>
-                      <IconButton
+                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
+                    <TextField
+          
+          value={sale.quantity === 0 ? '' : sale.quantity} // Si la cantidad es 0, muestra un string vacío para permitir la entrada de números nuevos
+          onChange={(event) => {
+            const newValue = parseInt(event.target.value);
+            const updatedSalesData = [...salesData];
+            updatedSalesData[index].quantity = isNaN(newValue) ? 0 : newValue; // Si no es un número válido, establece la cantidad en 0
+            setSalesData(updatedSalesData);
+          }}
+          inputProps={{ min: 0 }} // Establece el mínimo en 0 para permitir números negativos
+        />
+
+                      {/* <IconButton
                         onClick={() => incrementQuantity(index, productInfo)}
                       >
                         <AddIcon />
-                      </IconButton>
-                      {sale.quantity}
+                      </IconButton> */}
+                      {/* <Slider
+  value={sale.quantity}
+  onChange={(event, newValue) => {
+    const updatedSalesData = [...salesData];
+    updatedSalesData[index].quantity = newValue;
+    setSalesData(updatedSalesData); // Asume que tienes una función setSalesData para actualizar el estado
+    setSliderValue(newValue); // Actualiza el valor del slider en tiempo real
+  }}
+  min={1}
+  max={500}
+  step={1} 
+  valueLabelDisplay="on"
+/> */}
+                      {/* 
                       <IconButton
                         onClick={() => decrementQuantity(index, productInfo)}
                       >
                         <RemoveIcon />
-                      </IconButton>
+                      </IconButton> */}
                     </TableCell>
                     <TableCell>{sale.descripcion}</TableCell>
                     <TableCell>{sale.precio}</TableCell>
