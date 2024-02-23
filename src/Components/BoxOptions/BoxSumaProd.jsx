@@ -148,7 +148,7 @@ const BoxSumaProd = () => {
             marginTop: isMobile ? "-6px" : "0",
           }}
         >
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} style={{ overflowX: 'auto' }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -163,17 +163,19 @@ const BoxSumaProd = () => {
                 {salesData.map((sale, index) => (
                   <TableRow key={index}>
                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                    <TextField
-          
-          value={sale.quantity === 0 ? '' : sale.quantity} // Si la cantidad es 0, muestra un string vacío para permitir la entrada de números nuevos
-          onChange={(event) => {
-            const newValue = parseInt(event.target.value);
-            const updatedSalesData = [...salesData];
-            updatedSalesData[index].quantity = isNaN(newValue) ? 0 : newValue; // Si no es un número válido, establece la cantidad en 0
-            setSalesData(updatedSalesData);
-          }}
-          inputProps={{ min: 0 }} // Establece el mínimo en 0 para permitir números negativos
-        />
+                      <TextField
+                        value={sale.quantity === 0 ? "" : sale.quantity} // Si la cantidad es 0, muestra un string vacío para permitir la entrada de números nuevos
+                        onChange={(event) => {
+                          const newValue = parseInt(event.target.value);
+                          const updatedSalesData = [...salesData];
+                          updatedSalesData[index].quantity = isNaN(newValue)
+                            ? 0
+                            : newValue; // Si no es un número válido, establece la cantidad en 0
+                          setSalesData(updatedSalesData);
+                        }}
+                        inputProps={{ min: 0 }}
+                        style={{ width: 90 }}  // Establece el mínimo en 0 para permitir números negativos
+                      />
 
                       {/* <IconButton
                         onClick={() => incrementQuantity(index, productInfo)}
