@@ -10,6 +10,7 @@ import BoxGestionCaja from "../Components/BoxOptions/BoxGestionCaja";
 
 import BoxSumaProd from "../Components/BoxOptions/BoxSumaProd";
 import Navbar from "../Components/Navbar/Navbar";
+import BoxBuscador from "../Components/BoxOptions/BoxBuscador";
 
 const Home = () => {
   return (
@@ -27,6 +28,7 @@ const Home = () => {
               {/* BoxDatosCaja */}
               <Grid item xs={12} sm={12} md={6}lg={6} style={{ position: "relative" }}>
                 <BoxDatosCaja />
+                <BoxBuscador/>
                 {/* BoxSumaProd with absolute positioning */}
                 <BoxSumaProd
                   style={{
