@@ -24,10 +24,18 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
+import FaceIcon from "@mui/icons-material/Face";
 import axios from "axios";
 const BoxBuscador = () => {
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [serverResponse, setServerResponse] = useState("");
+  const [ultimaVenta, setUltimaVenta] = useState("");
+  useEffect(() => {
+    if (ultimaVenta !== null) {
+      console.log("Última venta:", ultimaVenta);
+    }
+  }, [ultimaVenta]);
 
   const handleSearch = async () => {
     try {
@@ -51,38 +59,125 @@ const BoxBuscador = () => {
     setSearchText(inputValue);
     if (inputValue.trim() === "") {
       setSearchResults([]);
-    
     }
   };
 
+  const handleUltimaCompraCliente = async (codigoCliente, codigoClienteSucursal) => {
+    try {
+      const response = await axios.get(`https://www.easyposdev.somee.com/api/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`);
+      setUltimaVenta(response.data);
+      console.log("Última venta response:", response);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+
   return (
     <Paper elevation={13} sx={{ marginBottom: "3px" }}>
-      <TextField
-        label="Buscar"
-        value={searchText}
-        onChange={handleInputChange}
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={12} lg={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={10} md={12} sx={{ display: "flex", margin: "8px" }}>
+              <Grid item md={8}>
+                <div style={{ display: "flex" }}></div>
+                <TextField
+                  fullWidth
+                  label="Ingrese Nombre Apellido"
+                  value={searchText}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item md={3}>
+                <Button
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  onClick={handleSearch}
+                >
+                  Buscar
+                </Button>
+              </Grid>
+            </Grid>
 
-      />
-      <Button variant="contained" onClick={handleSearch}>
-        Buscar
-      </Button>
-      <TableContainer>
-  <ul style={{ display: "flex" }}>
-    {Array.isArray(searchResults) && searchText.trim() !== "" &&
-      searchResults.map((result) => (
-        <ListItem key={result.id}>
-          <Chip
-            sx={{ display: "flex", margin: "auto" }}
-            label={
-              <div style={{ margin: "2px", padding: "13px" }}>
-                {result.nombreResponsable} {result.apellidoResponsable}
-              </div>
-            }
-          />
-        </ListItem>
-      ))}
-  </ul>
-</TableContainer>
+            <Grid item xs={12}>
+              {searchResults.length > 0 ? (
+                <TableContainer>
+                  <ul
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "3px",
+                    }}
+                  >
+                    {searchResults.map((result) => (
+                      <ListItem key={result.codigoCliente}>
+                        <Chip
+                          sx={{ display: "flex", margin: "auto" }}
+                          label={
+                            <div style={{ margin: "2px", padding: "13px" }}>
+                              {result.nombreResponsable}{" "}
+                              {result.apellidoResponsable}
+                            </div>
+                          }
+                          onClick={() => handleUltimaCompraCliente(result.codigoCliente, result.codigoClienteSucursal)}
+
+                        />
+                      </ListItem>
+                    ))}
+                  </ul>
+                </TableContainer>
+              ) : (
+                <Typography variant="subtitle1">
+                  Rut no encontrado. Ir a la página de clientes:{" "}
+                  <Button variant="outlined">Clientes</Button>
+                </Typography>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              {searchResults.length > 0 ? (
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        {/* <TableCell>ID Cabecera</TableCell>
+                        <TableCell>ID Usuario</TableCell> */}
+                        <TableCell>Total</TableCell>
+                        <TableCell>Método de Pago</TableCell>
+                        <TableCell>Productos</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {ultimaVenta && ultimaVenta.ticketBusqueda.map((ticket) => (
+                        <TableRow key={ticket.idCabecera}>
+                          {/* <TableCell>{ticket.idCabecera}</TableCell>
+                          <TableCell>{ticket.idUsuario}</TableCell> */}
+                          <TableCell>{ticket.total}</TableCell>
+                          <TableCell>{ticket.metodoPago}</TableCell>
+                          <TableCell>
+                            <ul>
+                              {ticket.products.map((product) => (
+                                <li key={product.codProducto}>
+                                  {product.descripcion} - Cantidad: {product.cantidad} - Precio Unidad: {product.precioUnidad}
+                                </li>
+                              ))}
+                            </ul>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography variant="subtitle1">
+                  Rut no encontrado. Ir a la página de clientes:{" "}
+                  <Button variant="outlined">Clientes</Button>
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
     </Paper>
   );
 };
