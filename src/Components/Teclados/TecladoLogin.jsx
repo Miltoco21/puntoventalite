@@ -3,7 +3,7 @@ import { TextField, Button, Container, Typography, Box, Grid,CircularProgress } 
 
 import { useNavigate } from "react-router-dom";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider"
-
+import axios from "axios"
 
 const Login = () => {
   const [rutOrCode, setRutOrCode] = useState("");
@@ -18,35 +18,49 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      if (!rutOrCode || !password) {
-        setError("Por favor, completa ambos campos.");
-        return;
-      }
-      setLoading(true);
-
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Usuarios/LoginUsuario",
-        {
-          codigoUsuario: 0,
-          rut: rutOrCode,
-          clave: password,
+        if (!rutOrCode || !password) {
+            setError("Por favor, completa ambos campos.");
+            return;
         }
-      );
-      console.log("Respuesta del servidor:", response.data.responseUsuario);
+        setLoading(true);
 
-      if (response.data.responseUsuario) {
-        // Actualizar userData después del inicio de sesión exitoso
-        updateUserData(response.data.responseUsuario);
+        // Console log para imprimir los datos antes de enviar el formulario
+        console.log("Datos antes de enviar el formulario:", { rutOrCode, password });
 
-        // Redirigir a la página de inicio
-        navigate("/home");
-      } else {
-        setError("Error de inicio de sesión. Verifica tus credenciales.");
-      }
+        const response = await axios.post(
+            "https://www.easyposdev.somee.com/api/Usuarios/LoginUsuario",
+            {
+                codigoUsuario: 0,
+                rut: rutOrCode,
+                clave: password,
+            }
+        );
+
+        // Console log para imprimir la respuesta del servidor
+        console.log("Respuesta del servidor:", response.data);
+
+        if (response.data.responseUsuario) {
+            // Actualizar userData después del inicio de sesión exitoso
+            updateUserData(response.data.responseUsuario);
+
+            // Redirigir a la página de inicio
+            navigate("/home");
+        } else {
+            setError("Error de inicio de sesión. Verifica tus credenciales.");
+        }
     } catch (error) {
-      setError("Error de inicio de sesión. Verifica tus credenciales.");
+        console.error("Error al intentar iniciar sesión:", error);
+        if (error.response) {
+            setError("Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña."+ error.message);
+        } else if (error.response && error.response.status === 500) {
+            setError("Error interno del servidor. Por favor, inténtalo de nuevo más tarde.");
+        } else {
+            setError("Error al intentar iniciar sesión. Por favor, inténtalo de nuevo más tarde.");
+        }
+    } finally {
+        setLoading(false); // Asegúrate de que setLoading se restablezca incluso si hay un error
     }
-  };
+};
   const handleNumberClick = (number) => {
     if (activeInput === "rutOrCode") {
       setRutOrCode((prevRutOrCode) => prevRutOrCode + number);

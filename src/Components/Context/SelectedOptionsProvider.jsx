@@ -80,7 +80,7 @@ export const SelectedOptionsProvider = ({ children }) => {
       // Lógica de inicio de sesión
 
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/Usuarios/LoginUsuario",
+        "https://www.easyposdev.somee.com/api/Usuarios/LoginUsuario",
         {
           codigoUsuario: 0,
           rut: rutOrCode,
@@ -96,10 +96,10 @@ export const SelectedOptionsProvider = ({ children }) => {
 
         // Resto del código para el inicio de sesión exitoso
       } else {
-        setError("Error de inicio de sesión. Verifica tus credenciales.");
+        setError("Error de inicio de sesión. Verifica tus credencialesBBBBB.");
       }
     } catch (error) {
-      setError("Error de inicio de sesión. Verifica tus credenciales.");
+      setError("Error de inicio de sesión. Verifica tus credencialesAAAAkkokok.");
     }
   };
 
