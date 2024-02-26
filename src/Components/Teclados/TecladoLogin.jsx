@@ -82,7 +82,7 @@ const Login = () => {
     }
   };
 
-  const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0];
+  const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0,"-"];
 
   return (
     <Container component="main" maxWidth="xs">
@@ -135,6 +135,7 @@ const Login = () => {
               </Grid>
             ))}
             <Grid container justifyContent="space-between" sx={{ mt: 2 }}>
+          
           {/* Botón para eliminar todos los datos */}
           <Button variant="outlined" onClick={handleClearAll}>
             Limpiar todo
