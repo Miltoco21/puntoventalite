@@ -587,6 +587,7 @@ const IngresoClientes = () => {
             xl={12}
             spacing={2}
           >
+            
             <Grid item xs={12} sm={6} md={12} lg={12}>
               <Paper>
                 <Grid

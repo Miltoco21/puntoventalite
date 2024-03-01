@@ -6,6 +6,8 @@ import {
   Typography,
   IconButton,
   Menu,
+  TextField,
+  Chip,
   Box,
   MenuItem,
   Dialog,
@@ -68,13 +70,15 @@ const NavBar = () => {
             </Box>
           </Grid>
           <Grid item xs={8} sm={9} md={9}>
-            <Paper elevation={3}>
-              <Box> ESTABLECIMIENTO</Box>
-            </Paper>
+            
+              <Chip  
+              label="Establecimiento"
+              sx={{borderRadius:"6px",backgroundColor:"white",width:"90%"}}> ESTABLECIMIENTO</Chip>
+           
           </Grid>
-          <Grid item xs={1} sm={1} md={1}>
+          <Grid item xs={2} sm={2} md={1}>
             <IconButton onClick={handleMenuOpen} style={{ padding: "8px" }}>
-              <Settings fontSize="large" />
+              <Settings fontSize="medium" />
             </IconButton>
             <Menu
               anchorEl={anchorEl}

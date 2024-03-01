@@ -30,7 +30,7 @@ import TecladoPLU from "../Teclados/TecladoPLU";
 import TecladoPeso from "../Teclados/TecladoPeso";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
-const BoxSumaProd = () => {
+const BoxSumaProd = ({ venta }) => {
   const {
     salesData,
     setSalesData,
@@ -217,6 +217,30 @@ const BoxSumaProd = () => {
                     </TableCell>
                   </TableRow>
                 ))}
+                                {venta &&
+                  venta.products.map((product, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <TextField
+                          value={product.quantity}
+                          onChange={(event) => {
+                            // Lógica para actualizar la cantidad si es necesario
+                          }}
+                          inputProps={{ min: 0 }}
+                          style={{ width: 90 }}
+                        />
+                      </TableCell>
+                      <TableCell>{product.descripcion}</TableCell>
+                      <TableCell>{product.precioUnidad}</TableCell>
+                      <TableCell>
+                        {calculateTotalPrice(product.quantity, product.precioUnidad)}
+                      </TableCell>
+                      <TableCell>
+                        {/* Botón para eliminar el producto */}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+
               </TableBody>
             </Table>
 

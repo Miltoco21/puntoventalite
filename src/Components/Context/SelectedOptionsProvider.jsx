@@ -16,11 +16,12 @@ export const SelectedOptionsProvider = ({ children }) => {
     selectedProduct: null,
   });
   const [productInfo, setProductInfo] = useState(/* initial value */);
- 
+  
+  
 
   const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
-
+  const [precioData, setPrecioData] = useState(null);
   const [salesData, setSalesData] = useState([]);
   const [grandTotal, setGrandTotal] = useState(0);
   const [products, setProducts] = useState([]);
@@ -227,6 +228,7 @@ export const SelectedOptionsProvider = ({ children }) => {
         setDescription,
         userData,
         updateUserData,
+        precioData, setPrecioData
       }}
     >
       {children}

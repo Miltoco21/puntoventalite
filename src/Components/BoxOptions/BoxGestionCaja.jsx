@@ -12,7 +12,7 @@ import {
   Typography,
   Button,
   DialogContent,
-  Dialog, 
+  Dialog,
   Table,
   TableBody,
   TableCell,
@@ -39,6 +39,9 @@ import BoxIngreso from "./BoxIngreso";
 import BoxStock from "./BoxStock";
 import IngresoClientes from "./IngresoClientes";
 import BoxPago from "./BoxPago";
+import BoxPagoTicket from "./BoxPagoTicket";
+import BoxBuscador from "./BoxBuscador";
+import BoxPreciosClientes from "./BoxPreciosClientes";
 
 const BoxGestionCaja = () => {
   const {
@@ -73,8 +76,9 @@ const BoxGestionCaja = () => {
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openRecoveryDialog, setOpenRecoveryDialog] = useState(false);
   const [openClienteDialog, setopenClienteDialog] = useState(false);
+  const [openPreciosClienteDialog, setOpenPreciosClienteDialog] = useState(false);
   const [openStockDialog, setOpenStockDialog] = useState(false);
- 
+  const [openTicketDialog, setOpenTicketDialog] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [openDevolucionDialog, setOpenDevolucionDialog] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -90,6 +94,8 @@ const BoxGestionCaja = () => {
   const [selectedCabecera, setSelectedCabecera] = useState(null);
   const [expandedAccordion, setExpandedAccordion] = useState(null);
   const [productoData, setProductoData] = useState([]);
+ 
+ 
 
   useEffect(() => {
     fetchData();
@@ -448,10 +454,18 @@ const BoxGestionCaja = () => {
   const handleCloseStock = () => {
     setOpenStockDialog(false);
   };
-
- 
-  
-
+  const handleOpenTicket = () => {
+    setOpenTicketDialog(true);
+  };
+  const handleCloseTicket = () => {
+    setOpenTicketDialog(false);
+  };
+  const handleOpenPrecioCliente=()=>{
+    setOpenPreciosClienteDialog(true);
+  }
+  const handleClosePrecioCliente=()=>{
+    setOpenPreciosClienteDialog(false);
+  }
 
   const [openCategoria, setOpenCategoria] = useState(false);
   const handleOpenCategoria = () => {
@@ -621,7 +635,7 @@ const BoxGestionCaja = () => {
               },
               margin: "5px",
             }}
-            onClick={() => handleNavigationChange(null, 9)}
+            onClick={handleOpenPrecioCliente}
           >
             {/* <CoffeeIcon /> */}
             <Typography variant="h7">Precios</Typography>
@@ -646,9 +660,7 @@ const BoxGestionCaja = () => {
           </Button>
         </Grid> */}
         <Grid item xs={12} sm={10} md={12} lg={12} xl={10}>
-          <Grid
-         
-          >
+          <Grid>
             <Box
               sx={{
                 borderRadius: "8px",
@@ -660,19 +672,34 @@ const BoxGestionCaja = () => {
               }}
             >
               <Grid container item xs={12}>
-                <Grid item xs={12}
-               sx={{ margin: "6px", color: "#ffffff", backgroundColor: "#00878889", fontFamily: 'digital-7',borderRadius: "5px", }}>
-                  <p style={{ margin: "6px"}} >
-                   TOTAL : $ <span style={{color: "#00878889"}}><span style={{color: "white"}} >{grandTotal}</span> </span>{" "}
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    margin: "6px",
+                    color: "#ffffff",
+                    backgroundColor: "#00878889",
+                    fontFamily: "digital-7",
+                    borderRadius: "5px",
+                  }}
+                >
+                  <p style={{ margin: "6px" }}>
+                    TOTAL : ${" "}
+                    <span style={{ color: "#00878889" }}>
+                      <span style={{ color: "white" }}>{grandTotal}</span>{" "}
+                    </span>{" "}
                   </p>
                 </Grid>
 
-                <Grid item xs={4}
-                sx={{display: "flex",justifyContent:"center"}}>
+                <Grid
+                  item
+                  xs={4}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
                   <Button
                     sx={{
                       margin: "7px",
-                      width:"80%",
+                      width: "80%",
                       height: "60px",
                       backgroundColor: "green",
                       color: "whitesmoke",
@@ -691,7 +718,7 @@ const BoxGestionCaja = () => {
                   <Button
                     sx={{
                       margin: "7px",
-                      width:"80%",
+                      width: "80%",
                       height: "60px",
                       backgroundColor: "green",
                       color: "whitesmoke",
@@ -710,7 +737,7 @@ const BoxGestionCaja = () => {
                   <Button
                     sx={{
                       margin: "7px",
-                      width:"80%",
+                      width: "80%",
                       height: "60px",
                       backgroundColor: "green",
                       color: "whitesmoke",
@@ -719,7 +746,7 @@ const BoxGestionCaja = () => {
                         color: "white",
                       },
                     }}
-                    onClick={handleOpenDialog}
+                    onClick={handleOpenTicket}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
                     <Typography variant="h7">Ticket</Typography>
@@ -731,29 +758,38 @@ const BoxGestionCaja = () => {
         </Grid>
       </Grid>
 
-      <Dialog
-     
-        open={openCategoria}
-        onClose={handleCloseCategoria}
-      >
+      <Dialog open={openCategoria} onClose={handleCloseCategoria}>
         <DialogContent>
           <BotonesCategorias onClose={handleCloseCategoria} />
         </DialogContent>
       </Dialog>
-      
+
       <Dialog
-        sx={{ width: "100%", }}
+        sx={{ width: "100%" }}
         open={openDialog}
         onClose={handleCloseDialog}
       >
         <DialogContent sx={{ width: "100%" }}>
-         <BoxPago/>
+          <BoxPago />
         </DialogContent>
       </Dialog>
 
+      <Dialog
+        sx={{ width: "100%" }}
+        open={openTicketDialog}
+        onClose={handleCloseTicket}
+      >
+        <DialogContent sx={{ width: "100%" }}>
+          <BoxPagoTicket />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseTicket}>Cancelar</Button>
+          
+        </DialogActions>
+      </Dialog>
+
       {/* Dialog for entering description */}
-     
-      
+
       <Snackbar
         open={openSuccessSnackbar}
         autoHideDuration={5000}
@@ -775,6 +811,17 @@ const BoxGestionCaja = () => {
         </DialogActions>
       </Dialog>
 
+      <Dialog open={openPreciosClienteDialog} onClose={handleClosePrecioCliente}>
+        <DialogTitle>Precios Clientes</DialogTitle>
+        <DialogContent>
+          <BoxPreciosClientes onClose={handleClosePrecioCliente} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePrecioCliente} >Cancelar</Button>
+          {/* <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button> */}
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={openDevolucionDialog} onClose={handleCloseDevolucion}>
         <DialogTitle>Devolución</DialogTitle>
         <DialogContent>
@@ -788,7 +835,6 @@ const BoxGestionCaja = () => {
       <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
         <DialogTitle>Crear Cliente</DialogTitle>
         <DialogContent>
-         
           <IngresoClientes onClose={handleCloseIngreso} />
         </DialogContent>
         <DialogActions>
@@ -802,10 +848,8 @@ const BoxGestionCaja = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseStock}>Cancelar</Button>
-         
         </DialogActions>
       </Dialog>
-      
     </Paper>
   );
 };

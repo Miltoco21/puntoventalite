@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
-const RegistroCompra = () => {
+const BoxPagoTicket = () => {
   const { grandTotal,userData,salesData,addToSalesData } = useContext(SelectedOptionsContext);
 
   const [totalCompra, setTotalCompra] = useState(grandTotal);
@@ -65,7 +65,7 @@ const RegistroCompra = () => {
 
   const handleGenerarBoletaElectronica = async () => {
     try {
-      const boletaElectronica = {
+      const ticket = {
         "idUsuario": userData.codigoUsuario,
       
         "total": grandTotal,
@@ -82,8 +82,8 @@ const RegistroCompra = () => {
       console.log("Datos enviados por Axios:", boletaElectronica);
       // Realizar la solicitud POST a la API para generar la boleta electrónica
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/GenerarBoletaElectronica",
-        boletaElectronica
+        "https://www.easyposdev.somee.com/api/Ventas/ImprimirTicket",
+        ticket
       );
   
       console.log("Respuesta del servidor:", response.data);
@@ -107,14 +107,10 @@ const RegistroCompra = () => {
       setError("Error al generar la boleta electrónica.");
     }
   };
-  
-
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h4">Ventana de Pago</Typography>
-      
+        <Typography variant="h4">Pago de Ticket</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={6} lg={6}>
         <TextField
@@ -181,7 +177,7 @@ const RegistroCompra = () => {
             variant="contained"
             onClick={handleGenerarBoletaElectronica}
           >
-            procesar
+            Procesar
           </Button></Grid>
           
         </Grid>
@@ -226,6 +222,6 @@ const RegistroCompra = () => {
       </Grid> */}
     </Grid>
   );
-};
+}
 
-export default RegistroCompra;
+export default BoxPagoTicket

@@ -1,8 +1,3 @@
-/* eslint-disable no-undef */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-
 import React, { useState, useEffect, useContext } from "react";
 import {
   Paper,
@@ -24,25 +19,23 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
-import FaceIcon from "@mui/icons-material/Face";
+import BoxSumaProd from "./BoxSumaProd";
 import axios from "axios";
+import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
+
 const BoxBuscador = () => {
+  const { salesData, addToSalesData ,setPrecioData} = useContext(SelectedOptionsContext);
+
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [serverResponse, setServerResponse] = useState("");
-  const [ultimaVenta, setUltimaVenta] = useState("");
-  useEffect(() => {
-    if (ultimaVenta !== null) {
-      console.log("Última venta:", ultimaVenta);
-    }
-  }, [ultimaVenta]);
-
+  const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
+  const [selectedUser, setSelectedUser] = useState(null);
+ 
   const handleSearch = async () => {
     try {
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );
-      console.log(" resultado busqueda", response.data.clienteSucursal);
       if (Array.isArray(response.data.clienteSucursal)) {
         setSearchResults(response.data.clienteSucursal);
       } else {
@@ -61,7 +54,6 @@ const BoxBuscador = () => {
       setSearchResults([]);
     }
   };
-
   const handleUltimaCompraCliente = async (
     codigoCliente,
     codigoClienteSucursal
@@ -70,121 +62,162 @@ const BoxBuscador = () => {
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
       );
-      setUltimaVenta(response.data);
-      console.log("Última venta response:", response);
+
+      console.log("Datos enviados por chip:", response.data); // Console log de los datos enviados por el chip
+
+      const { ticketBusqueda } = response.data; // Extraer la sección de ticket de la respuesta
+
+      // Verificar si hay información de tickets antes de procesarla
+      if (Array.isArray(ticketBusqueda) && ticketBusqueda.length > 0) {
+        ticketBusqueda.forEach((ticket) => {
+          const products = ticket.products; // Extraer la matriz de productos del ticket
+
+          // Verificar si hay productos antes de enviarlos a addToSalesData
+          if (Array.isArray(products) && products.length > 0) {
+            products.forEach((product) => {
+              addToSalesData({
+                nombre: product.descripcion,
+                precioVenta: product.precioUnidad,
+                idProducto: product.codProducto,
+                cantidad: product.cantidad,
+              });
+            });
+          } else {
+            console.log("No se encontraron productos en la última venta.");
+          }
+        });
+      } else {
+        console.log("No se encontraron tickets de venta en la última compra.");
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  ///Fx recibe parametros de evento onclick
+  const handleOpenPreciosClientesDialog = async (codigoCliente, codigoClienteSucursal) => {
+    try {
+      console.log(codigoCliente, codigoClienteSucursal);
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
+      );
+  
+      // Actualiza el estado con los datos obtenidos de la API
+      setPrecioData(response.data);
+      console.log("Respuesta Precios Clientes:", response.data);
+  
+      // Abre el diálogo
+      setOpenPrecioDialog(true);
+    } catch (error) {
+      console.error("Error Precios Clientes", error);
+    }
+  };
+  // const handleOpenDialog = async (codigoCliente, codigoClienteSucursal) => {
+  //   try {
+  //     console.log(codigoCliente, codigoClienteSucursal);
+  //     const response = await axios.get(
+  //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
+  //     );
+  
+  //     // Aquí puedes abrir el diálogo con los datos obtenidos
+  //     console.log("Datos del diálogo:", response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  // const handleUltimaCompraCliente = async (codigoCliente, codigoClienteSucursal, producto) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://www.easyposdev.somee.com/api/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
+  //     );
+  //     setUltimaVenta(response.data);
+  //     console.log("Datos enviados por chip:", response.data); // Console log de los datos enviados por el chip
+
+  //     // Enviar los datos de los productos de la última venta a addToSalesData
+  //     response.data.products.forEach((product) => {
+  //       addToSalesData({
+  //         nombre: product.descripcion,
+  //         precioVenta: product.precioUnidad, // Ajustar según el precio correcto en la respuesta de la API
+  //         idProducto: product.codProducto, // Ajustar según el identificador correcto en la respuesta de la API
+  //       });
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
 
   return (
     <Paper elevation={13} sx={{ marginBottom: "3px" }}>
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={12} lg={12}>
-        <Grid container spacing={2}>
-          <Grid item xs={10} md={12} sx={{ display: "flex", margin: "8px" }}>
-            <Grid item md={8}>
-              <TextField
-                fullWidth
-                label="Ingrese Nombre Apellido"
-                value={searchText}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item md={3}>
-              <Button
-                fullWidth
-                size="large"
-                variant="contained"
-                onClick={handleSearch}
-              >
-                Buscar
-              </Button>
-            </Grid>
-          </Grid>
-  
-          <Grid item xs={12}>
-            {searchResults && searchResults.length > 0 && (
-              <TableContainer>
-                <ul
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: "3px",
-                  }}
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={12} lg={12}>
+          <Grid container spacing={2}>
+            <Grid
+              item
+              xs={10}
+              md={12}
+              sx={{
+                display: "flex",
+                margin: "8px",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
+              <Grid item md={8}>
+                <TextField
+                  fullWidth
+                  label="Ingrese Nombre Apellido"
+                  value={searchText}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item md={3}>
+                <Button
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  onClick={handleSearch}
                 >
-                  {searchResults.map((result) => (
-                    <ListItem key={result.codigoCliente}>
-                      <Chip
-                        sx={{ display: "flex", margin: "auto" }}
-                        label={
-                          <div style={{ margin: "2px", padding: "13px" }}>
-                            {result.nombreResponsable}{" "}
-                            {result.apellidoResponsable}
-                          </div>
-                        }
-                        onClick={() =>
-                          handleUltimaCompraCliente(
-                            result.codigoCliente,
-                            result.codigoClienteSucursal
-                          )
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </ul>
-              </TableContainer>
-            )}
-            {searchResults && searchResults.length === 0 && searchText !== '' && (
-              <Typography variant="subtitle1">
-                Rut no encontrado. Ir a la página de clientes:{" "}
-                <Button variant="outlined">Clientes</Button>
-              </Typography>
-            )}
+                  Buscar
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              {searchResults && searchResults.length > 0 && (
+                <TableContainer>
+                  <ul
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "3px",
+                    }}
+                  >
+                    {searchResults.map((result) => (
+                      <ListItem key={result.codigoCliente}>
+                        <Chip
+                          sx={{ display: "flex", margin: "auto" }}
+                          label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
+                          onClick={() => {
+                            handleUltimaCompraCliente(
+                              result.codigoCliente,
+                              result.codigoClienteSucursal
+                            );
+                            handleOpenPreciosClientesDialog(
+                              result.codigoCliente,
+                              result.codigoClienteSucursal
+                            );
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                  </ul>
+                </TableContainer>
+              )}
+            </Grid>
+            <Grid item xs={12}></Grid>
           </Grid>
-          <Grid item xs={12}>
-  {ultimaVenta && ultimaVenta.ticketBusqueda && (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Descripción</TableCell>
-            <TableCell>Cantidad</TableCell>
-            <TableCell>Precio Unitario</TableCell>
-            <TableCell>Total</TableCell>
-            <TableCell>Método de Pago</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {ultimaVenta.ticketBusqueda.map((ticket) => (
-            ticket.products.map((product) => (
-              <TableRow key={product.codProducto}>
-                <TableCell>{product.descripcion}</TableCell>
-                <TableCell>{product.cantidad}</TableCell>
-                <TableCell>{product.precioUnidad}</TableCell>
-                <TableCell>{product.cantidad * product.precioUnidad}</TableCell>
-                {/* Si quieres mostrar el total de la venta solo en la primera fila, puedes hacerlo así: */}
-                {/* {ticket.products.indexOf(product) === 0 && <TableCell rowSpan={ticket.products.length}>{ticket.total}</TableCell>} */}
-                {/* Si quieres mostrar el total de la venta en cada fila, descomenta la línea a continuación: */}
-                {/* <TableCell>{ticket.total}</TableCell> */}
-                {/* Si el total de la venta solo debe mostrarse en la última fila, puedes hacerlo así: */}
-                {/* {ticket.products.indexOf(product) === ticket.products.length - 1 && <TableCell>{ticket.total}</TableCell>} */}
-                {/* Si prefieres no mostrar el total en cada fila de productos, puedes eliminar esta columna */}
-                <TableCell>{ticket.metodoPago}</TableCell>
-              </TableRow>
-            ))
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  )}
-</Grid>
-
         </Grid>
       </Grid>
-    </Grid>
-  </Paper>
-  
+    </Paper>
   );
 };
 
