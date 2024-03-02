@@ -42,6 +42,7 @@ import BoxPago from "./BoxPago";
 import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 import BoxPreciosClientes from "./BoxPreciosClientes";
+import StepperSI from "../Stepper/StepperSI"
 
 const BoxGestionCaja = () => {
   const {
@@ -54,6 +55,7 @@ const BoxGestionCaja = () => {
     addToSalesData,
   } = useContext(SelectedOptionsContext);
 
+  const [openCrearProductoDialog, setOpenCrearProductoDialog] = useState(false);
   const [clickedDigits, setClickedDigits] = useState([]);
   const [totalAPagar, setTotalAPagar] = useState(0);
   const [change, setChange] = useState(0);
@@ -76,7 +78,8 @@ const BoxGestionCaja = () => {
   const [openDescriptionDialog, setOpenDescriptionDialog] = useState(false);
   const [openRecoveryDialog, setOpenRecoveryDialog] = useState(false);
   const [openClienteDialog, setopenClienteDialog] = useState(false);
-  const [openPreciosClienteDialog, setOpenPreciosClienteDialog] = useState(false);
+  const [openPreciosClienteDialog, setOpenPreciosClienteDialog] =
+    useState(false);
   const [openStockDialog, setOpenStockDialog] = useState(false);
   const [openTicketDialog, setOpenTicketDialog] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
@@ -94,8 +97,6 @@ const BoxGestionCaja = () => {
   const [selectedCabecera, setSelectedCabecera] = useState(null);
   const [expandedAccordion, setExpandedAccordion] = useState(null);
   const [productoData, setProductoData] = useState([]);
- 
- 
 
   useEffect(() => {
     fetchData();
@@ -460,12 +461,19 @@ const BoxGestionCaja = () => {
   const handleCloseTicket = () => {
     setOpenTicketDialog(false);
   };
-  const handleOpenPrecioCliente=()=>{
+  const handleOpenPrecioCliente = () => {
     setOpenPreciosClienteDialog(true);
-  }
-  const handleClosePrecioCliente=()=>{
+  };
+  const handleClosePrecioCliente = () => {
     setOpenPreciosClienteDialog(false);
-  }
+  };
+  const handleOpenCrearProductoDialog = () => {
+    setOpenCrearProductoDialog(true);
+  };
+
+  const handleCloseCrearProductoDialog = () => {
+    setOpenCrearProductoDialog(false);
+  };
 
   const [openCategoria, setOpenCategoria] = useState(false);
   const handleOpenCategoria = () => {
@@ -565,8 +573,9 @@ const BoxGestionCaja = () => {
           </Button>
         </Grid>
 
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
+        
+           {/*  */}
+          {/* <Button
             sx={{
               width: "90%",
               height: "80px",
@@ -580,10 +589,30 @@ const BoxGestionCaja = () => {
             }}
             onClick={handleOpenDevolucion}
           >
-            {/* <CoffeeIcon /> */}
+          
             <Typography variant="h7">Devolución</Typography>
+          </Button> */}
+      
+
+        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
+          <Button
+            sx={{
+              width: "90%",
+              height: "80px",
+              backgroundColor: "lightSalmon",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "coral",
+                color: "white",
+              },
+              margin: "5px",
+            }}
+            onClick={handleOpenCrearProductoDialog}
+          >
+            <Typography variant="h7">Crear Producto</Typography>
           </Button>
         </Grid>
+
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
             sx={{
@@ -784,7 +813,6 @@ const BoxGestionCaja = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseTicket}>Cancelar</Button>
-          
         </DialogActions>
       </Dialog>
 
@@ -811,13 +839,16 @@ const BoxGestionCaja = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={openPreciosClienteDialog} onClose={handleClosePrecioCliente}>
+      <Dialog
+        open={openPreciosClienteDialog}
+        onClose={handleClosePrecioCliente}
+      >
         <DialogTitle>Precios Clientes</DialogTitle>
         <DialogContent>
           <BoxPreciosClientes onClose={handleClosePrecioCliente} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClosePrecioCliente} >Cancelar</Button>
+          <Button onClick={handleClosePrecioCliente}>Cancelar</Button>
           {/* <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button> */}
         </DialogActions>
       </Dialog>
@@ -848,6 +879,21 @@ const BoxGestionCaja = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseStock}>Cancelar</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openCrearProductoDialog}
+        onClose={handleCloseCrearProductoDialog}
+      >
+        <DialogTitle>Crear Producto</DialogTitle>
+        <DialogContent>
+          <StepperSI onClose={handleCloseCrearProductoDialog} />
+          {/* Aquí puedes colocar el formulario para crear un nuevo producto */}
+          {/* Por ejemplo, campos para nombre, precio, descripción, etc. */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCrearProductoDialog}>Cancelar</Button>
+          {/* <Button onClick={handleCrearProducto}>Crear</Button> */}
         </DialogActions>
       </Dialog>
     </Paper>

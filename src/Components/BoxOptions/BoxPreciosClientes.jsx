@@ -37,6 +37,7 @@ import BoxPago from "./BoxPago";
 import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 
+
 const BoxPreciosClientes = () => {
   
   const { precioData, setPrecioData } = useContext(SelectedOptionsContext);
