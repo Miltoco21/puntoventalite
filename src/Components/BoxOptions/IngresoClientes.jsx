@@ -47,6 +47,15 @@ function Alert(props) {
 }
 
 const IngresoClientes = () => {
+
+  const validarRutChileno = (rut) => {
+    // Expresión regular para validar RUT chileno
+    const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
+    
+    // Comprobar si el RUT cumple con el formato
+    return rutRegex.test(rut);
+  };
+
   const [formData, setFormData] = useState({
     rut: "",
     nombre: "",
@@ -106,6 +115,19 @@ const IngresoClientes = () => {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [rut, setRut] = useState("");
+  const [rutError, setRutError] = useState(false);
+
+  const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
+
+  const handleRutChange = (event) => {
+    const newRut = event.target.value;
+    setRut(newRut);
+    setRutError(!rutRegex.test(newRut));
+  };
+
 
   const [branchData, setBranchData] = useState({
     codigoCliente: 0,
@@ -311,8 +333,24 @@ const IngresoClientes = () => {
   };
 
   const handleSubmit = async () => {
+    if (!validarRutChileno(formData.rut)) {
+      setErrorMessage("Por favor ingresa un RUT válido.");
+      return;
+    }
+
+
+    const emptyFields = Object.values(formData).some((value) => value === "");
+
+    if (emptyFields) {
+      setErrorMessage("Por favor completa todos los campos antes de enviar el formulario.");
+      return;
+    } else {
+      setErrorMessage("");
+    }
+  
     const formDataToSend = {
       ...formData,
+      rut: rut,//////
       region: String(formData.region),
       comuna: String(formData.comuna),
     };
@@ -418,6 +456,7 @@ const IngresoClientes = () => {
             lg={8}
             spacing={2}
           >
+            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             <Grid item xs={12} sm={6} md={6}>
               <TextField
                 label="Rut"
