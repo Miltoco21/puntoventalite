@@ -29,7 +29,7 @@ const Step5Component = ({ data, onNext }) => {
   const [newImpuesto, setNewImpuesto] = useState("");
   const [nota, setNota] = useState(data.nota||"");
 
-  const [stockCritico, setStockCritico] = useState(data.stockCritico||"");
+  const [stockCritico, setStockCritico] = useState("");
   const [selectedImpuestoId, setSelectedImpuestoId] = useState(data.selectedImpuestoId||"");
 
   const [selectedFile, setSelectedFile] = useState(data.selectedFile||null);

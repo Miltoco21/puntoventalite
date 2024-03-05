@@ -24,8 +24,8 @@ import {
 
 const Step3Component = ({ data, onNext }) => {
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockInicial, setStockInical] = useState(data.stockInicial||"");
-  const [precioCosto, setPrecioCosto] = useState(data.precioCosto||"");
+  const [stockInicial, setStockInical] = useState("");
+  const [precioCosto, setPrecioCosto] = useState("");
   const [selectedUnidadId, setSelectedUnidadId] = useState(data.selectedUnidadId||"");
 
   const [openDialog1, setOpenDialog1] = useState(false);

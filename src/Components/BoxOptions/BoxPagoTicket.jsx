@@ -79,7 +79,7 @@ const BoxPagoTicket = () => {
       };
   
       // Mostrar los datos que se están enviando por Axios
-      console.log("Datos enviados por Axios:", boletaElectronica);
+      console.log("Datos enviados por Axios:",ticket);
       // Realizar la solicitud POST a la API para generar la boleta electrónica
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/Ventas/ImprimirTicket",
@@ -171,6 +171,13 @@ const BoxPagoTicket = () => {
             onClick={() => handleMetodoPagoClick("TARJETA")}
           >
             Crédito
+          </Button>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() => handleMetodoPagoClick("CUENTA CORRIENTE")}
+          >
+            Cuenta Corriente
           </Button>
           <Grid><Button
             fullWidth

@@ -43,6 +43,7 @@ import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 import BoxPreciosClientes from "./BoxPreciosClientes";
 import StepperSI from "../Stepper/StepperSI"
+import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente"
 
 const BoxGestionCaja = () => {
   const {
@@ -498,6 +499,17 @@ const BoxGestionCaja = () => {
     setOpenDialog(false);
   };
 
+  const [openDeudasDialog, setOpenDeudasDialog] = useState(false);
+
+  // Paso 2: Funciones para manejar la apertura y el cierre del diálogo
+  const handleOpenDeudasDialog = () => {
+    setOpenDeudasDialog(true);
+  };
+
+  const handleCloseDeudasDialog = () => {
+    setOpenDeudasDialog(false);
+  };
+
   return (
     <Paper
       elevation={13}
@@ -645,7 +657,7 @@ const BoxGestionCaja = () => {
               },
               margin: "5px",
             }}
-            onClick={() => handleNavigationChange(null, 8)}
+            onClick={handleOpenDeudasDialog}
           >
             {/* <CoffeeIcon /> */}
             <Typography variant="h7">Deudas</Typography>
@@ -894,6 +906,15 @@ const BoxGestionCaja = () => {
         <DialogActions>
           <Button onClick={handleCloseCrearProductoDialog}>Cancelar</Button>
           {/* <Button onClick={handleCrearProducto}>Crear</Button> */}
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
+        <DialogContent>
+          <BoxCtaCorriente></BoxCtaCorriente>
+         
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>
         </DialogActions>
       </Dialog>
     </Paper>

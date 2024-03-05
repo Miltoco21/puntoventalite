@@ -19,18 +19,31 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'; 
 import BoxSumaProd from "./BoxSumaProd";
 import axios from "axios";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const BoxBuscador = () => {
-  const { salesData, addToSalesData ,setPrecioData} = useContext(SelectedOptionsContext);
+  const { salesData, addToSalesData, setPrecioData, setVentaData } = useContext(
+    SelectedOptionsContext
+  );
 
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
   const [selectedUser, setSelectedUser] = useState(null);
- 
+
+  const [selectedChipIndex, setSelectedChipIndex] = useState(null);
+  const handleChipClick = (index, result) => {
+    setSelectedUser(result); // Establecer el usuario seleccionado
+    setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
+    // Llamar a las funciones asociadas al clic en el chip seleccionado
+    handleUltimaCompraCliente(result.codigoCliente, result.codigoClienteSucursal);
+    handleOpenPreciosClientesDialog(result.codigoCliente, result.codigoClienteSucursal);
+    handleOpenDeudasClientesDialog(result.codigoCliente, result.codigoClienteSucursal);
+  };
+
   const handleSearch = async () => {
     try {
       const response = await axios.get(
@@ -94,30 +107,56 @@ const BoxBuscador = () => {
     }
   };
   ///Fx recibe parametros de evento onclick
-  const handleOpenPreciosClientesDialog = async (codigoCliente, codigoClienteSucursal) => {
+  const handleOpenPreciosClientesDialog = async (
+    codigoCliente,
+    codigoClienteSucursal
+  ) => {
     try {
       console.log(codigoCliente, codigoClienteSucursal);
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
       );
-  
+
       // Actualiza el estado con los datos obtenidos de la API
       setPrecioData(response.data);
       console.log("Respuesta Precios Clientes:", response.data);
-  
+
       // Abre el diálogo
       setOpenPrecioDialog(true);
     } catch (error) {
       console.error("Error Precios Clientes", error);
     }
   };
+
+  const handleOpenDeudasClientesDialog = async (
+    codigoCliente,
+    codigoClienteSucursal
+  ) => {
+    try {
+      console.log(codigoCliente, codigoClienteSucursal);
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
+      );
+
+      // Aquí puedes manejar la respuesta como lo desees, por ejemplo, pasándola a otro componente.
+      console.log("Respuesta Deudas Clientes:", response.data.clienteDeuda);
+
+      // Puedes pasar los datos al componente necesario, por ejemplo:
+      setVentaData(response.data.clienteDeuda);
+
+      // También puedes abrir un diálogo o realizar otras acciones según tu lógica de aplicación.
+    } catch (error) {
+      console.error("Error Deudas Clientes", error);
+    }
+  };
+
   // const handleOpenDialog = async (codigoCliente, codigoClienteSucursal) => {
   //   try {
   //     console.log(codigoCliente, codigoClienteSucursal);
   //     const response = await axios.get(
   //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
   //     );
-  
+
   //     // Aquí puedes abrir el diálogo con los datos obtenidos
   //     console.log("Datos del diálogo:", response.data);
   //   } catch (error) {
@@ -191,23 +230,21 @@ const BoxBuscador = () => {
                       gap: "3px",
                     }}
                   >
-                    {searchResults.map((result) => (
-                      <ListItem key={result.codigoCliente}>
+                    {searchResults.map((result, index) => (
+                        <ListItem key={result.codigoCliente}>
                         <Chip
-                          sx={{ display: "flex", margin: "auto" }}
-                          label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
-                          onClick={() => {
-                            handleUltimaCompraCliente(
-                              result.codigoCliente,
-                              result.codigoClienteSucursal
-                            );
-                            handleOpenPreciosClientesDialog(
-                              result.codigoCliente,
-                              result.codigoClienteSucursal
-                            );
+                          sx={{
+                            display: "flex",
+                            margin: "auto",
+                            backgroundColor: selectedChipIndex === index ? "#A8EB12" : "#2196f3",
+                            transition: "background-color 0.3s ease",
                           }}
+                          label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
+                          icon={selectedChipIndex === index ? <CheckCircleIcon /> : null} // Agrega el icono de verificación si el chip está seleccionado
+                          onClick={() => handleChipClick(index, result)} // Pasar el índice y el resultado al handleChipClick
                         />
                       </ListItem>
+                    
                     ))}
                   </ul>
                 </TableContainer>
@@ -222,3 +259,23 @@ const BoxBuscador = () => {
 };
 
 export default BoxBuscador;
+{
+  /* <Chip
+                          sx={{ display: "flex", margin: "auto" }}
+                          label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
+                          onClick={() => {
+                            handleUltimaCompraCliente(
+                              result.codigoCliente,
+                              result.codigoClienteSucursal
+                            );
+                            handleOpenPreciosClientesDialog(
+                              result.codigoCliente,
+                              result.codigoClienteSucursal
+                            );
+                            handleOpenDeudasClientesDialog(
+                              result.codigoCliente,
+                              result.codigoClienteSucursal
+                            );
+                          }}
+                        /> */
+}
