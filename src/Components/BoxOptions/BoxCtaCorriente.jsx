@@ -78,46 +78,43 @@ const BoxCtaCorriente = () => {
         </Typography>
       </Grid>
       <Grid item xs={12}>
-        {ventaData && ventaData.length > 0 ? (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Descripción </TableCell>
-                  <TableCell> Folio</TableCell>
-                  <TableCell>Pago Parcial</TableCell>
-                  <TableCell>Total</TableCell>
-                  <TableCell>Acciones</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {ventaData.map((deuda) => (
-                  <TableRow key={deuda.id}>
-                     
-                    <TableCell>{deuda.descripcionComprobante}</TableCell>
-                    <TableCell>{deuda.nroComprobante}</TableCell>
-                    <TableCell>${deuda.totalPagadoParcial}</TableCell>
-                    <TableCell>${deuda.total}</TableCell>
-                    <TableCell>
-                      <Button variant="outlined" onClick={() => handleOpenPaymentDialog(deuda)}>Pagar</Button>
-                    </TableCell>
-                  </TableRow>
-                  
-                ))}
-              </TableBody>
-              <TableRow>
-                  <TableCell colSpan={2} align="right">
-                    <strong>Total Deuda:</strong>
-                  </TableCell>
-                  <TableCell>${totalDeuda}</TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-            </Table>
-          </TableContainer>
-        ) : (
-          <Typography variant="body1">No hay datos de venta disponibles.</Typography>
-        )}
-      </Grid>
+  {ventaData && ventaData.length > 0 && (
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Descripción</TableCell>
+            <TableCell>Folio</TableCell>
+            <TableCell>Pago Parcial</TableCell>
+            <TableCell>Total</TableCell>
+            <TableCell>Acciones</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {ventaData.map((deuda) => (
+            <TableRow key={deuda.id}>
+              <TableCell>{deuda.descripcionComprobante}</TableCell>
+              <TableCell>{deuda.nroComprobante}</TableCell>
+              <TableCell>${deuda.totalPagadoParcial}</TableCell>
+              <TableCell>${deuda.total}</TableCell>
+              <TableCell>
+                <Button variant="outlined" onClick={() => handleOpenPaymentDialog(deuda)}>Pagar</Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+        <TableRow>
+          <TableCell colSpan={2} align="right">
+            <strong>Total Deuda:</strong>
+          </TableCell>
+          <TableCell>${totalDeuda}</TableCell>
+          <TableCell></TableCell>
+        </TableRow>
+      </Table>
+    </TableContainer>
+  )}
+</Grid>
+
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda</DialogTitle>
         <DialogContent>
