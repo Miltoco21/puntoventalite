@@ -110,54 +110,57 @@ const BoxPreciosClientes = () => {
     <Grid container spacing={2} justifyContent="center">
     <Grid item xs={12} md={12} lg={12}>
       <Paper>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID Cliente</TableCell>
-                <TableCell>Nombre Cliente</TableCell>
-                <TableCell>ID Producto</TableCell>
-                <TableCell>Nombre Producto</TableCell>
-                <TableCell>Precio</TableCell>
-                <TableCell>Guardar</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {precioData &&
-                precioData.clientesProductoPrecioMostrar.map((item) => (
-                  <TableRow key={item.codigoCliente}>
-                    <TableCell>{item.codigoCliente}</TableCell>
-                    <TableCell>{item.nombreCliente}</TableCell>
-                    <TableCell>{item.idProducto}</TableCell>
-                    <TableCell>{item.nombre}</TableCell>
-                    <TableCell>
-                      <TextField
-                        variant="outlined"
-                        value={
-                          preciosModificados[item.idProducto] !== undefined
-                            ? preciosModificados[item.idProducto]
-                            : item.precio
-                        }
-                        onChange={(e) => handlePrecioChange(e, item.idProducto)}
-                      />
-                    </TableCell>
-                    <TableCell>
-                    <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleSaveChanges(item.idProducto, item.codigoCliente, item.codigoClienteSucursal)}
-                        >
-                          Guardar
-                        </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      <TableContainer sx={{ overflowX: 'auto' }}>
+  <Table sx={{ minWidth: 650 }}>
+    <TableHead>
+      <TableRow>
+        <TableCell sx={{ width: '10%' }}>ID Cliente</TableCell>
+        <TableCell sx={{ width: '20%' }}>Nombre Cliente</TableCell>
+        <TableCell sx={{ width: '10%' }}>ID Producto</TableCell>
+        <TableCell sx={{ width: '20%' }}>Nombre Producto</TableCell>
+        <TableCell sx={{ width: '20%' }}>Precio</TableCell>
+        <TableCell sx={{ width: '10%' }}>Guardar</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {precioData &&
+        precioData.clientesProductoPrecioMostrar.map((item) => (
+          <TableRow key={item.codigoCliente}>
+            <TableCell>{item.codigoCliente}</TableCell>
+            <TableCell>{item.nombreCliente}</TableCell>
+            <TableCell>{item.idProducto}</TableCell>
+            <TableCell>{item.nombre}</TableCell>
+            <TableCell>
+              <TextField
+                variant="outlined"
+                fullWidth
+                value={
+                  preciosModificados[item.idProducto] !== undefined
+                    ? preciosModificados[item.idProducto]
+                    : item.precio
+                }
+                onChange={(e) => handlePrecioChange(e, item.idProducto)}
+              />
+            </TableCell>
+            <TableCell>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleSaveChanges(item.idProducto, item.codigoCliente, item.codigoClienteSucursal)}
+              >
+                Guardar
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))}
+    </TableBody>
+  </Table>
+</TableContainer>
+
       </Paper>
     </Grid>
   </Grid>
+  
   );
 };
 
