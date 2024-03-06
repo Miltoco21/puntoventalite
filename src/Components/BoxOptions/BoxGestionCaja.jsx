@@ -29,6 +29,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 
 import MuiAlert from "@mui/material/Alert";
+import { createTheme } from '@mui/material/styles';
 
 import axios from "axios";
 import BotonesCategorias from "./BotonesCategorias";
@@ -778,7 +779,7 @@ const BoxGestionCaja = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <Button
-                    sx={{
+                    style={{
                       margin: "7px",
                       width: "80%",
                       height: "60px",
@@ -789,7 +790,11 @@ const BoxGestionCaja = () => {
                         color: "white",
                       },
                     }}
-                    onClick={handleOpenTicket}
+                    onClick={() => {
+                      console.log("Botón de Ticket presionado");
+                      handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
+                    }}
+                    
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
                     <Typography variant="h7">Ticket</Typography>
@@ -912,7 +917,7 @@ const BoxGestionCaja = () => {
       </Dialog>
       <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
         <DialogContent>
-          <BoxCtaCorriente></BoxCtaCorriente>
+          <BoxCtaCorriente/>
          
         </DialogContent>
         <DialogActions>

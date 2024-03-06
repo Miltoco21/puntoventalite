@@ -25,16 +25,18 @@ import axios from "axios";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const BoxBuscador = () => {
-  const { salesData, addToSalesData, setPrecioData, setVentaData } = useContext(
+  const { salesData, addToSalesData, setPrecioData, setVentaData, searchResults,setSearchResults, updateSearchResults, selectedUser,
+    setSelectedUser,} = useContext(
     SelectedOptionsContext
   );
 
   const [searchText, setSearchText] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  
   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
-  const [selectedUser, setSelectedUser] = useState(null);
+
 
   const [selectedChipIndex, setSelectedChipIndex] = useState(null);
+
   const handleChipClick = (index, result) => {
     setSelectedUser(result); // Establecer el usuario seleccionado
     setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
@@ -42,23 +44,31 @@ const BoxBuscador = () => {
     handleUltimaCompraCliente(result.codigoCliente, result.codigoClienteSucursal);
     handleOpenPreciosClientesDialog(result.codigoCliente, result.codigoClienteSucursal);
     handleOpenDeudasClientesDialog(result.codigoCliente, result.codigoClienteSucursal);
+    setSelectedUser(result);
+    
   };
 
-  const handleSearch = async () => {
-    try {
-      const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
-      );
-      if (Array.isArray(response.data.clienteSucursal)) {
-        setSearchResults(response.data.clienteSucursal);
-      } else {
-        setSearchResults([]);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
+const handleSearch = async () => {
+  try {
+    const response = await axios.get(
+      `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
+    );
+    if (Array.isArray(response.data.clienteSucursal)) {
+      setSearchResults(response.data.clienteSucursal);
+      // También actualiza el contexto con los resultados de la búsqueda
+      updateSearchResults(response.data.clienteSucursal);
+    } else {
       setSearchResults([]);
+      // También actualiza el contexto con los resultados de la búsqueda vacíos
+      updateSearchResults([]);
     }
-  };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    setSearchResults([]);
+    // También actualiza el contexto con los resultados de la búsqueda vacíos en caso de error
+    updateSearchResults([]);
+  }
+};
 
   const handleInputChange = (e) => {
     const inputValue = e.target.value;

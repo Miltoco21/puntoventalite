@@ -17,12 +17,30 @@ import {
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 const BoxPagoTicket = () => {
-  const { grandTotal,userData,salesData,addToSalesData } = useContext(SelectedOptionsContext);
+  const {
+    grandTotal,
+    userData,
+    salesData,
+    addToSalesData,
+    ventaData,
+    searchResults,
+    setVentaData,
+  } = useContext(SelectedOptionsContext);
+  console.log("userData", userData);
+  console.log("ventaData", ventaData);
+  console.log("searchResults", searchResults);
+  console.log("salesdata", salesData);
 
   const [totalCompra, setTotalCompra] = useState(grandTotal);
   const [cantidadPagada, setCantidadPagada] = useState(0);
   const [metodoPago, setMetodoPago] = useState("");
   const [error, setError] = useState(null);
+
+  const handleMetodoPagoClick = (metodo) => {
+    setMetodoPago(metodo);
+
+    // Actualizar el estado de los botones de método de pago
+  };
 
   // Función para calcular el monto restante por pagar
   const calcularPorPagar = () => {
@@ -36,10 +54,6 @@ const BoxPagoTicket = () => {
     setTotalCompra(total);
   };
 
-  const handleMetodoPagoClick = (metodo) => {
-    setMetodoPago(metodo);
-  };
-   
   const handleCantidadPagadaChange = (event) => {
     const cantidad = parseFloat(event.target.value);
     setCantidadPagada(cantidad);
@@ -63,34 +77,40 @@ const BoxPagoTicket = () => {
     }
   };
 
-  const handleGenerarBoletaElectronica = async () => {
+  const handleGenerarTicket = async () => {
+    const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
+    const codigoCliente = searchResults[0].codigoCliente;
     try {
       const ticket = {
-        "idUsuario": userData.codigoUsuario,
-      
-        "total": grandTotal,
-        "products": salesData.map((sale) => ({
-          "codProducto": sale.idProducto,
-          "cantidad": sale.cantidad,
-          "precioUnidad": sale.precio,
-          "descripcion": sale.descripcion,
+        idUsuario: userData.codigoUsuario,
+        codigoClienteSucursal: codigoClienteSucursal,
+        codigoCliente: codigoCliente,
+        total:grandTotal,
+
+        products: salesData.map((sale) => ({
+          codProducto: sale.idProducto,
+          cantidad: sale.quantity,
+          precioUnidad: sale.precio,
+          descripcion: sale.descripcion,
         })),
-        "metodoPago": metodoPago,
+        metodoPago: metodoPago,
       };
-  
+
       // Mostrar los datos que se están enviando por Axios
-      console.log("Datos enviados por Axios:",ticket);
+      console.log("Datos enviados por Axios:", ticket);
       // Realizar la solicitud POST a la API para generar la boleta electrónica
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/Ventas/ImprimirTicket",
         ticket
       );
-  
+
       console.log("Respuesta del servidor:", response.data);
     } catch (error) {
       if (error.response) {
-        
-        console.log("Server responded with error status:", error.response.status);
+        console.log(
+          "Server responded with error status:",
+          error.response.status
+        );
         console.log("Error response data:", error.response.data);
         console.log("Error response headers:", error.response.headers);
       } else if (error.request) {
@@ -102,7 +122,7 @@ const BoxPagoTicket = () => {
         console.log("Error message:", error.message);
       }
       console.log("Error config:", error.config);
-  
+
       setError("Error al generar la boleta electrónica.");
       setError("Error al generar la boleta electrónica.");
     }
@@ -110,7 +130,7 @@ const BoxPagoTicket = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Typography variant="h4">Pago de Ticket</Typography>
+        <Typography variant="h4">Pago de Tickett</Typography>
       </Grid>
       <Grid item xs={12} sm={6} md={6} lg={6}>
         <TextField
@@ -155,6 +175,7 @@ const BoxPagoTicket = () => {
             fullWidth
             variant="outlined"
             onClick={() => handleMetodoPagoClick("EFECTIVO")}
+            // sx={efectivoSelected ? "primary" : "default"} // Cambiar el color si está seleccionado
           >
             Efectivo
           </Button>
@@ -162,6 +183,7 @@ const BoxPagoTicket = () => {
             fullWidth
             variant="outlined"
             onClick={() => handleMetodoPagoClick("TARJETA")}
+            // color={debitoSelected ? "primary" : "default"}
           >
             Débito
           </Button>
@@ -169,6 +191,7 @@ const BoxPagoTicket = () => {
             fullWidth
             variant="outlined"
             onClick={() => handleMetodoPagoClick("TARJETA")}
+            // color={creditoSelected ? "primary" : "default"}
           >
             Crédito
           </Button>
@@ -176,17 +199,15 @@ const BoxPagoTicket = () => {
             fullWidth
             variant="outlined"
             onClick={() => handleMetodoPagoClick("CUENTA CORRIENTE")}
+            // color={cuentaCorrienteSelected ? "primary" : "default"}
           >
             Cuenta Corriente
           </Button>
-          <Grid><Button
-            fullWidth
-            variant="contained"
-            onClick={handleGenerarBoletaElectronica}
-          >
-            Procesar
-          </Button></Grid>
-          
+          <Grid>
+            <Button fullWidth variant="contained" onClick={handleGenerarTicket}>
+              Procesar
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
       {metodoPago && (
@@ -203,32 +224,8 @@ const BoxPagoTicket = () => {
           </Typography>
         </Grid>
       )}
-      {/* {salesData.map((sale, index) => (
-        <Grid item xs={12} key={index}>
-          <Typography variant="body1">
-            Descripción: {sale.descripcion}, Cantidad: {sale.cantidad}, Precio: {sale.precio}
-          </Typography>
-        </Grid>
-      ))}
-       <Grid item xs={12}>
-        <Typography variant="h6">Datos del usuario:</Typography>
-        <Typography variant="body1">ID de Usuario: {userData.codigoUsuario}</Typography>
-        <Typography variant="body1">Rol: {userData.rol}</Typography>
-        <Typography variant="body1">Nombres: {userData.nombres}</Typography>
-        <Typography variant="body1">Apellidos: {userData.apellidos}</Typography>
-        <Typography variant="body1">RUT: {userData.rut}</Typography>
-      </Grid>
-
-      <Grid item xs={12}>
-        <Typography variant="h5">Ventas</Typography>
-        <ul>
-          {salesData.map((sale, index) => (
-            <li key={index}>{sale.descripcion} - Cantidad: {sale.cantidad} - Precio: {sale.precio}</li>
-          ))}
-        </ul>
-      </Grid> */}
     </Grid>
   );
-}
+};
 
-export default BoxPagoTicket
+export default BoxPagoTicket;

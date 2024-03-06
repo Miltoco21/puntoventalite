@@ -22,11 +22,18 @@ export const SelectedOptionsProvider = ({ children }) => {
   const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
   const [precioData, setPrecioData] = useState(null);
-  const [ventaData, setVentaData] = useState(null);
+  const [ventaData, setVentaData] = useState("");
   const [salesData, setSalesData] = useState([]);
   const [grandTotal, setGrandTotal] = useState(0);
   const [products, setProducts] = useState([]);
   const [salesDataTimestamp, setSalesDataTimestamp] = useState(Date.now());
+
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const [searchResults, setSearchResults] = useState([]);
+  const updateSearchResults = (results) => {
+    setSearchResults(results);
+  };
 
   const [userData, setUserData] = useState([]);
   const updateUserData = (data) => {
@@ -223,6 +230,8 @@ export const SelectedOptionsProvider = ({ children }) => {
         productInfo,
         setProductInfo,
         quantity,
+        selectedUser,
+        setSelectedUser,
       
         calculateTotalPrice,
         description,
@@ -230,7 +239,10 @@ export const SelectedOptionsProvider = ({ children }) => {
         userData,
         updateUserData,
         precioData, setPrecioData,
-        ventaData, setVentaData
+        ventaData, setVentaData,
+        searchResults,
+        setSearchResults,
+        updateSearchResults
 
       }}
     >
