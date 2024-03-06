@@ -548,7 +548,9 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
+            disabled={true} 
             sx={{
+              disabled:true,
               width: "90%",
               height: "80px",
               backgroundColor: "lightSalmon",
