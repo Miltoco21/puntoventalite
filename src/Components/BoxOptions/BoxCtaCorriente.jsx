@@ -13,7 +13,7 @@ const BoxCtaCorriente = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para controlar la apertura del Snackbar
   const [snackbarMessage, setSnackbarMessage] = useState("");
   
-  const totalDeuda = ventaData.reduce((total, deuda) => total + deuda.total, 0);
+  const totalDeuda = ventaData ? ventaData.reduce((total, deuda) => total + deuda.total, 0) : 0;
    
 
 
@@ -84,6 +84,7 @@ const BoxCtaCorriente = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Descripción </TableCell>
+                  <TableCell> Folio</TableCell>
                   <TableCell>Pago Parcial</TableCell>
                   <TableCell>Total</TableCell>
                   <TableCell>Acciones</TableCell>
@@ -92,7 +93,9 @@ const BoxCtaCorriente = () => {
               <TableBody>
                 {ventaData.map((deuda) => (
                   <TableRow key={deuda.id}>
+                     
                     <TableCell>{deuda.descripcionComprobante}</TableCell>
+                    <TableCell>{deuda.nroComprobante}</TableCell>
                     <TableCell>${deuda.totalPagadoParcial}</TableCell>
                     <TableCell>${deuda.total}</TableCell>
                     <TableCell>

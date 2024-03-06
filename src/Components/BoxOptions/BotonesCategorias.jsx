@@ -235,69 +235,14 @@ const BotonesCategorias = ({ onClose }) => {
 // };
 
   return (
-    <SelectedOptionsContext.Provider
-      value={{ selectedProduct, setSelectedProduct }}
-    >
-      <Paper
-        elevation={13}
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-          alignItems: "center",
-          width: "100%", // Add this line
-          overflow: "hidden", // Add this line
-        }}
-      >
-        <Grid container spacing={1} sx={{ margin: "0 auto" }}>
-          <Grid item xs={12} sm={12} md={8} lg={12} xl={2}>
-            <Grid sx={{display:"flex",justifyContent:"center"}}><Box
-              
-            >
-              <Typography>Categorias</Typography>
-            </Box>
-
-            {/* <Button
-              onClick={handleCloseCategoria}
-              elevation={8}
-              sx={{
-                margin: 1,
-                width: "90px",
-                height: "30px",
-                backgroundColor: "purple",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "red",
-                  color: "white",
-                },
-              }}
-            >
-              <Typography variant="h7">Cerrar </Typography> <HighlightOffIcon />
-            </Button> */}
-            </Grid>
-            
-          </Grid>
-
-          <Grid container item
-              xs={12} 
-              sm={12} 
-              md={12} 
-              lg={12} 
-
-              sx={{display:"flex"}}> {categories.map((category) => (
-            <Grid 
-            sx={{display:"flex",justifyContent:"center"}}
-              item
-              xs={12}
-              sm={6}
-              md={6}
-              lg={6}
-              xl={6}
-              key={category.idCategoria}
-            >
+    <SelectedOptionsContext.Provider value={{}}>
+    <Paper elevation={13}>
+      <Box p={2}>
+        <Typography variant="h5">Categorias</Typography>
+        <Grid container spacing={2}>
+          {categories.map((category) => (
+            <Grid item key={category.idCategoria} xs={12} sm={6} md={4} lg={3}>
               <Button
-                value={category.idCategoria}
-                // onClick={() => handleOpenDialog(category.idCategoria)}
                 onClick={() => {
                   handleOpenDialog(category.idCategoria);
                   setSelectedOptions((prevOptions) => ({
@@ -305,178 +250,29 @@ const BotonesCategorias = ({ onClose }) => {
                     category: category.idCategoria,
                   }));
                 }}
-                sx={{
-                  margin: 3,
-                  width: "80%",
-                  height: "80%",
-                  backgroundColor: "lightSalmon",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "coral",
-                    color: "white",
-                  },
-                }}
+                fullWidth
+                variant="contained"
               >
-                <span style={{ fontSize: '60%' }}>{category.descripcion}</span>
+                {category.descripcion}
               </Button>
             </Grid>
-          ))}</Grid>
-
-         
+          ))}
         </Grid>
-        <Dialog open={open} onClose={handleCloseDialog}>
-          <DialogTitle> Selecciona Subcategorias</DialogTitle>
-          <DialogContent>
-            {subcategories.map((subcategory) => (
-              <Button
-                key={subcategory.idSubcategoria}
-                onClick={() =>
-                  handleOpenFamilyDialog(subcategory.idSubcategoria)
-                }
-                sx={{
-                  margin: 1,
-                  width: "90px",
-                  height: "60px",
-                  backgroundColor: "lightSalmon",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "coral",
-                    color: "white",
-                  },
-                }}
-              >
-                {subcategory.descripcion}
-              </Button>
-            ))}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cerrar</Button>
-          </DialogActions>
-        </Dialog>
+      </Box>
+    </Paper>
 
-        <Dialog open={openFamily} onClose={handleCloseFamilyDialog}>
-          <DialogTitle>Familias</DialogTitle>
-          <DialogContent>
-            {families.map((family) => (
-              <Button
-                key={family.idFamilia}
-                onClick={() => handleOpenSubFamilyDialog(family.idFamilia)}
-                sx={{
-                  margin: 1,
-                  width: "90px",
-                  height: "60px",
-                  backgroundColor: "lightSalmon",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "coral",
-                    color: "white",
-                  },
-                }}
-              >
-                {family.descripcion}
-              </Button>
-            ))}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseFamilyDialog}>Cerrar</Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={openSubFamily} onClose={handleCloseSubFamilyDialog}>
-          <DialogTitle>Subfamilias</DialogTitle>
-          <DialogContent>
-            {subfamilies.map((subfamily) => (
-              <Button
-                key={subfamily.idSubFamilia}
-                onClick={() => handleSubfamilyClick(subfamily)}
-                // onClick={() => {
-                //   console.log("Subfamily selected:", subfamily);
-                //   setSelectedOptions((prevOptions) => ({
-                //     ...prevOptions,
-                //     subFamily: subfamily,
-                //   }));
-                // }}
-                sx={{
-                  margin: 1,
-                  width: "90px",
-                  height: "60px",
-                  backgroundColor: "lightSalmon",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "coral",
-                    color: "white",
-                  },
-                }}
-              >
-                {subfamily.descripcion}
-              </Button>
-            ))}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseSubFamilyDialog}>Cerrar</Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={openProductDialog} onClose={handleCloseProductDialog}>
-          <DialogTitle>Selecciona Producto</DialogTitle>
-          <DialogContent>
-            <Typography variant="h6">Selecciona un producto:</Typography>
-            {Array.isArray(selectedProduct) && selectedProduct.length > 0 ? (
-              <Grid container spacing={1}>
-                {selectedProduct.map((product) => (
-                  <Grid item key={product.idProducto}>
-                    <Button
-                      onClick={() => {
-                        console.log("Product Clicked:", product);
-                        handleProductClick(product);
-                      }}
-                      sx={{
-                        margin: 1,
-                        width: "150px",
-                        height: "60px",
-                        backgroundColor: "lightSalmon",
-                        color: "white",
-                        "&:hover": {
-                          backgroundColor: "coral",
-                          color: "white",
-                        },
-                      }}
-                    >
-                      {product.nombre}
-                    </Button>
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Typography>No hay productos disponibles.</Typography>
-            )}
-          </DialogContent>
+    <Dialog open={open} onClose={handleCloseDialog}>
+      {/* Dialog content */}
+    </Dialog>
 
-          <DialogActions>
-           
-          </DialogActions>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                console.log("Cerrar Clicked");
-                handleCloseProductDialog();
-              }}
-            >
-              Cerrar
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={openNoProductDialog} onClose={handleCloseNoProductDialog}>
-          <DialogTitle>Producto no asociado</DialogTitle>
-          <DialogContent>
-            <Typography>
-              No hay productos asociados a esta subfamilia.
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseNoProductDialog}>Cerrar</Button>
-          </DialogActions>
-        </Dialog>
-      </Paper>
-    </SelectedOptionsContext.Provider>
+    <Dialog open={openFamily} onClose={handleCloseFamilyDialog}>
+      {/* Family dialog content */}
+    </Dialog>
+
+    <Dialog open={openSubFamily} onClose={handleCloseSubFamilyDialog}>
+      {/* Subfamily dialog content */}
+    </Dialog>
+  </SelectedOptionsContext.Provider>
   );
 };
 
