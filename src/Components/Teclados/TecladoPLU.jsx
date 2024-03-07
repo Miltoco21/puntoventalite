@@ -2,11 +2,14 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Button, TextField, Grid, Container, Paper } from "@mui/material";
 import axios from "axios";
+import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
+  const { precioData, setPrecioData } = useContext(SelectedOptionsContext);
+  console.log("PrecioData:", precioData);
   const [sellerCode, setSellerCode] = useState("");
 
   const [activeField, setActiveField] = useState("sellerCode");
@@ -34,10 +37,14 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
   };
 
   const handleEnter = async () => {
+     const codigoCliente =
+      precioData.clientesProductoPrecioMostrar[0].codigoCliente;
+    const codigoSucursal =
+      precioData.clientesProductoPrecioMostrar[0].codigoClienteSucursal;
     try {
       // Make an API call to fetch product information based on product ID (assuming PLU is the product ID)
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${sellerCode}`
+        `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductoByCodigoAndCodigoClienteCodigoSucursal?idproducto=${sellerCode}&codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoSucursal}`
       );
 
       console.log("API Response:", response.data);
@@ -65,12 +72,12 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
   };
 
   return (
-    <Container >
-      <Grid  justifyContent="center">
+    <Container>
+      <Grid justifyContent="center">
         <Grid item xs={12} sm={12} md={12} lg={12}>
-          <Paper elevation={22} >
-            <Grid container  fullWidth justifyContent="center" spacing={1}>
-              <Grid item xs={11} sm={8}md={11}lg={11}>
+          <Paper elevation={22}>
+            <Grid container fullWidth justifyContent="center" spacing={1}>
+              <Grid item xs={11} sm={8} md={11} lg={11}>
                 <TextField
                   label="Ingresa Plu "
                   variant="outlined"
@@ -80,7 +87,14 @@ const TecladoPLU = ({ onPluSubmit, plu, onClose }) => {
                 />
               </Grid>
               {Array.from({ length: 10 }, (_, i) => (
-                <Grid container justifyContent="center" item xs={4} lg={3} key={i}>
+                <Grid
+                  container
+                  justifyContent="center"
+                  item
+                  xs={4}
+                  lg={3}
+                  key={i}
+                >
                   <Button
                     variant="outlined"
                     onClick={() => handleNumberClick((9 - i).toString())}

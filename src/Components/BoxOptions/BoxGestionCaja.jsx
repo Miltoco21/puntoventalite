@@ -864,7 +864,7 @@ const BoxGestionCaja = () => {
       >
         <DialogTitle>Precios Clientes</DialogTitle>
         <DialogContent>
-          <BoxPreciosClientes onClose={handleClosePrecioCliente} />
+          <BoxPreciosClientes onClosePreciosClientes={handleClosePrecioCliente} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePrecioCliente}>Cancelar</Button>
