@@ -825,10 +825,10 @@ const BoxGestionCaja = () => {
       <Dialog
         sx={{ width: "100%" }}
         open={openTicketDialog}
-        onClose={handleCloseTicket}
+        onCloseTicket={handleCloseTicket}
       >
         <DialogContent sx={{ width: "100%" }}>
-          <BoxPagoTicket />
+          <BoxPagoTicket  onCloseTicket={handleCloseTicket}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseTicket}>Cancelar</Button>

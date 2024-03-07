@@ -13,11 +13,12 @@ import {
   TableContainer,
   TextField,
   TableHead,
+  Snackbar
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
-const BoxPagoTicket = () => {
+const BoxPagoTicket = ({onCloseTicket}) => {
   const {
     grandTotal,
     userData,
@@ -32,13 +33,54 @@ const BoxPagoTicket = () => {
   const [cantidadPagada, setCantidadPagada] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState("");
   const [error, setError] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+
 
   const handleMetodoPagoClick = (metodo) => {
     setSelectedMethod(metodo);
   };
 
   const handleGenerarTicket = async () => {
-    // Resto del código para generar el ticket...
+    const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
+    const codigoCliente = searchResults[0].codigoCliente;
+    try {
+      const ticket = {
+        idUsuario: userData.codigoUsuario,
+        codigoClienteSucursal: codigoClienteSucursal,
+        codigoCliente: codigoCliente,
+        total: grandTotal,
+        products: salesData.map((sale) => ({
+          codProducto: sale.idProducto,
+          cantidad: sale.quantity,
+          precioUnidad: sale.precio,
+          descripcion: sale.descripcion,
+        })),
+        metodoPago: selectedMethod, // Utiliza selectedMethod en lugar de metodoPago
+      };
+
+      console.log("Datos enviados por Axios:", ticket);
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/Ventas/ImprimirTicket",
+        ticket
+      );
+
+      console.log("Respuesta del servidor:", response.data);
+      if (response.status === 200) {
+        setSnackbarMessage(response.data.descripcion);
+        setSnackbarOpen(true);
+        
+        // Esperar 4 segundos antes de cerrar el modal
+        setTimeout(() => {
+          onCloseTicket();
+        }, 3000);
+      }
+
+    } catch (error) {
+      console.error("Error al generar la boleta electrónica:", error);
+      setError("Error al generar la boleta electrónica.");
+    }
   };
 
   return (
@@ -84,7 +126,7 @@ const BoxPagoTicket = () => {
       </Grid>
 
       <Grid item xs={12} md={6} lg={6}>
-      <Grid>
+        <Grid>
           <Button
             id={`${selectedMethod}-btn`}
             fullWidth
@@ -112,13 +154,34 @@ const BoxPagoTicket = () => {
           <Button
             id={`${selectedMethod}-btn`}
             fullWidth
-            variant={selectedMethod === "CUENTA CORRIENTE" ? "contained" : "outlined"}
+            variant={
+              selectedMethod === "CUENTA CORRIENTE"
+                ? "contained"
+                : "outlined"
+            }
             onClick={() => handleMetodoPagoClick("CUENTA CORRIENTE")}
           >
             Cuenta Corriente
           </Button>
         </Grid>
+        <Grid>
+          <Button
+            fullWidth
+            variant="contained"
+            color="secondary"
+            onClick={handleGenerarTicket}
+          >
+            Procesar
+          </Button>
+        </Grid>
       </Grid>
+      {selectedMethod && (
+        <Grid item xs={12}>
+          <Typography variant="body1">
+            Método de pago seleccionado: {selectedMethod}
+          </Typography>
+        </Grid>
+      )}
       
       {error && (
         <Grid item xs={12}>
@@ -127,6 +190,15 @@ const BoxPagoTicket = () => {
           </Typography>
         </Grid>
       )}
+
+<Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={onCloseTicket}
+        message={snackbarMessage}
+      />
+
     </Grid>
   );
 };
