@@ -916,7 +916,8 @@ const BoxGestionCaja = () => {
         </DialogActions>
       </Dialog>
       <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
-        <DialogContent>
+        <DialogContent onClose={handleCloseDeudasDialog}>
+          
           <BoxCtaCorriente/>
          
         </DialogContent>

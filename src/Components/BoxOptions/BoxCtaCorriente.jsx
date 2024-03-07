@@ -5,7 +5,7 @@ import axios from "axios";
 
 const BoxCtaCorriente = () => {
   const { ventaData, setVentaData } = useContext(SelectedOptionsContext);
-  console.log(ventaData);
+  console.log("ventaData",ventaData);
   const [selectedDeuda, setSelectedDeuda] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
@@ -78,6 +78,7 @@ const BoxCtaCorriente = () => {
         </Typography>
       </Grid>
       <Grid item xs={12}>
+        
   {ventaData && ventaData.length > 0 && (
     <TableContainer>
       <Table>
