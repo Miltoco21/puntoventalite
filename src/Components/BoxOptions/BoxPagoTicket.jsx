@@ -155,11 +155,11 @@ const BoxPagoTicket = ({onCloseTicket}) => {
             id={`${selectedMethod}-btn`}
             fullWidth
             variant={
-              selectedMethod === "CUENTA CORRIENTE"
+              selectedMethod === "CUENTACORRIENTE"
                 ? "contained"
                 : "outlined"
             }
-            onClick={() => handleMetodoPagoClick("CUENTA CORRIENTE")}
+            onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
           >
             Cuenta Corriente
           </Button>
