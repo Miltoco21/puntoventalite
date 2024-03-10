@@ -878,7 +878,7 @@ const IngresoClientes = () => {
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleCloseModal} color="primary">
-                    Cancelar
+                    Cerrar
                   </Button>
                   <Button
                     onClick={handleAddBranch}

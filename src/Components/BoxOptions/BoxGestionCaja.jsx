@@ -831,7 +831,7 @@ const BoxGestionCaja = () => {
           <BoxPagoTicket  onCloseTicket={handleCloseTicket}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseTicket}>Cancelar</Button>
+          <Button onClick={handleCloseTicket}>cerrar</Button>
         </DialogActions>
       </Dialog>
 
@@ -853,7 +853,7 @@ const BoxGestionCaja = () => {
           <BoxRecuperarVenta onClose={handleCloseRecoveryDialog} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseRecoveryDialog}>Cancelar</Button>
+          <Button onClick={handleCloseRecoveryDialog}>cerrar</Button>
           <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
         </DialogActions>
       </Dialog>
@@ -867,7 +867,7 @@ const BoxGestionCaja = () => {
           <BoxPreciosClientes onClosePreciosClientes={handleClosePrecioCliente} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClosePrecioCliente}>Cancelar</Button>
+          <Button onClick={handleClosePrecioCliente}>cerrar</Button>
           {/* <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button> */}
         </DialogActions>
       </Dialog>
@@ -878,7 +878,7 @@ const BoxGestionCaja = () => {
           <BoxDevolucion onClose={handleCloseDevolucion} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDevolucion}>Cancelar</Button>
+          <Button onClick={handleCloseDevolucion}>cerrar</Button>
           <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
         </DialogActions>
       </Dialog>
@@ -888,7 +888,7 @@ const BoxGestionCaja = () => {
           <IngresoClientes onClose={handleCloseIngreso} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseIngreso}>Cancelar</Button>
+          <Button onClick={handleCloseIngreso}>cerrar</Button>
         </DialogActions>
       </Dialog>
       <Dialog open={openStockDialog} onClose={handleCloseStock}>
@@ -897,7 +897,7 @@ const BoxGestionCaja = () => {
           <BoxStock onClose={handleCloseStock} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseStock}>Cancelar</Button>
+          <Button onClick={handleCloseStock}>cerrar</Button>
         </DialogActions>
       </Dialog>
       <Dialog
@@ -911,7 +911,7 @@ const BoxGestionCaja = () => {
           {/* Por ejemplo, campos para nombre, precio, descripción, etc. */}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseCrearProductoDialog}>Cancelar</Button>
+          <Button onClick={handleCloseCrearProductoDialog}>Cerrar</Button>
           {/* <Button onClick={handleCrearProducto}>Crear</Button> */}
         </DialogActions>
       </Dialog>
