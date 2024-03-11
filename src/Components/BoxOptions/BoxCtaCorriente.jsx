@@ -457,7 +457,7 @@ const BoxCtaCorriente = () => {
       />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField label="Numero Opercaion" variant="outlined" fullWidth />
+              <TextField label="Numero Operación" variant="outlined" fullWidth />
             </Grid>
           </Grid>
         </DialogContent>
