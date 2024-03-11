@@ -13,12 +13,7 @@ import {
   Button,
   DialogContent,
   Dialog,
-  Table,
-  TableBody,
-  TableCell,
-  Autocomplete,
-  TableContainer,
-  TableHead,
+ 
   DialogActions,
   DialogTitle,
   TableRow,
@@ -29,7 +24,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 
 import MuiAlert from "@mui/material/Alert";
-import { createTheme } from '@mui/material/styles';
+import { createTheme } from "@mui/material/styles";
 
 import axios from "axios";
 import BotonesCategorias from "./BotonesCategorias";
@@ -43,8 +38,8 @@ import BoxPago from "./BoxPago";
 import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 import BoxPreciosClientes from "./BoxPreciosClientes";
-import StepperSI from "../Stepper/StepperSI"
-import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente"
+import StepperSI from "../Stepper/StepperSI";
+import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente";
 
 const BoxGestionCaja = () => {
   const {
@@ -549,9 +544,9 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-            disabled={true} 
+            disabled={true}
             sx={{
-              disabled:true,
+              disabled: true,
               width: "90%",
               height: "80px",
               backgroundColor: "lightSalmon",
@@ -588,9 +583,8 @@ const BoxGestionCaja = () => {
           </Button>
         </Grid>
 
-        
-           {/*  */}
-          {/* <Button
+        {/*  */}
+        {/* <Button
             sx={{
               width: "90%",
               height: "80px",
@@ -607,7 +601,6 @@ const BoxGestionCaja = () => {
           
             <Typography variant="h7">Devolución</Typography>
           </Button> */}
-      
 
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
@@ -722,15 +715,39 @@ const BoxGestionCaja = () => {
                   sx={{
                     margin: "6px",
                     color: "#ffffff",
-                    backgroundColor: "#00878889",
-                    fontFamily: "digital-7",
+                    backgroundColor: "#E1213B",
+
                     borderRadius: "5px",
                   }}
                 >
-                  <p style={{ margin: "6px" }}>
+                  <p
+                    style={{
+                      margin: "6px",
+                      fontSize: "36px",
+                      fontWeight: "bold",
+                      fontFamily: "Victor Mono"
+                    }}
+                  >
                     TOTAL : ${" "}
-                    <span style={{ color: "#00878889" }}>
-                      <span style={{ color: "white" }}>{grandTotal}</span>{" "}
+                    <span
+                      style={{
+                        color: "#00878889",
+                        fontSize: "24px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <span
+                        style={{
+                          height:"600%",
+                          color: "white",
+                          fontSize: "36px",
+                          fontFamily: "Victor Mono",
+                         
+                          fontWeight: "700",
+                        }}
+                      >
+                        {grandTotal}
+                      </span>{" "}
                     </span>{" "}
                   </p>
                 </Grid>
@@ -794,7 +811,7 @@ const BoxGestionCaja = () => {
                       console.log("Botón de Ticket presionado");
                       handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
                     }}
-                    
+
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
                     <Typography variant="h7">Ticket</Typography>
@@ -828,7 +845,7 @@ const BoxGestionCaja = () => {
         onCloseTicket={handleCloseTicket}
       >
         <DialogContent sx={{ width: "100%" }}>
-          <BoxPagoTicket  onCloseTicket={handleCloseTicket}/>
+          <BoxPagoTicket onCloseTicket={handleCloseTicket} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseTicket}>cerrar</Button>
@@ -864,7 +881,9 @@ const BoxGestionCaja = () => {
       >
         <DialogTitle>Precios Clientes</DialogTitle>
         <DialogContent>
-          <BoxPreciosClientes onClosePreciosClientes={handleClosePrecioCliente} />
+          <BoxPreciosClientes
+            onClosePreciosClientes={handleClosePrecioCliente}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePrecioCliente}>cerrar</Button>
@@ -917,9 +936,7 @@ const BoxGestionCaja = () => {
       </Dialog>
       <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
         <DialogContent onClose={handleCloseDeudasDialog}>
-          
-          <BoxCtaCorriente/>
-         
+          <BoxCtaCorriente />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>

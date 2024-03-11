@@ -36,7 +36,10 @@ const BoxPagoTicket = ({onCloseTicket}) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-
+  useEffect(() => {
+    // Actualizar la cantidad pagada cuando cambia el total de la compra (grandTotal)
+    setCantidadPagada(grandTotal);
+  }, [grandTotal]);
 
   const handleMetodoPagoClick = (metodo) => {
     setSelectedMethod(metodo);
@@ -100,7 +103,7 @@ const BoxPagoTicket = ({onCloseTicket}) => {
         <TextField
           margin="dense"
           fullWidth
-          type="number"
+          
           label="Cantidad pagada"
           value={cantidadPagada}
           onChange={(e) => setCantidadPagada(parseFloat(e.target.value))}
@@ -175,13 +178,14 @@ const BoxPagoTicket = ({onCloseTicket}) => {
           </Button>
         </Grid>
       </Grid>
-      {selectedMethod && (
+
+      {/* {selectedMethod && (
         <Grid item xs={12}>
           <Typography variant="body1">
             Método de pago seleccionado: {selectedMethod}
           </Typography>
         </Grid>
-      )}
+      )} */}
       
       {error && (
         <Grid item xs={12}>

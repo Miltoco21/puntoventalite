@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
+import axios from "axios";
 
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
@@ -54,6 +55,7 @@ const BoxSumaProd = ({ venta }) => {
   const [open, setOpen] = useState(false);
   const [openPeso, setOpenPeso] = useState(false);
   const [sliderValue, setSliderValue] = useState(1);
+  const [productByCodigo, setProductByCodigo] = useState([]);
 
   const calculateTotalPrice = (quantity, price) => quantity * price;
 
@@ -71,12 +73,47 @@ const BoxSumaProd = ({ venta }) => {
   const handleClose = () => setOpen(false);
   const handleClosePeso = () => setOpenPeso(false);
 
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-    if (productInfo) {
-      addToSalesData(productInfo);
+
+
+  const handleSearchButtonClick = async () => {
+    try {
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
+      );
+      console.log("Respuesta de la API:", response.data);
+  
+      console.log("Cantidad registros:", response.data.cantidadRegistros);
+      if (response.data.cantidadRegistros > 0) {
+        const productoEncontrado = response.data.productos[0];
+        addToSalesData(productoEncontrado, 1); // Agregar el producto con cantidad 1
+        setProductByCodigo(productoEncontrado); // Actualizar el estado con el producto encontrado
+      } else {
+        console.log("Producto no encontrado.");
+        setProductByCodigo(null); // Limpiar el estado si no se encontró ningún producto
+      }
+    } catch (error) {
+      console.error("Error al buscar el producto:", error);
+      // Manejar el error, mostrar un mensaje al usuario, etc.
     }
   };
+
+  // const handleSearchButtonClick = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
+  //     );
+  //     console.log("Respuesta de la API:", response.data);
+
+  //     console.log("CAntidad registros:", response.data.cantidadRegistros);
+  //     if (response.data.cantidadRegistros)
+  //       setProductByCodigo(response.data.productos[0]);
+  //     console.log("productByCodigo:", productByCodigo);
+  //     // Corrección aquí
+  //   } catch (error) {
+  //     console.error("Error al buscar el producto:", error);
+  //     // Manejar el error, mostrar un mensaje al usuario, etc.
+  //   }
+  // };
 
   const handlePesoSubmit = (pesoValue) => {
     setPeso(pesoValue);
@@ -100,7 +137,6 @@ const BoxSumaProd = ({ venta }) => {
         flexDirection: "column",
         maxWidth: "1200px",
         margin: "0 auto",
-
         justifyContent: "center",
       }}
     >
@@ -124,15 +160,22 @@ const BoxSumaProd = ({ venta }) => {
                 focused
                 placeholder="Ingresa Código"
                 value={searchTerm}
-                onChange={handleSearch}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Button size="large" variant="outlined" onClick={handleOpen}>
+             
+              <Button
+                size="large"
+                variant="outlined"
+                onClick={handleSearchButtonClick}
+              >
                 PLU
               </Button>
               <Button size="large" variant="outlined" onClick={handleOpenPeso}>
                 Peso
               </Button>
             </div>
+
+           
           </Grid>
         </Paper>
       </Grid>
@@ -148,7 +191,7 @@ const BoxSumaProd = ({ venta }) => {
             marginTop: isMobile ? "-6px" : "0",
           }}
         >
-          <TableContainer component={Paper} style={{ overflowX: 'auto' }}>
+          <TableContainer component={Paper} style={{ overflowX: "auto" }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -174,33 +217,8 @@ const BoxSumaProd = ({ venta }) => {
                           setSalesData(updatedSalesData);
                         }}
                         inputProps={{ min: 0 }}
-                        style={{ width: 90 }}  // Establece el mínimo en 0 para permitir números negativos
+                        style={{ width: 90 }} // Establece el mínimo en 0 para permitir números negativos
                       />
-
-                      {/* <IconButton
-                        onClick={() => incrementQuantity(index, productInfo)}
-                      >
-                        <AddIcon />
-                      </IconButton> */}
-                      {/* <Slider
-  value={sale.quantity}
-  onChange={(event, newValue) => {
-    const updatedSalesData = [...salesData];
-    updatedSalesData[index].quantity = newValue;
-    setSalesData(updatedSalesData); // Asume que tienes una función setSalesData para actualizar el estado
-    setSliderValue(newValue); // Actualiza el valor del slider en tiempo real
-  }}
-  min={1}
-  max={500}
-  step={1} 
-  valueLabelDisplay="on"
-/> */}
-                      {/* 
-                      <IconButton
-                        onClick={() => decrementQuantity(index, productInfo)}
-                      >
-                        <RemoveIcon />
-                      </IconButton> */}
                     </TableCell>
                     <TableCell>{sale.descripcion}</TableCell>
                     <TableCell>{sale.precio}</TableCell>
@@ -217,7 +235,7 @@ const BoxSumaProd = ({ venta }) => {
                     </TableCell>
                   </TableRow>
                 ))}
-                                {venta &&
+                {venta &&
                   venta.products.map((product, index) => (
                     <TableRow key={index}>
                       <TableCell>
@@ -233,17 +251,18 @@ const BoxSumaProd = ({ venta }) => {
                       <TableCell>{product.descripcion}</TableCell>
                       <TableCell>{product.precioUnidad}</TableCell>
                       <TableCell>
-                        {calculateTotalPrice(product.quantity, product.precioUnidad)}
+                        {calculateTotalPrice(
+                          product.quantity,
+                          product.precioUnidad
+                        )}
                       </TableCell>
                       <TableCell>
                         {/* Botón para eliminar el producto */}
                       </TableCell>
                     </TableRow>
                   ))}
-
               </TableBody>
             </Table>
-
             <Paper
               sx={{
                 display: "flex",
@@ -259,15 +278,14 @@ const BoxSumaProd = ({ venta }) => {
           </TableContainer>
         </Paper>
       </Grid>
-
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
-          <TecladoPLU
+          {/* <TecladoPLU
             plu={plu}
             setPlu={setPlu}
             onClose={handleClose}
             onPluSubmit={handlePluSubmit}
-          />
+          /> */}
         </DialogContent>
       </Dialog>
       <Dialog open={openPeso} onClose={handleClosePeso}>
