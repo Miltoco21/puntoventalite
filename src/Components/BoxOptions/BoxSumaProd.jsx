@@ -11,12 +11,18 @@ import {
   TextField,
   IconButton,
   Table,
+  Autocomplete,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
   Typography,
+  Popper,
+  Grow,
+  ClickAwayListener,
+  MenuItem,
+  MenuList,
   Slider,
   Dialog,
   DialogContent,
@@ -57,6 +63,10 @@ const BoxSumaProd = ({ venta }) => {
   const [sliderValue, setSliderValue] = useState(1);
   const [productByCodigo, setProductByCodigo] = useState([]);
 
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+
   const calculateTotalPrice = (quantity, price) => quantity * price;
 
   const handlePluSubmit = (productInfo) => {
@@ -73,29 +83,95 @@ const BoxSumaProd = ({ venta }) => {
   const handleClose = () => setOpen(false);
   const handleClosePeso = () => setOpenPeso(false);
 
-
-
-  const handleSearchButtonClick = async () => {
-    try {
-      const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
-      );
-      console.log("Respuesta de la API:", response.data);
-  
-      console.log("Cantidad registros:", response.data.cantidadRegistros);
-      if (response.data.cantidadRegistros > 0) {
-        const productoEncontrado = response.data.productos[0];
-        addToSalesData(productoEncontrado, 1); // Agregar el producto con cantidad 1
-        setProductByCodigo(productoEncontrado); // Actualizar el estado con el producto encontrado
-      } else {
-        console.log("Producto no encontrado.");
-        setProductByCodigo(null); // Limpiar el estado si no se encontró ningún producto
+  const handlePluSearchButtonClick = async () => {
+    if (searchTerm.trim() !== "") {
+      try {
+        const response = await axios.get(
+          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
+        );
+        console.log("Respuesta de la API:", response.data);
+        console.log("Cantidad registros:", response.data.cantidadRegistros);
+        if (response.data.cantidadRegistros > 0) {
+          const productoEncontrado = response.data.productos[0];
+          addToSalesData(productoEncontrado, quantity);
+          setProductByCodigo(productoEncontrado);
+        } else {
+          console.log("Producto no encontrado.");
+          setProductByCodigo(null);
+        }
+      } catch (error) {
+        console.error("Error al buscar el producto:", error);
       }
-    } catch (error) {
-      console.error("Error al buscar el producto:", error);
-      // Manejar el error, mostrar un mensaje al usuario, etc.
     }
   };
+
+  const handleDescripcionSearchButtonClick = async () => {
+    if (searchTerm.trim() !== "") {
+      try {
+        const response = await axios.get(
+          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
+        );
+        console.log("Respuesta de la API:", response.data);
+        console.log("Cantidad registros:", response.data.cantidadRegistros);
+        if (response.data.cantidadRegistros > 0) {
+          setProducts(response.data.productos);
+        } else {
+          console.log("Producto no encontrado.");
+          setProducts([]);
+        }
+      } catch (error) {
+        console.error("Error al buscar el producto por descripción:", error);
+      }
+    }
+  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
+        );
+        setProducts(response.data.productos);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    if (searchTerm.trim() !== "") {
+      fetchProducts();
+    } else {
+      setProducts([]); // Si el término de búsqueda está vacío, limpiar la lista de productos
+    }
+  }, [searchTerm]);
+
+  const handleAddProductToSales = (product) => {
+    if (product) {
+      addToSalesData(product, quantity); // Agregar el producto seleccionado a salesData con la cantidad actual
+      setQuantity(1); // Restablecer la cantidad a 1 después de agregar el producto
+    }
+  };
+
+
+  // const handleDescripcionSearchButtonClick = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
+  //     );
+  //     console.log("Respuesta de la API:", response.data);
+
+  //     console.log("Cantidad registros:", response.data.cantidadRegistros);
+  //     if (response.data.cantidadRegistros > 0) {
+  //       const productoEncontrado = response.data.productos;
+  //        // Agregar el producto con cantidad 1
+  //       setProductByCodigo(productoEncontrado); // Actualizar el estado con el producto encontrado
+  //     } else {
+  //       console.log("Producto no encontrado.");
+  //       setProductByCodigo(null); // Limpiar el estado si no se encontró ningún producto
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al buscar el producto por descripción:", error);
+  //     // Manejar el error, mostrar un mensaje al usuario, etc.
+  //   }
+  // };
 
   // const handleSearchButtonClick = async () => {
   //   try {
@@ -154,29 +230,46 @@ const BoxSumaProd = ({ venta }) => {
           }}
         >
           <Grid item xs={12} lg={14} sx={{ minWidth: 200, width: "80%" }}>
-            <div style={{ display: "flex" }}>
-              <TextField
-                fullWidth
-                focused
-                placeholder="Ingresa Código"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-             
-              <Button
-                size="large"
-                variant="outlined"
-                onClick={handleSearchButtonClick}
-              >
-                PLU
-              </Button>
-              <Button size="large" variant="outlined" onClick={handleOpenPeso}>
-                Peso
-              </Button>
-            </div>
+  <div style={{ display: "flex" }}>
+    <Grid item xs={12} md={6} lg={14}>
+      <Autocomplete
+        options={searchTerm ? products.filter(product =>
+          product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+        ) : products}
+        getOptionLabel={(product) => product.nombre}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            fullWidth
+            focused
+            placeholder="Ingresa Código"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        )}
+        onChange={(event, newValue) => {
+                    setSelectedProduct(newValue);
+                    handleAddProductToSales(newValue); // Agregar el producto seleccionado a salesData
+                  }}
+        style={{ maxWidth: "100%" }}
+      />
+    </Grid>
+    <Button
+      size="large"
+      variant="outlined"
+      onClick={() => {
+        handlePluSearchButtonClick();
+        handleDescripcionSearchButtonClick();
+      }}
+    >
+      PLU
+    </Button>
+    <Button size="large" variant="outlined" onClick={handleOpenPeso}>
+      Peso
+    </Button>
+  </div>
+</Grid>
 
-           
-          </Grid>
         </Paper>
       </Grid>
 
@@ -207,17 +300,17 @@ const BoxSumaProd = ({ venta }) => {
                   <TableRow key={index}>
                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
                       <TextField
-                        value={sale.quantity === 0 ? "" : sale.quantity} // Si la cantidad es 0, muestra un string vacío para permitir la entrada de números nuevos
+                        value={sale.quantity === 0 ? "" : sale.quantity}
                         onChange={(event) => {
                           const newValue = parseInt(event.target.value);
                           const updatedSalesData = [...salesData];
                           updatedSalesData[index].quantity = isNaN(newValue)
                             ? 0
-                            : newValue; // Si no es un número válido, establece la cantidad en 0
+                            : newValue;
                           setSalesData(updatedSalesData);
                         }}
                         inputProps={{ min: 0 }}
-                        style={{ width: 90 }} // Establece el mínimo en 0 para permitir números negativos
+                        style={{ width: 90 }}
                       />
                     </TableCell>
                     <TableCell>{sale.descripcion}</TableCell>
@@ -235,32 +328,6 @@ const BoxSumaProd = ({ venta }) => {
                     </TableCell>
                   </TableRow>
                 ))}
-                {venta &&
-                  venta.products.map((product, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <TextField
-                          value={product.quantity}
-                          onChange={(event) => {
-                            // Lógica para actualizar la cantidad si es necesario
-                          }}
-                          inputProps={{ min: 0 }}
-                          style={{ width: 90 }}
-                        />
-                      </TableCell>
-                      <TableCell>{product.descripcion}</TableCell>
-                      <TableCell>{product.precioUnidad}</TableCell>
-                      <TableCell>
-                        {calculateTotalPrice(
-                          product.quantity,
-                          product.precioUnidad
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {/* Botón para eliminar el producto */}
-                      </TableCell>
-                    </TableRow>
-                  ))}
               </TableBody>
             </Table>
             <Paper
@@ -279,24 +346,10 @@ const BoxSumaProd = ({ venta }) => {
         </Paper>
       </Grid>
       <Dialog open={open} onClose={handleClose}>
-        <DialogContent>
-          {/* <TecladoPLU
-            plu={plu}
-            setPlu={setPlu}
-            onClose={handleClose}
-            onPluSubmit={handlePluSubmit}
-          /> */}
-        </DialogContent>
+        <DialogContent>{/* Componente de TecladoPLU */}</DialogContent>
       </Dialog>
       <Dialog open={openPeso} onClose={handleClosePeso}>
-        <DialogContent>
-          <TecladoPeso
-            peso={peso}
-            setPeso={setPeso}
-            onClose={handleClosePeso}
-            onPesoSubmit={handlePesoSubmit}
-          />
-        </DialogContent>
+        <DialogContent>{/* Componente de TecladoPeso */}</DialogContent>
       </Dialog>
     </Paper>
   );
