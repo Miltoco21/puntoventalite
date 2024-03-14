@@ -99,7 +99,7 @@ const StepperComponent = () => {
   const handleSubmit = () => {
     // Assuming 'data' contains the collected data from all steps
     console.log("Submitting Data:", data);
-
+  
     // Send the data to the server using Axios (replace with your API endpoint)
     axios
       .post(
@@ -109,9 +109,9 @@ const StepperComponent = () => {
       .then((response) => {
         // Handle the response from the server if needed
         console.log("Server Response:", response.data);
-
+  
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
-
+  
         // Reset the data and step state:
         setData({
           step1: {},
@@ -121,7 +121,7 @@ const StepperComponent = () => {
           step5: {},
         });
         // setActiveStep(0);
-
+  
         // Set success message and open dialog
         setDialogMessage("Producto guardado con exito");
         setOpen(true);
@@ -129,13 +129,18 @@ const StepperComponent = () => {
       .catch((error) => {
         // Handle any errors
         console.error("Error:", error);
-
+  
         // Set error message and open dialog
         setDialogMessage("Error al guardar");
         setOpen(true);
       });
+  
+    // Agregar un console.log aquí
+    console.log("Producto guardado");
+  
+    // Si ves este mensaje, significa que la función handleSubmit ha sido ejecutada completamente.
   };
-
+  
   const getStepContent = (step) => {
     switch (step) {
       case 0:

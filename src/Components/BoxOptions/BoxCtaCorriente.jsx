@@ -421,6 +421,7 @@ const BoxCtaCorriente = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 select
+              
                 label="Tipo de Cuenta"
                 value={tipoCuenta}
                 onChange={handleChangeTipoCuenta}

@@ -24,15 +24,19 @@ import {
 
 const Step3Component = ({ data, onNext }) => {
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockInicial, setStockInical] = useState("");
-  const [precioCosto, setPrecioCosto] = useState("");
+  const [stockInicial, setStockInicial] = useState((data.stockInicial||""));
+  const [precioCosto, setPrecioCosto] = useState((data.precioCosto||""));
   const [selectedUnidadId, setSelectedUnidadId] = useState(data.selectedUnidadId||"");
-
+  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
   const [openDialog1, setOpenDialog1] = useState(false);
 
  
 
   const handleNext = () => {
+    // if (!selectedUnidadId || !precioCosto || !stockInicial) {
+    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
+    //   return;
+    // }
     const stepData = {
       selectedUnidadId,
       precioCosto,
@@ -158,6 +162,15 @@ const Step3Component = ({ data, onNext }) => {
             Guardar y continuar
           </Button>
         </Grid>
+        <Grid item xs={12} md={8}>
+        <Box mt={2}>
+          {(!selectedUnidadId || !precioCosto || !stockInicial) && (
+            <Typography variant="body2" color="error">
+              {emptyFieldsMessage}
+            </Typography>
+          )}
+        </Box>
+      </Grid>
       </Grid>
 
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>

@@ -29,15 +29,21 @@ const Step5Component = ({ data, onNext }) => {
   const [newImpuesto, setNewImpuesto] = useState("");
   const [nota, setNota] = useState(data.nota||"");
 
-  const [stockCritico, setStockCritico] = useState("");
+  const [stockCritico, setStockCritico] = useState(data.stockCritico||"");
   const [selectedImpuestoId, setSelectedImpuestoId] = useState(data.selectedImpuestoId||"");
 
   const [selectedFile, setSelectedFile] = useState(data.selectedFile||null);
 
   const [openDialog1, setOpenDialog1] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
+  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
 
   const handleNext = () => {
+
+    //   if (!stockCritico || !selectedImpuestoId || !nota|| !selectedFile) {
+    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
+    //   return;
+    // }
     const stepData = {
       stockCritico,
       selectedImpuestoId,
@@ -46,9 +52,25 @@ const Step5Component = ({ data, onNext }) => {
     };
     console.log("Step 5 Data:", stepData); // Log the data for this step
     onNext(stepData);
+    
   };
 
-  const handleSubmit = () => {};
+  const handlePrevious = () => {
+    // Navigate to previous step
+    onNext(data); // Send the current data to the previous step
+  };
+  const handleSubmitAll = async () => {
+    try {
+      const allData = { ...data, step5: { stockCritico, selectedImpuestoId, selectedFile, nota } };
+      console.log("All Data:", allData); // Log all data before sending to server
+      const response = await axios.post( "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto", allData);
+      console.log("Server Response:", response.data);
+      // Optionally, reset the state or perform other actions upon successful submission
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle any errors
+    }
+  };
 
   const handleOpenDialog1 = () => {
     setOpenDialog1(true);
@@ -209,12 +231,22 @@ const Step5Component = ({ data, onNext }) => {
         <Button
           variant="contained"
           color="secondary"
-          onClick={handleNext}
+          onClick={handleSubmitAll}
           fullWidth
           sx={{ marginTop: "16px" }}
         >
           Guardar
         </Button>
+
+        <Grid item xs={12} md={8}>
+        <Box mt={2}>
+          {(!stockCritico || !selectedImpuestoId || !nota|| !selectedFile) && (
+            <Typography variant="body2" color="error">
+              {emptyFieldsMessage}
+            </Typography>
+          )}
+        </Box>
+      </Grid>
       </Grid>
     </Grid>
 

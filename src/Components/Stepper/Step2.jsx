@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
+  Typography
   
 } from "@mui/material";
 
@@ -30,11 +31,16 @@ const Step2Component = ({ data, onNext }) => {
   const [openDialog1, setOpenDialog1] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
   const [openDialog3, setOpenDialog3] = useState(false);
+  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
   
   const [bodega, setBodega] = useState("");
  
 
   const handleNext = () => {
+    // if (!selectedBodegaId || !selectedProveedorId ) {
+    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
+    //   return;
+    // }
     const stepData = {
       selectedBodegaId,
       selectedProveedorId
@@ -208,6 +214,16 @@ const Step2Component = ({ data, onNext }) => {
         >
           Guardar y continuar
         </Button>
+      </Grid>
+      {/* Mensaje de validación */}
+      <Grid item xs={12} md={8}>
+        <Box mt={2}>
+          {(!selectedBodegaId || !selectedProveedorId ) && (
+            <Typography variant="body2" color="error">
+              {emptyFieldsMessage}
+            </Typography>
+          )}
+        </Box>
       </Grid>
     </Grid>
 

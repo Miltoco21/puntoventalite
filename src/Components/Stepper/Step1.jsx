@@ -11,6 +11,7 @@ import {
   Paper,
   Button,
   Dialog,
+ Typography,
   DialogActions,
   DialogTitle,
   DialogContent,
@@ -19,7 +20,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  Typography,
+  
 } from "@mui/material";
 
 const Step1Component = ({ data, onNext }) => {
@@ -39,11 +40,11 @@ const Step1Component = ({ data, onNext }) => {
   const [subcategories, setSubCategories] = useState([]);
   const [families, setFamilies] = useState([]);
   const [subfamilies, setSubFamilies] = useState([]);
-  const [respuestaSINO, setRespuestaSINO] = useState(data.respuestaSINO||"");
-  const [pesoSINO, setPesoSINO] = useState(data.pesoSINO||"");
-  const [nombre, setNombre] = useState(data.nombre||"");
-  const [marca, setMarca] = useState(data.marca||"");
-
+  const [respuestaSINO, setRespuestaSINO] = useState(data.respuestaSINO || "");
+  const [pesoSINO, setPesoSINO] = useState(data.pesoSINO || "");
+  const [nombre, setNombre] = useState(data.nombre || "");
+  const [marca, setMarca] = useState(data.marca || "");
+    
   const [openDialog1, setOpenDialog1] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
   const [openDialog3, setOpenDialog3] = useState(false);
@@ -52,16 +53,22 @@ const Step1Component = ({ data, onNext }) => {
   const [newSubCategory, setNewSubCategory] = useState("");
   const [newFamily, setNewFamily] = useState("");
   const [newSubFamily, setNewSubFamily] = useState("");
+  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
 
   const handleRespuesta = (e) => {
     const value = e.target.value;
     setRespuestaSINO(value);
+    
   };
   const handlePeso = (e) => {
     const value = e.target.value;
     setPesoSINO(value);
   };
   const handleNext = () => {
+    // if (!respuestaSINO || !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) {
+    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
+    //   return;
+    // }
     const stepData = {
       respuestaSINO,
       pesoSINO,
@@ -234,21 +241,23 @@ const Step1Component = ({ data, onNext }) => {
           <Typography>¿Este producto requiere trazabilidad?</Typography>
           <FormControl component="fieldset">
             <RadioGroup value={respuestaSINO} onChange={handleRespuesta}>
-              <FormControlLabel value="Sí" control={<Radio />} label="Sí" />
-              <FormControlLabel value="No" control={<Radio />} label="No" />
+              <Grid sx={{ display: "flex" }}>
+                <FormControlLabel value="Sí" control={<Radio />} label="Sí" />
+                <FormControlLabel value="No" control={<Radio />} label="No" />
+              </Grid>
             </RadioGroup>
           </FormControl>
         </Grid>
         <Grid item xs={12} md={8}>
           <Typography>¿Este producto es pesable?</Typography>
           <FormControl component="fieldset">
-            <RadioGroup value={pesoSINO} onChange={handlePeso}>
+            <Grid sx={{ display: "flex" }}>
               <FormControlLabel value="Sí" control={<Radio />} label="Sí" />
               <FormControlLabel value="No" control={<Radio />} label="No" />
-            </RadioGroup>
+            </Grid>
           </FormControl>
         </Grid>
-        <Grid item xs={12}md={8}>
+        <Grid item xs={12} md={8}>
           <InputLabel>Selecciona Categoría</InputLabel>
           <Select
             fullWidth
@@ -257,10 +266,7 @@ const Step1Component = ({ data, onNext }) => {
             label="Selecciona Categoría"
           >
             {categories.map((category) => (
-              <MenuItem
-                key={category.idCategoria}
-                value={category.idCategoria}
-              >
+              <MenuItem key={category.idCategoria} value={category.idCategoria}>
                 {category.descripcion}
               </MenuItem>
             ))}
@@ -343,6 +349,17 @@ const Step1Component = ({ data, onNext }) => {
             Guardar y continuar
           </Button>
         </Grid>
+
+         {/* Mensaje de validación */}
+      {/* <Grid item xs={12} md={8}>
+        <Box mt={2}>
+          {(!respuestaSINO || !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) && (
+            <Typography variant="body2" color="error">
+              {emptyFieldsMessage}
+            </Typography>
+          )}
+        </Box>
+      </Grid> */}
       </Grid>
 
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>

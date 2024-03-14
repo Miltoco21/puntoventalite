@@ -39,6 +39,7 @@ import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 import BoxPreciosClientes from "./BoxPreciosClientes";
 import StepperSI from "../Stepper/StepperSI";
+import StepperNo from "../Stepper/StepperNo"
 import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente";
 
 const BoxGestionCaja = () => {
@@ -728,7 +729,7 @@ const BoxGestionCaja = () => {
                       fontFamily: "Victor Mono"
                     }}
                   >
-                    TOTAL : ${" "}
+                    TOTAL : $
                     <span
                       style={{
                         color: "#00878889",

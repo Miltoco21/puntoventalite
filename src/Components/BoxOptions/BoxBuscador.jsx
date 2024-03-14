@@ -19,56 +19,106 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'; 
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BoxSumaProd from "./BoxSumaProd";
 import axios from "axios";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const BoxBuscador = () => {
-  const { salesData, addToSalesData, setPrecioData, setVentaData, searchResults,setSearchResults, updateSearchResults, selectedUser,
-    setSelectedUser,} = useContext(
-    SelectedOptionsContext
-  );
+  const {
+    salesData,
+    addToSalesData,
+    setPrecioData,
+    setVentaData,
+    searchResults,
+    setSearchResults,
+    updateSearchResults,
+    selectedUser,
+    setSelectedUser,
+    clearSalesData,
+  } = useContext(SelectedOptionsContext);
 
   const [searchText, setSearchText] = useState("");
-  
-  const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
 
+  const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
 
   const [selectedChipIndex, setSelectedChipIndex] = useState(null);
 
+
   const handleChipClick = (index, result) => {
-    setSelectedUser(result); // Establecer el usuario seleccionado
-    setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
-    // Llamar a las funciones asociadas al clic en el chip seleccionado
-    handleUltimaCompraCliente(result.codigoCliente, result.codigoClienteSucursal);
-    handleOpenPreciosClientesDialog(result.codigoCliente, result.codigoClienteSucursal);
-    handleOpenDeudasClientesDialog(result.codigoCliente, result.codigoClienteSucursal);
-    setSelectedUser(result);
-    
+    // Verificar si el usuario seleccionado es el mismo que el usuario actualmente seleccionado
+    if (selectedUser !== null && selectedUser.codigoCliente === result.codigoCliente && selectedUser.codigoClienteSucursal === result.codigoClienteSucursal) {
+      // Si es el mismo usuario, limpiar los datos de la venta
+      clearSalesData();
+      // Desseleccionar el usuario estableciendo selectedUser a null
+      setSelectedUser(null);
+      // Establecer el índice del chip seleccionado a null
+      setSelectedChipIndex(null);
+    } else {
+      // Si es un usuario diferente, realizar las acciones normales de selección
+      setSelectedUser(result); // Establecer el usuario seleccionado
+      setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
+      // Llamar a las funciones asociadas al clic en el chip seleccionado
+      handleUltimaCompraCliente(
+        result.codigoCliente,
+        result.codigoClienteSucursal
+      );
+      handleOpenPreciosClientesDialog(
+        result.codigoCliente,
+        result.codigoClienteSucursal
+      );
+      handleOpenDeudasClientesDialog(
+        result.codigoCliente,
+        result.codigoClienteSucursal
+      );
+    }
   };
 
-const handleSearch = async () => {
-  try {
-    const response = await axios.get(
-      `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
-    );
-    if (Array.isArray(response.data.clienteSucursal)) {
-      setSearchResults(response.data.clienteSucursal);
-      // También actualiza el contexto con los resultados de la búsqueda
-      updateSearchResults(response.data.clienteSucursal);
-    } else {
+  // const handleChipClick = (index, result) => {
+
+  //   if (selectedUser !== null) {
+  //     clearSalesData();
+  //   }
+  //   setSelectedUser(result); // Establecer el usuario seleccionado
+  //   setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
+  //   // Llamar a las funciones asociadas al clic en el chip seleccionado
+  //   handleUltimaCompraCliente(
+  //     result.codigoCliente,
+  //     result.codigoClienteSucursal
+  //   );
+  //   handleOpenPreciosClientesDialog(
+  //     result.codigoCliente,
+  //     result.codigoClienteSucursal
+  //   );
+  //   handleOpenDeudasClientesDialog(
+  //     result.codigoCliente,
+  //     result.codigoClienteSucursal
+  //   );
+  //   setSelectedUser(result);
+  
+  // };
+
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
+      );
+      if (Array.isArray(response.data.clienteSucursal)) {
+        setSearchResults(response.data.clienteSucursal);
+        // También actualiza el contexto con los resultados de la búsqueda
+        updateSearchResults(response.data.clienteSucursal);
+      } else {
+        setSearchResults([]);
+        // También actualiza el contexto con los resultados de la búsqueda vacíos
+        updateSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
       setSearchResults([]);
-      // También actualiza el contexto con los resultados de la búsqueda vacíos
+      // También actualiza el contexto con los resultados de la búsqueda vacíos en caso de error
       updateSearchResults([]);
     }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    setSearchResults([]);
-    // También actualiza el contexto con los resultados de la búsqueda vacíos en caso de error
-    updateSearchResults([]);
-  }
-};
+  };
 
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
@@ -160,40 +210,7 @@ const handleSearch = async () => {
     }
   };
 
-  // const handleOpenDialog = async (codigoCliente, codigoClienteSucursal) => {
-  //   try {
-  //     console.log(codigoCliente, codigoClienteSucursal);
-  //     const response = await axios.get(
-  //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
-  //     );
 
-  //     // Aquí puedes abrir el diálogo con los datos obtenidos
-  //     console.log("Datos del diálogo:", response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
-  // const handleUltimaCompraCliente = async (codigoCliente, codigoClienteSucursal, producto) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://www.easyposdev.somee.com/api/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
-  //     );
-  //     setUltimaVenta(response.data);
-  //     console.log("Datos enviados por chip:", response.data); // Console log de los datos enviados por el chip
-
-  //     // Enviar los datos de los productos de la última venta a addToSalesData
-  //     response.data.products.forEach((product) => {
-  //       addToSalesData({
-  //         nombre: product.descripcion,
-  //         precioVenta: product.precioUnidad, // Ajustar según el precio correcto en la respuesta de la API
-  //         idProducto: product.codProducto, // Ajustar según el identificador correcto en la respuesta de la API
-  //       });
-  //     });
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
 
   return (
     <Paper elevation={13} sx={{ marginBottom: "3px" }}>
@@ -241,20 +258,26 @@ const handleSearch = async () => {
                     }}
                   >
                     {searchResults.map((result, index) => (
-                        <ListItem key={result.codigoCliente}>
+                      <ListItem key={result.codigoCliente}>
                         <Chip
                           sx={{
                             display: "flex",
                             margin: "auto",
-                            backgroundColor: selectedChipIndex === index ? "#A8EB12" : "#2196f3",
+                            backgroundColor:
+                              selectedChipIndex === index
+                                ? "#A8EB12"
+                                : "#2196f3",
                             transition: "background-color 0.3s ease",
                           }}
                           label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
-                          icon={selectedChipIndex === index ? <CheckCircleIcon /> : null} // Agrega el icono de verificación si el chip está seleccionado
+                          icon={
+                            selectedChipIndex === index ? (
+                              <CheckCircleIcon />
+                            ) : null
+                          } // Agrega el icono de verificación si el chip está seleccionado
                           onClick={() => handleChipClick(index, result)} // Pasar el índice y el resultado al handleChipClick
                         />
                       </ListItem>
-                    
                     ))}
                   </ul>
                 </TableContainer>

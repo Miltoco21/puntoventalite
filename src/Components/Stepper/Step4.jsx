@@ -24,9 +24,10 @@ import {
 
 const Step4Component = ({ data, onNext }) => {
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockInicial, setStockInical] = useState("");
-  const [precioVenta, setPrecioVenta] = useState("");
+  const [stockInicial, setStockInical] = useState(data.stockInicial||"");
+  const [precioVenta, setPrecioVenta] = useState(data.precioVenta||"");
   const [selectedFormatoId, setSelectedFormatoId] = useState(data.selectedFormatoId||"");
+  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
 
   const [openDialog1, setOpenDialog1] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
@@ -34,6 +35,10 @@ const Step4Component = ({ data, onNext }) => {
   
 
   const handleNext = () => {
+    //  if (!selectedFormatoId || !precioVenta || !stockInicial) {
+    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
+    //   return;
+    // }
     const stepData = {
       selectedFormatoId,
       precioVenta
@@ -129,7 +134,7 @@ const Step4Component = ({ data, onNext }) => {
           </Select>
         </Box>
       </Grid>
-      <Grid item xs={12} md={3}>
+      {/* <Grid item xs={12} md={3}>
         <Box display="flex" alignItems="center" justifyContent="flex-end">
           <Button
             style={{
@@ -145,13 +150,13 @@ const Step4Component = ({ data, onNext }) => {
             +
           </Button>
         </Box>
-      </Grid>
+      </Grid> */}
       <Grid item xs={12}>
         <InputLabel>Ingresa Precio Venta</InputLabel>
-        <Box display="flex" alignItems="center">
+        
           <TextField
             sx={{
-              marginTop: "6px",
+             
               width: "100%",
            
               marginLeft: "16px",
@@ -167,7 +172,7 @@ const Step4Component = ({ data, onNext }) => {
               },
             }}
           />
-          <Button
+          {/* <Button
             size="large"
             variant="outlined"
             style={{
@@ -179,8 +184,8 @@ const Step4Component = ({ data, onNext }) => {
             onClick={handleOpenDialog2}
           >
             +
-          </Button>
-        </Box>
+          </Button> */}
+        
       </Grid>
       <Grid item xs={12}>
         <Button
@@ -191,6 +196,15 @@ const Step4Component = ({ data, onNext }) => {
         >
           Guardar y continuar
         </Button>
+      </Grid>
+      <Grid item xs={12} md={8}>
+        <Box mt={2}>
+          {(!selectedFormatoId || !precioVenta || !stockInicial) && (
+            <Typography variant="body2" color="error">
+              {emptyFieldsMessage}
+            </Typography>
+          )}
+        </Box>
       </Grid>
     </Grid>
 
