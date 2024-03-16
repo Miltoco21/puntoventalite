@@ -828,6 +828,9 @@ const BoxGestionCaja = () => {
         <DialogContent>
           <BotonesCategorias onClose={handleCloseCategoria} />
         </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCategoria}>cerrar</Button>
+        </DialogActions>
       </Dialog>
 
       <Dialog

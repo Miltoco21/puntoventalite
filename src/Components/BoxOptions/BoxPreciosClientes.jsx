@@ -80,6 +80,13 @@ const BoxPreciosClientes = ({ onClosePreciosClientes }) => {
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
         
+        // Realizar la segunda llamada a la API para obtener las deudas del cliente
+        const deudasResponse = await axios.get(
+          `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
+        );
+
+        console.log("Respuesta de la API de deudas:", deudasResponse.data);
+        
         // Esperar 4 segundos antes de cerrar el modal
         setTimeout(() => {
           onClosePreciosClientes();
