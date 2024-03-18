@@ -19,12 +19,16 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BoxSumaProd from "./BoxSumaProd";
+import BoxPreciosClientes from "./BoxPreciosClientes";
 import axios from "axios";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
+import { Visibility } from "@mui/icons-material";
 
-const BoxBuscador = () => {
+const BoxBuscador = (handleClosePreciosClientes) => {
   const {
     salesData,
     addToSalesData,
@@ -36,6 +40,10 @@ const BoxBuscador = () => {
     selectedUser,
     setSelectedUser,
     clearSalesData,
+    selectedCodigoCliente,
+    setSelectedCodigoCliente,
+    selectedCodigoClienteSucursal,
+    setSelectedCodigoClienteSucursal,
   } = useContext(SelectedOptionsContext);
 
   const [searchText, setSearchText] = useState("");
@@ -44,10 +52,13 @@ const BoxBuscador = () => {
 
   const [selectedChipIndex, setSelectedChipIndex] = useState(null);
 
-
   const handleChipClick = (index, result) => {
     // Verificar si el usuario seleccionado es el mismo que el usuario actualmente seleccionado
-    if (selectedUser !== null && selectedUser.codigoCliente === result.codigoCliente && selectedUser.codigoClienteSucursal === result.codigoClienteSucursal) {
+    if (
+      selectedUser !== null &&
+      selectedUser.codigoCliente === result.codigoCliente &&
+      selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
+    ) {
       // Si es el mismo usuario, limpiar los datos de la venta
       clearSalesData();
       // Desseleccionar el usuario estableciendo selectedUser a null
@@ -73,30 +84,6 @@ const BoxBuscador = () => {
       );
     }
   };
-
-  // const handleChipClick = (index, result) => {
-
-  //   if (selectedUser !== null) {
-  //     clearSalesData();
-  //   }
-  //   setSelectedUser(result); // Establecer el usuario seleccionado
-  //   setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
-  //   // Llamar a las funciones asociadas al clic en el chip seleccionado
-  //   handleUltimaCompraCliente(
-  //     result.codigoCliente,
-  //     result.codigoClienteSucursal
-  //   );
-  //   handleOpenPreciosClientesDialog(
-  //     result.codigoCliente,
-  //     result.codigoClienteSucursal
-  //   );
-  //   handleOpenDeudasClientesDialog(
-  //     result.codigoCliente,
-  //     result.codigoClienteSucursal
-  //   );
-  //   setSelectedUser(result);
-  
-  // };
 
   const handleSearch = async () => {
     try {
@@ -136,7 +123,7 @@ const BoxBuscador = () => {
         `https://www.easyposdev.somee.com/api/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
       );
 
-      console.log("Datos enviados por chip:", response.data); // Console log de los datos enviados por el chip
+      console.log("Respuesta Ultima Compra :", response.data); // Console log de los datos enviados por el chip
 
       const { ticketBusqueda } = response.data; // Extraer la sección de ticket de la respuesta
 
@@ -167,25 +154,14 @@ const BoxBuscador = () => {
     }
   };
   ///Fx recibe parametros de evento onclick
-  const handleOpenPreciosClientesDialog = async (
+  const handleOpenPreciosClientesDialog = (
     codigoCliente,
     codigoClienteSucursal
   ) => {
-    try {
-      console.log(codigoCliente, codigoClienteSucursal);
-      const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
-      );
-
-      // Actualiza el estado con los datos obtenidos de la API
-      setPrecioData(response.data);
-      console.log("Respuesta Precios Clientes:", response.data);
-
-      // Abre el diálogo
-      setOpenPrecioDialog(true);
-    } catch (error) {
-      console.error("Error Precios Clientes", error);
-    }
+    
+    setSelectedCodigoCliente(codigoCliente);
+    setSelectedCodigoClienteSucursal(codigoClienteSucursal);
+    setOpenPrecioDialog(true);
   };
 
   const handleOpenDeudasClientesDialog = async (
@@ -210,10 +186,11 @@ const BoxBuscador = () => {
     }
   };
 
-
-
   return (
-    <Paper elevation={13} sx={{ marginBottom: "3px" }}>
+    <Paper
+      elevation={13}
+      sx={{ marginBottom: "3px", backgroundColor: "#859398" }}
+    >
       <Grid container spacing={2}>
         <Grid item xs={12} md={12} lg={12}>
           <Grid container spacing={2}>
@@ -223,13 +200,19 @@ const BoxBuscador = () => {
               md={12}
               sx={{
                 display: "flex",
-                margin: "8px",
+
                 justifyContent: "center",
-                gap: 2,
+                gap: 1,
               }}
             >
               <Grid item md={8}>
                 <TextField
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "white",
+                    borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
+                    // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Ajusta el sombreado según tus preferencias
+                  }}
                   fullWidth
                   label="Ingrese Nombre Apellido"
                   value={searchText}
@@ -238,10 +221,20 @@ const BoxBuscador = () => {
               </Grid>
               <Grid item md={3}>
                 <Button
+                  sx={{
+                    width: "90%",
+                    height: "100%",
+                    backgroundColor: " #283048",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#1c1b17 ",
+                      color: "white",
+                    },
+                  }}
                   fullWidth
-                  size="large"
                   variant="contained"
                   onClick={handleSearch}
+                  startIcon={<SearchIcon />}
                 >
                   Buscar
                 </Button>
@@ -287,6 +280,13 @@ const BoxBuscador = () => {
           </Grid>
         </Grid>
       </Grid>
+
+      <div style={{ display: "none" }}>
+        <BoxPreciosClientes
+          onClosePreciosClientes={handleClosePreciosClientes}
+          onOpenPreciosClientesDialog={handleOpenPreciosClientesDialog}
+        />
+      </div>
     </Paper>
   );
 };

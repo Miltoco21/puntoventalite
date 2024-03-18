@@ -509,8 +509,12 @@ const BoxGestionCaja = () => {
 
   return (
     <Paper
-      elevation={13}
+      elevation={5}
       sx={{
+        background: "#859398",  /* fallback for old browsers */
+        /* Chrome 10-25, Safari 5.1-6 */
+
+        
         display: "flex",
         flexDirection: "column",
         maxWidth: "1000px",
@@ -530,10 +534,10 @@ const BoxGestionCaja = () => {
             sx={{
               width: "90%",
               height: "80px",
-              backgroundColor: "lightSalmon",
+              backgroundColor: " #283048",
               color: "white",
               "&:hover": {
-                backgroundColor: "coral",
+                backgroundColor: "#1c1b17 ",
                 color: "white",
               },
               margin: "5px",
@@ -547,13 +551,12 @@ const BoxGestionCaja = () => {
           <Button
             disabled={true}
             sx={{
-              disabled: true,
               width: "90%",
               height: "80px",
-              backgroundColor: "lightSalmon",
+              backgroundColor: " #283048",
               color: "white",
               "&:hover": {
-                backgroundColor: "coral",
+                backgroundColor: "#1c1b17 ",
                 color: "white",
               },
               margin: "5px",
@@ -566,17 +569,17 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: "lightSalmon",
+           sx={{
+            width: "90%",
+            height: "80px",
+            backgroundColor: " #283048",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "#1c1b17 ",
               color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
-                color: "white",
-              },
-              margin: "5px",
-            }}
+            },
+            margin: "5px",
+          }}
             onClick={handleOpenCategoria}
           >
             {/* <LockPersonIcon /> */}
@@ -608,10 +611,10 @@ const BoxGestionCaja = () => {
             sx={{
               width: "90%",
               height: "80px",
-              backgroundColor: "lightSalmon",
+              backgroundColor: " #283048",
               color: "white",
               "&:hover": {
-                backgroundColor: "coral",
+                backgroundColor: "#1c1b17 ",
                 color: "white",
               },
               margin: "5px",
@@ -627,10 +630,10 @@ const BoxGestionCaja = () => {
             sx={{
               width: "90%",
               height: "80px",
-              backgroundColor: "lightSalmon",
+              backgroundColor: " #283048",
               color: "white",
               "&:hover": {
-                backgroundColor: "coral",
+                backgroundColor: "#1c1b17 ",
                 color: "white",
               },
               margin: "5px",
@@ -643,17 +646,17 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: "lightSalmon",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
+              sx={{
+                width: "90%",
+                height: "80px",
+                backgroundColor: " #283048",
                 color: "white",
-              },
-              margin: "5px",
-            }}
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin: "5px",
+              }}
             onClick={handleOpenDeudasDialog}
           >
             {/* <CoffeeIcon /> */}
@@ -662,13 +665,13 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-            sx={{
+             sx={{
               width: "90%",
               height: "80px",
-              backgroundColor: "lightSalmon",
+              backgroundColor: " #283048",
               color: "white",
               "&:hover": {
-                backgroundColor: "coral",
+                backgroundColor: "#1c1b17 ",
                 color: "white",
               },
               margin: "5px",
@@ -715,14 +718,15 @@ const BoxGestionCaja = () => {
                   xs={12}
                   sx={{
                     margin: "6px",
-                    color: "#ffffff",
-                    backgroundColor: "#E1213B",
+                    color: "#E1213B",
+                    backgroundColor: "#ffffff",
 
                     borderRadius: "5px",
                   }}
                 >
                   <p
                     style={{
+                      
                       margin: "6px",
                       fontSize: "36px",
                       fontWeight: "bold",
@@ -740,7 +744,7 @@ const BoxGestionCaja = () => {
                       <span
                         style={{
                           height:"600%",
-                          color: "white",
+                          color: "#E1213B",
                           fontSize: "36px",
                           fontFamily: "Victor Mono",
                          
@@ -759,17 +763,17 @@ const BoxGestionCaja = () => {
                   sx={{ display: "flex", justifyContent: "center" }}
                 >
                   <Button
-                    sx={{
-                      margin: "7px",
-                      width: "80%",
-                      height: "60px",
-                      backgroundColor: "green",
-                      color: "whitesmoke",
-                      "&:hover": {
-                        backgroundColor: "red",
-                        color: "white",
-                      },
-                    }}
+                   sx={{
+                    margin: "7px",
+                    width: "80%",
+                    height: "60px",
+                    background: "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                    color: "black",
+                    "&:hover": {
+                      backgroundColor: "red",
+                      color: "white",
+                    },
+                  }}
                     onClick={handleOpenDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
@@ -782,13 +786,14 @@ const BoxGestionCaja = () => {
                       margin: "7px",
                       width: "80%",
                       height: "60px",
-                      backgroundColor: "green",
-                      color: "whitesmoke",
+                      background: "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                      color: "black",
                       "&:hover": {
                         backgroundColor: "red",
                         color: "white",
                       },
                     }}
+                    
                     onClick={handleOpenDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
@@ -797,17 +802,17 @@ const BoxGestionCaja = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <Button
-                    style={{
-                      margin: "7px",
-                      width: "80%",
-                      height: "60px",
-                      backgroundColor: "green",
-                      color: "whitesmoke",
-                      "&:hover": {
-                        backgroundColor: "red",
-                        color: "white",
-                      },
-                    }}
+                   sx={{
+                    margin: "7px",
+                    width: "80%",
+                    height: "60px",
+                    background: "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                    color: "black",
+                    "&:hover": {
+                      backgroundColor: "red",
+                      color: "white",
+                    },
+                  }}
                     onClick={() => {
                       console.log("Botón de Ticket presionado");
                       handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario

@@ -61,20 +61,30 @@ const NavBar = () => {
   };
 
   return (
-    <Paper elevation={3} style={{ backgroundColor: "blue", padding: "6px" }}>
-      <Grid container item  xs={12} >
-        <Grid item xs={12} sx={{display:"flex"}} >
-          <Grid item xs={3} sm={2} md={2}>
+    <Paper
+      elevation={3}
+      style={{ backgroundColor: "#283048", padding: "1px", marginTop: "2px" }}
+    >
+      <Grid container item xs={12}>
+        <Grid item xs={12} sx={{ display: "flex" }}>
+          <Grid item xs={3} sm={2} md={2} sx={{ marginTop: "6px" }}>
             <Box variant="h5" color="white">
               EasyPOS
             </Box>
           </Grid>
           <Grid item xs={8} sm={9} md={9}>
-            
-              <Chip  
+            <Chip
               label="Establecimiento"
-              sx={{borderRadius:"6px",backgroundColor:"white",width:"90%"}}> ESTABLECIMIENTO</Chip>
-           
+              sx={{
+                marginTop: "6px",
+                borderRadius: "6px",
+                backgroundColor: "white",
+                width: "90%",
+              }}
+            >
+              {" "}
+              ESTABLECIMIENTO
+            </Chip>
           </Grid>
           <Grid item xs={2} sm={2} md={1}>
             <IconButton onClick={handleMenuOpen} style={{ padding: "8px" }}>
@@ -98,11 +108,39 @@ const NavBar = () => {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={10} 
-        sx={{display:"flex",margin:"1%"}} 
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={10}
+          sx={{ display: "flex", margin: "1%", justifyContent: "center" }}
         >
-          <Typography variant="h5">Fecha: {formattedDate}</Typography>
-          <Typography variant="h5">  Hora: {formattedTime}</Typography>
+          <Grid item xs={6} sm={6}>
+            <Typography
+              sx={{
+                width: "100%",
+                color: "white",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              Fecha: {formattedDate}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} sm={6}>
+            {" "}
+            <Typography
+              sx={{
+                width: "100%",
+                color: "white",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              {" "}
+              Hora: {formattedTime}
+            </Typography>
+          </Grid>
         </Grid>
       </Grid>
       <Dialog

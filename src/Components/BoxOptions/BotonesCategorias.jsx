@@ -320,11 +320,13 @@ const BotonesCategorias = ({ onClose }) => {
                 item
                 key={category.idCategoria}
                 xs={12}
-                sm={6}
-                md={4}
-                lg={3}
+                sm={12}
+                md={12}
+                lg={12}
               >
                 <Button
+                
+                sx={{width:"100%"}}
                   onClick={() => {
                     handleOpenDialog(category.idCategoria);
                     setSelectedOptions((prevOptions) => ({
@@ -401,7 +403,12 @@ const BotonesCategorias = ({ onClose }) => {
               {selectedProduct.map((product) => (
                 <Button
                   key={product.idProducto}
-                  onClick={() => addToSalesData(product)}
+                  onClick={() => {
+                    addToSalesData(product);
+                    handleCloseProductDialog();
+                    handleCloseFamilyDialog();
+                    onClose();
+                  }}
                   sx={{
                     margin: 1,
                     width: "90px",
@@ -429,7 +436,7 @@ const BotonesCategorias = ({ onClose }) => {
               handleCloseFamilyDialog();
             }}
           >
-            Cerrarr
+            Cerrar
           </Button>
         </DialogActions>
       </Dialog>

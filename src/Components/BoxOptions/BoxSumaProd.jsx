@@ -150,7 +150,6 @@ const BoxSumaProd = ({ venta }) => {
     }
   };
 
-
   // const handleDescripcionSearchButtonClick = async () => {
   //   try {
   //     const response = await axios.get(
@@ -209,6 +208,7 @@ const BoxSumaProd = ({ venta }) => {
     <Paper
       elevation={13}
       sx={{
+        background: "#859398",
         display: "flex",
         flexDirection: "column",
         maxWidth: "1200px",
@@ -218,75 +218,111 @@ const BoxSumaProd = ({ venta }) => {
     >
       <Grid container item xs={12} md={12} lg={16}>
         <Paper
-          elevation={15}
+          elevation={13}
           sx={{
+            background: "#859398",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             padding: "5px",
             margin: "5px",
-            marginTop: isMobile ? "-6px" : "0",
+
             width: "100%",
           }}
         >
           <Grid item xs={12} lg={14} sx={{ minWidth: 200, width: "80%" }}>
-  <div style={{ display: "flex" }}>
-    <Grid item xs={12} md={6} lg={14}>
-      <Autocomplete
-        options={searchTerm ? products.filter(product =>
-          product.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-        ) : products}
-        getOptionLabel={(product) => product.nombre}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            fullWidth
-            focused
-            placeholder="Ingresa Código"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        )}
-        onChange={(event, newValue) => {
+            <div style={{ display: "flex" }}>
+              <Grid item xs={12} md={6} lg={14} sx={{ margin: "1px" }}>
+                <Autocomplete
+                  sx={{
+                    backgroundColor: "white",
+                    borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
+                    // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Ajusta el sombreado según tus preferencias
+                  }}
+                  options={
+                    searchTerm
+                      ? products.filter((product) =>
+                          product.nombre
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                        )
+                      : products
+                  }
+                  getOptionLabel={(product) => product.nombre}
+                  renderInput={(params) => (
+                    <TextField
+                      sx={{
+                        backgroundColor: "white",
+                        borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
+                        // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Ajusta el sombreado según tus preferencias
+                      }}
+                      {...params}
+                      fullWidth
+                      focused
+                      placeholder="Ingresa Código"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  )}
+                  onChange={(event, newValue) => {
                     setSelectedProduct(newValue);
                     handleAddProductToSales(newValue); // Agregar el producto seleccionado a salesData
                   }}
-        style={{ maxWidth: "100%" }}
-      />
-    </Grid>
-    <Button
-      size="large"
-      variant="outlined"
-      onClick={() => {
-        handlePluSearchButtonClick();
-        handleDescripcionSearchButtonClick();
-      }}
-    >
-      PLU
-    </Button>
-    <Button size="large" variant="outlined" onClick={handleOpenPeso}>
-      Peso
-    </Button>
-  </div>
-</Grid>
-
+                  style={{ maxWidth: "100%" }}
+                />
+              </Grid>
+              <Button
+                sx={{
+                  margin: "1px",
+                  backgroundColor: " #283048",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#1c1b17 ",
+                    color: "white",
+                  },
+                }}
+                size="large"
+                onClick={() => {
+                  handlePluSearchButtonClick();
+                  handleDescripcionSearchButtonClick();
+                }}
+              >
+                PLU
+              </Button>
+              <Button
+                sx={{
+                  margin: "1px",
+                  backgroundColor: " #283048",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#1c1b17 ",
+                    color: "white",
+                  },
+                }}
+                size="large"
+                onClick={handleOpenPeso}
+              >
+                Peso
+              </Button>
+            </div>
+          </Grid>
         </Paper>
       </Grid>
 
       <Grid item xs={12}>
         <Paper
-          elevation={14}
+          elevation={1}
           sx={{
+            background: "#859398",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             margin: "5px",
-            marginTop: isMobile ? "-6px" : "0",
           }}
         >
           <TableContainer component={Paper} style={{ overflowX: "auto" }}>
             <Table>
-              <TableHead>
+              <TableHead sx={{ background: "#859398", height: "30%" }}>
                 <TableRow>
                   <TableCell>Cantidad</TableCell>
                   <TableCell>Descripción</TableCell>
@@ -295,9 +331,9 @@ const BoxSumaProd = ({ venta }) => {
                   <TableCell>Eliminar</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody style={{ maxHeight: "300px", overflowY: "auto" }}>
+              <TableBody style={{ maxHeight: "400px", overflowY: "auto" }}>
                 {salesData.map((sale, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={index} sx={{ height: "33px" }}>
                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
                       <TextField
                         value={sale.quantity === 0 ? "" : sale.quantity}
@@ -309,8 +345,7 @@ const BoxSumaProd = ({ venta }) => {
                             : newValue;
                           setSalesData(updatedSalesData);
                         }}
-                        inputProps={{ min: 0 }}
-                        style={{ width: 90 }}
+                        style={{ width: 80 }}
                       />
                     </TableCell>
                     <TableCell>{sale.descripcion}</TableCell>
@@ -332,15 +367,16 @@ const BoxSumaProd = ({ venta }) => {
             </Table>
             <Paper
               sx={{
+               
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 padding: "21px",
                 margin: "5px",
               }}
-              elevation={21}
+              elevation={18}
             >
-              <Typography>Total: {grandTotal}</Typography>
+              <Typography >Total: {grandTotal}</Typography>
             </Paper>
           </TableContainer>
         </Paper>

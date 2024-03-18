@@ -34,12 +34,47 @@ import BoxPago from "./BoxPago";
 import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 
-const BoxPreciosClientes = ({ onClosePreciosClientes }) => {
-  const { precioData, setPrecioData } = useContext(SelectedOptionsContext);
-  console.log("PrecioData:", precioData);
+const BoxPreciosClientes = ({
+  onClosePreciosClientes,
+  onOpenPreciosClientesDialog,
+}) => {
+  const {
+    precioData,
+    setPrecioData,
+    userData,
+    setUserData,
+    searchResults,
+    setSearchResults,
+    selectedCodigoCliente,
+    selectedCodigoClienteSucursal,
+    setSelectedCodigoCliente,
+    setSelectedCodigoClienteSucursal,
+  } = useContext(SelectedOptionsContext);
+  console.log("PrecioDataAA:", precioData);
+  console.log("searchResults:", searchResults);
+  console.log("selectedCodigoCliente:",selectedCodigoCliente);
+  console.log("selectedCodigoClienteSucursal:",selectedCodigoClienteSucursal);
+
   const [preciosModificados, setPreciosModificados] = useState({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const fetchPrecioData = async () => {
+    try {
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${selectedCodigoCliente}&codigoClienteSucursal=${selectedCodigoClienteSucursal}`
+      );
+
+      console.log("Nuevos precios:", response.data);
+      setPrecioData(response.data);
+    } catch (error) {
+      console.error("Error al obtener los nuevos precios:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPrecioData();
+  }, [selectedCodigoCliente, selectedCodigoClienteSucursal, setPrecioData]);
 
   const handlePrecioChange = (e, itemId) => {
     const updatedPrices = {
@@ -77,29 +112,26 @@ const BoxPreciosClientes = ({ onClosePreciosClientes }) => {
       console.log("Respuesta de la API:", response.data);
 
       if (response.status === 200) {
+        const updatePrecios = await axios.get(
+          `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
+        );
+
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
-        
+
         // Realizar la segunda llamada a la API para obtener las deudas del cliente
         const deudasResponse = await axios.get(
           `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
         );
 
         console.log("Respuesta de la API de deudas:", deudasResponse.data);
-        
+
         // Esperar 4 segundos antes de cerrar el modal
         setTimeout(() => {
-          onClosePreciosClientes();
-        }, 3000);
+          // setSearchResults();
+          onClosePreciosClientes(); ////Cierre Modal al finalizar
+        }, 2000);
       }
-
-
-     
-
-      // Cerrar el modal si la solicitud es exitosa
-      // onClosePreciosClientes();
-
-      // Manejar la respuesta según sea necesario
     } catch (error) {
       console.error("Error al actualizar los precios:", error);
     }
@@ -111,7 +143,7 @@ const BoxPreciosClientes = ({ onClosePreciosClientes }) => {
 
   return (
     <>
-      {precioData && (
+      {precioData && searchResults &&(
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} md={12} lg={12}>
             <Paper>
@@ -124,28 +156,33 @@ const BoxPreciosClientes = ({ onClosePreciosClientes }) => {
                 }}
                 p={2}
               >
-                <Typography variant="h7" id="codCliente">
-                  ID Cliente:{" "}
-                  {precioData.clientesProductoPrecioMostrar[0].codigoCliente}{" "}
-                  {/* Suponiendo que el ID de cliente está en la primera entrada */}
-                </Typography>
-
-                <Typography variant="h7">
-                  Nombre Cliente:{" "}
-                  {precioData.clientesProductoPrecioMostrar[0].nombreCliente}{" "}
-                  {/* Suponiendo que el nombre del cliente está en la primera entrada */}
-                </Typography>
+                {precioData && precioData.clientesProductoPrecioMostrar && (
+                  <Typography variant="h7" id="codCliente">
+                    ID Cliente:{" "}
+                    {precioData.clientesProductoPrecioMostrar[0] &&
+                      precioData.clientesProductoPrecioMostrar[0]
+                        .codigoCliente}{" "}
+                  </Typography>
+                )}
+                {precioData && precioData.clientesProductoPrecioMostrar && (
+                  <Typography variant="h7">
+                    Nombre Cliente:{" "}
+                    {precioData.clientesProductoPrecioMostrar[0] &&
+                      precioData.clientesProductoPrecioMostrar[0]
+                        .nombreCliente}{" "}
+                  </Typography>
+                )}
               </Card>
               <TableContainer sx={{ overflowX: "auto" }}>
                 <Table sx={{ minWidth: 650 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ width: "10%" }}>ID Producto</TableCell>
-                      <TableCell sx={{ width: "20%" }}>
+                      <TableCell sx={{ width: "3%" }}>ID </TableCell>
+                      <TableCell sx={{ width: "9%" }}>
                         Nombre Producto
                       </TableCell>
-                      <TableCell sx={{ width: "20%" }}>Precio</TableCell>
-                      <TableCell sx={{ width: "10%" }}>Guardar</TableCell>
+                      <TableCell sx={{ width: "8%" }}>Precio</TableCell>
+                      <TableCell sx={{ width: "8%" }}>Guardar</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -171,15 +208,15 @@ const BoxPreciosClientes = ({ onClosePreciosClientes }) => {
                           <Button
                             variant="contained"
                             color="primary"
-                            onClick={() =>
+                            onClick={() => {
                               handleSaveChanges(
                                 item.idProducto,
                                 precioData.clientesProductoPrecioMostrar[0]
                                   .codigoCliente,
                                 precioData.clientesProductoPrecioMostrar[0]
                                   .codigoClienteSucursal
-                              )
-                            }
+                              );
+                            }}
                           >
                             Guardar
                           </Button>

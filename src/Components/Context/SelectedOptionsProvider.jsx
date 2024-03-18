@@ -16,8 +16,6 @@ export const SelectedOptionsProvider = ({ children }) => {
     selectedProduct: null,
   });
   const [productInfo, setProductInfo] = useState(/* initial value */);
-  
-  
 
   const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
@@ -27,6 +25,9 @@ export const SelectedOptionsProvider = ({ children }) => {
   const [grandTotal, setGrandTotal] = useState(0);
   const [products, setProducts] = useState([]);
   const [salesDataTimestamp, setSalesDataTimestamp] = useState(Date.now());
+
+  const [selectedCodigoCliente, setSelectedCodigoCliente] = useState("");
+  const [selectedCodigoClienteSucursal, setSelectedCodigoClienteSucursal] = useState("");
 
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -61,27 +62,26 @@ export const SelectedOptionsProvider = ({ children }) => {
     // ...
 
     // Example: Log a message
-    console.log("Sales data :",salesData);
+    console.log("Sales data :", salesData);
   }, [salesData]);
 
+  const addToSalesData = (product, quantity = 1) => {
+    const precioVenta = product.precioVenta || 0;
 
- const addToSalesData = (product, quantity = 1) => {
-  const precioVenta = product.precioVenta || 0;
+    const newSale = {
+      quantity: quantity, // Cambiar 'cantidad' a 'quantity'
+      descripcion: product.nombre,
+      precio: precioVenta,
+      total: calculateTotalPrice(quantity, precioVenta),
+      idProducto: product.idProducto,
+    };
 
-  const newSale = {
-    quantity: quantity, // Cambiar 'cantidad' a 'quantity'
-    descripcion: product.nombre,
-    precio: precioVenta,
-    total: calculateTotalPrice(quantity, precioVenta),
-    idProducto: product.idProducto,
+    setSalesData((prevSalesData) => {
+      const updatedSalesData = [...prevSalesData, newSale];
+      return updatedSalesData;
+      setGrandTotal((prevTotal) => prevTotal + newSale.total);
+    });
   };
-
-  setSalesData((prevSalesData) => {
-    const updatedSalesData = [...prevSalesData, newSale];
-    return updatedSalesData;
-    setGrandTotal((prevTotal) => prevTotal + newSale.total);
-  });
-};
 
   //////LOGIN//////
   const handleLogin = async () => {
@@ -97,7 +97,6 @@ export const SelectedOptionsProvider = ({ children }) => {
         }
       );
       console.log("Respuesta del servidor:", response.data);
-    
 
       if (response.responseUsuario) {
         // Almacena los datos del usuario en el estado
@@ -108,11 +107,12 @@ export const SelectedOptionsProvider = ({ children }) => {
         setError("Error de inicio de sesión. Verifica tus credencialesBBBBB.");
       }
     } catch (error) {
-      setError("Error de inicio de sesión. Verifica tus credencialesAAAAkkokok.");
+      setError(
+        "Error de inicio de sesión. Verifica tus credencialesAAAAkkokok."
+      );
     }
   };
 
-  
   const clearSalesData = () => {
     setSalesData([]);
     setGrandTotal(0);
@@ -150,14 +150,14 @@ export const SelectedOptionsProvider = ({ children }) => {
       }
       return sale;
     });
-  
+
     setSalesData(updatedSalesData);
-  
+
     if (productInfo) {
       addToSalesData(productInfo, selectedQuantity); // Usar 'quantity' en lugar de 'cantidad'
     }
   };
-  
+
   const decrementQuantity = (index, productInfo) => {
     const updatedSalesData = salesData.map((sale, i) => {
       if (i === index && sale.quantity > 1) {
@@ -166,15 +166,13 @@ export const SelectedOptionsProvider = ({ children }) => {
       }
       return sale;
     });
-  
+
     setSalesData(updatedSalesData);
-  
+
     if (productInfo) {
       addToSalesData(productInfo, setQuantity); // Usar 'quantity' en lugar de 'cantidad'
     }
   };
-
- 
 
   const suspenderVenta = async (salesData) => {
     try {
@@ -232,18 +230,21 @@ export const SelectedOptionsProvider = ({ children }) => {
         quantity,
         selectedUser,
         setSelectedUser,
-      
+
         calculateTotalPrice,
         description,
         setDescription,
         userData,
         updateUserData,
-        precioData, setPrecioData,
-        ventaData, setVentaData,
+        precioData,
+        setPrecioData,
+        ventaData,
+        setVentaData,
         searchResults,
         setSearchResults,
-        updateSearchResults
-
+        updateSearchResults,
+        selectedCodigoCliente, setSelectedCodigoCliente,
+        selectedCodigoClienteSucursal, setSelectedCodigoClienteSucursal
       }}
     >
       {children}

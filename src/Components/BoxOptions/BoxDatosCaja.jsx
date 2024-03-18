@@ -6,6 +6,7 @@ import {
   Box,
   Typography,
   Grid,
+  Chip,
   useTheme,
   Container,
   TextField,
@@ -23,7 +24,7 @@ const BoxVendedor = () => {
   const vendedores = [
     {
       codigo: userData.codigoUsuario || "21",
-      nombre: userData.nombres + " " + userData.apellidos ||" nombreapellido",
+      nombre: userData.nombres + " " + userData.apellidos || " nombreapellido",
       caja: " 1",
       rol: userData.rol,
       boleta: " 323232321",
@@ -50,30 +51,124 @@ const BoxVendedor = () => {
           key={vend.codigo}
           elevation={8}
           sx={{
+            background: "#859398",
             marginBottom: "20px",
             padding: "20px",
           }}
+          variant="outlined"
+          rounded={true}
         >
           <Grid container item xs={12} lg={12} spacing={2} alignItems="center">
             <Grid item xs={6} md={6} lg={6}>
-              <TextField fullWidth label="Vendedor:" value={vend.nombre} />
+            <Chip
+  sx={{
+    backgroundColor: "white",
+    borderRadius: "20px",
+    "& .MuiChip-label": {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    "& .highlighted": {
+      color: "blue", // Color para el texto entre comillas
+    },
+  }}
+  label={
+    <span>
+      Vendedor: <span className="highlighted">{vend.nombre}</span>
+    </span>
+  }
+/>
+              {/* <Chip
+                sx={{
+                  backgroundColor: "white",
+                  borderRadius: "20px",
+                  "& .MuiInputLabel-root": {
+                    color: "blue", // Color del label editable
+                  },
+                }}
+                fullWidth
+                label={"Vendedor: " + vend.nombre} 
+                value={vend.nombre}
+              /> */}
             </Grid>
             <Grid item xs={6} md={3} lg={6}>
-              <TextField 
-              fullWidth
-              label="Nº Última Operación" value={vend.operacion} />
+            <Chip
+  sx={{
+    backgroundColor: "white",
+    borderRadius: "20px",
+    "& .MuiChip-label": {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    "& .highlighted": {
+      color: "blue", // Color para el texto entre comillas
+    },
+  }}
+  label={
+    <span>
+      Nº Última Operación: <span className="highlighted">{vend.operacion}</span>
+    </span>
+  }
+/>
+
+
             </Grid>
-            <Grid item xs={3} md={3} lg={3} label="Código">
-              <TextField fullWidth label="Código" value={vend.codigo} />
+            <Grid item xs={3} md={3} lg={3}>
+            <Chip
+  sx={{
+    backgroundColor: "white",
+    "& .MuiInputLabel-root": {
+      color: "blue", // Color del label editable
+    },
+  }}
+  fullWidth
+  label={
+    <span>
+      Código: <span style={{ color: "blue" }}>{vend.codigo}</span>
+    </span>
+  }
+  value={vend.codigo}
+/>
             </Grid>
             <Grid item xs={3} md={3} lg={2}>
-              <TextField fullWidth label="Caja" value={vend.caja} />
+              <Chip
+                sx={{
+                  backgroundColor: "white",
+                  // borderRadius: "20px",
+                  "& .MuiInputLabel-root": {
+                    color: "blue", // Color del label editable
+                  },
+                }}
+                fullWidth
+                label={
+                  <span>
+                    Caja: <span style={{ color: "blue" }}>{vend.codigo}</span>
+                  </span>
+                }
+                value={vend.caja}
+              />
             </Grid>
 
             <Grid item xs={6} md={3} lg={6}>
-              <TextField fullWidth label="Última Boleta" value={vend.boleta} />
+              <Chip
+                sx={{
+                  backgroundColor: "white",
+                  // borderRadius: "20px",
+                  "& .MuiInputLabel-root": {
+                    color: "blue", // Color del label editable
+                  },
+                }}
+                fullWidth
+                label={
+                  <span>
+                    Última Boleta: <span style={{ color: "blue" }}>{vend.boleta}</span>
+                  </span>
+                }
+                value={vend.boleta}
+              />
             </Grid>
-           
           </Grid>
         </Paper>
       ))}
