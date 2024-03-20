@@ -11,7 +11,7 @@ import {
   Paper,
   Button,
   Dialog,
- Typography,
+  Typography,
   DialogActions,
   DialogTitle,
   DialogContent,
@@ -20,7 +20,6 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  
 } from "@mui/material";
 
 const Step1Component = ({ data, onNext }) => {
@@ -44,7 +43,7 @@ const Step1Component = ({ data, onNext }) => {
   const [pesoSINO, setPesoSINO] = useState(data.pesoSINO || "");
   const [nombre, setNombre] = useState(data.nombre || "");
   const [marca, setMarca] = useState(data.marca || "");
-    
+
   const [openDialog1, setOpenDialog1] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
   const [openDialog3, setOpenDialog3] = useState(false);
@@ -53,12 +52,11 @@ const Step1Component = ({ data, onNext }) => {
   const [newSubCategory, setNewSubCategory] = useState("");
   const [newFamily, setNewFamily] = useState("");
   const [newSubFamily, setNewSubFamily] = useState("");
-  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
+  const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
 
   const handleRespuesta = (e) => {
     const value = e.target.value;
     setRespuestaSINO(value);
-    
   };
   const handlePeso = (e) => {
     const value = e.target.value;
@@ -229,7 +227,7 @@ const Step1Component = ({ data, onNext }) => {
   }, [selectedFamilyId, selectedCategoryId, selectedSubCategoryId]);
 
   return (
-    <Paper
+    <Paper  
       elevation={3}
       sx={{
         padding: "16px",
@@ -237,24 +235,34 @@ const Step1Component = ({ data, onNext }) => {
       }}
     >
       <Grid container spacing={2} item xs={12} md={12}>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8} disabled={true} style={{ pointerEvents: "none" }}>
           <Typography>¿Este producto requiere trazabilidad?</Typography>
           <FormControl component="fieldset">
-            <RadioGroup value={respuestaSINO} onChange={handleRespuesta}>
-              <Grid sx={{ display: "flex" }}>
+            <RadioGroup
+              disabled={true}
+              value={respuestaSINO}
+              onChange={handleRespuesta}
+            >
+              <Grid sx={{ display: "flex" }} disabled={true}>
                 <FormControlLabel value="Sí" control={<Radio />} label="Sí" />
                 <FormControlLabel value="No" control={<Radio />} label="No" />
               </Grid>
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8}  disabled={true}  style={{ pointerEvents: "none" }}>
           <Typography>¿Este producto es pesable?</Typography>
-          <FormControl component="fieldset">
-            <Grid sx={{ display: "flex" }}>
-              <FormControlLabel value="Sí" control={<Radio />} label="Sí" />
-              <FormControlLabel value="No" control={<Radio />} label="No" />
-            </Grid>
+          <FormControl component="fieldset" >
+            <RadioGroup
+              disabled={true}
+              value={pesoSINO}
+              onChange={handlePeso}
+            >
+              <Grid sx={{ display: "flex" }} disabled={true}>
+                <FormControlLabel value="Sí" control={<Radio />} label="Sí" />
+                <FormControlLabel value="No" control={<Radio />} label="No" />
+              </Grid>
+            </RadioGroup>
           </FormControl>
         </Grid>
         <Grid item xs={12} md={8}>
@@ -350,8 +358,8 @@ const Step1Component = ({ data, onNext }) => {
           </Button>
         </Grid>
 
-         {/* Mensaje de validación */}
-      {/* <Grid item xs={12} md={8}>
+        {/* Mensaje de validación */}
+        {/* <Grid item xs={12} md={8}>
         <Box mt={2}>
           {(!respuestaSINO || !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) && (
             <Typography variant="body2" color="error">

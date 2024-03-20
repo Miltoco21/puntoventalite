@@ -24,8 +24,43 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
 const BoxCtaCorriente = () => {
-  const { ventaData, setVentaData } = useContext(SelectedOptionsContext);
-  console.log("ventaData", ventaData);
+
+  
+  const {
+    ventaData,
+    setVentaData,
+    selectedCodigoCliente,
+    selectedCodigoClienteSucursal,
+  } = useContext(SelectedOptionsContext);
+  console.log("ventaData:", ventaData);
+  console.log("selectedCodigoCliente:", selectedCodigoCliente);
+  console.log("selectedCodigoClienteSucursal:", selectedCodigoClienteSucursal);
+  const fetchDeudaData = async () => {
+      
+        try {
+          const response = await axios.get(
+            `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${selectedCodigoClienteSucursal}&codigoCliente=${selectedCodigoCliente}`
+          );
+
+          console.log("Nuevas Deudas:", response.data);
+            setVentaData(response.data.clienteDeuda)
+        } catch (error) {
+          console.error("Error al obtener los nuevos precios:", error);
+        }
+    };
+  useEffect(() => {
+    fetchDeudaData();
+  }, [selectedCodigoCliente, selectedCodigoClienteSucursal]);
+
+  
+
+  useEffect(() => {
+    // Aquí puedes agregar más efectos secundarios si es necesario
+    console.log("Se montó el componente BoxCtaCorriente");
+  }, []);
+
+
+
   const [selectedDeuda, setSelectedDeuda] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
@@ -69,6 +104,7 @@ const BoxCtaCorriente = () => {
     // Agrega más bancos según sea necesario
   ];
 
+  
   const obtenerFechaActual = () => {
     const fecha = new Date();
     const year = fecha.getFullYear();
@@ -156,29 +192,28 @@ const BoxCtaCorriente = () => {
         fecha: fecha, // Fecha de la transferencia
         numeroOperacion: numeroOperacion, // Número de operación
       };
-  
+
       // Mostrar los datos de transferencia en la consola
-      console.log('Datos de transferencia:', transferData);
-  
+      console.log("Datos de transferencia:", transferData);
+
       // Realizar la solicitud POST utilizando Axios
-      const response = await axios.post('URL_DE_TU_API', transferData);
-  
+      const response = await axios.post("URL_DE_TU_API", transferData);
+
       // Verificar la respuesta del servidor
       if (response.status === 200) {
         // Si la solicitud es exitosa, puedes realizar acciones adicionales aquí
-        console.log('Transferencia realizada con éxito');
+        console.log("Transferencia realizada con éxito");
         // Cerrar el modal de transferencia
         handleTransferenciaModalClose();
       } else {
         // Manejar errores o respuestas no exitosas aquí
-        console.error('Error al realizar la transferencia');
+        console.error("Error al realizar la transferencia");
       }
     } catch (error) {
       // Capturar y manejar cualquier error de la solicitud
-      console.error('Error al realizar la transferencia:', error);
+      console.error("Error al realizar la transferencia:", error);
     }
   };
-  
 
   const handlePayment = async () => {
     try {
@@ -421,7 +456,6 @@ const BoxCtaCorriente = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 select
-              
                 label="Tipo de Cuenta"
                 value={tipoCuenta}
                 onChange={handleChangeTipoCuenta}
@@ -436,7 +470,6 @@ const BoxCtaCorriente = () => {
               </TextField>
             </Grid>
 
-           
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Número de cuenta"
@@ -445,20 +478,24 @@ const BoxCtaCorriente = () => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-            <TextField
-        label="Fecha"
-        variant="outlined"
-        fullWidth
-        type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
-        value={fecha}
-        onChange={handleFechaChange}
-        InputLabelProps={{
-          shrink: true, // Encoger la etiqueta para evitar solapamientos
-        }}
-      />
+              <TextField
+                label="Fecha"
+                variant="outlined"
+                fullWidth
+                type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
+                value={fecha}
+                onChange={handleFechaChange}
+                InputLabelProps={{
+                  shrink: true, // Encoger la etiqueta para evitar solapamientos
+                }}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField label="Numero Operación" variant="outlined" fullWidth />
+              <TextField
+                label="Numero Operación"
+                variant="outlined"
+                fullWidth
+              />
             </Grid>
           </Grid>
         </DialogContent>

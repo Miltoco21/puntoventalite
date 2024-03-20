@@ -27,12 +27,14 @@ import BoxPreciosClientes from "./BoxPreciosClientes";
 import axios from "axios";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import { Visibility } from "@mui/icons-material";
+import BoxCtaCorriente from "./BoxCtaCorriente";
 
 const BoxBuscador = (handleClosePreciosClientes) => {
   const {
     salesData,
     addToSalesData,
     setPrecioData,
+    ventaData,
     setVentaData,
     searchResults,
     setSearchResults,
@@ -78,10 +80,11 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      handleOpenDeudasClientesDialog(
-        result.codigoCliente,
-        result.codigoClienteSucursal
-      );
+      // handleOpenDeudasClientesDialog(
+      //   result.codigoCliente,
+      //   result.codigoClienteSucursal
+      // );
+      clearSalesData();
     }
   };
 
@@ -158,32 +161,17 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     codigoCliente,
     codigoClienteSucursal
   ) => {
-    
     setSelectedCodigoCliente(codigoCliente);
     setSelectedCodigoClienteSucursal(codigoClienteSucursal);
-    setOpenPrecioDialog(true);
+    // setOpenPrecioDialog(true);
   };
 
-  const handleOpenDeudasClientesDialog = async (
+  const handleOpenDeudasClientesDialog = (
     codigoCliente,
     codigoClienteSucursal
   ) => {
-    try {
-      console.log(codigoCliente, codigoClienteSucursal);
-      const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
-      );
-
-      // Aquí puedes manejar la respuesta como lo desees, por ejemplo, pasándola a otro componente.
-      console.log("Respuesta Deudas Clientes:", response.data.clienteDeuda);
-
-      // Puedes pasar los datos al componente necesario, por ejemplo:
-      setVentaData(response.data.clienteDeuda);
-
-      // También puedes abrir un diálogo o realizar otras acciones según tu lógica de aplicación.
-    } catch (error) {
-      console.error("Error Deudas Clientes", error);
-    }
+    setSelectedCodigoCliente(codigoCliente);
+    setSelectedCodigoClienteSucursal(codigoClienteSucursal);
   };
 
   return (
@@ -191,12 +179,13 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       elevation={13}
       sx={{ marginBottom: "3px", backgroundColor: "#859398" }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         <Grid item xs={12} md={12} lg={12}>
           <Grid container spacing={2}>
             <Grid
               item
-              xs={10}
+              xs={12}
+              sm={12}
               md={12}
               sx={{
                 display: "flex",
@@ -205,9 +194,18 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                 gap: 1,
               }}
             >
-              <Grid item md={8}>
+              <Grid
+                item
+                xs={10}
+                sm={8}
+                md={8}
+                sx={{
+                  display: "flex",
+
+                  justifyContent: "center",
+                }}
+              >
                 <TextField
-                  variant="outlined"
                   sx={{
                     backgroundColor: "white",
                     borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
@@ -285,6 +283,12 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         <BoxPreciosClientes
           onClosePreciosClientes={handleClosePreciosClientes}
           onOpenPreciosClientesDialog={handleOpenPreciosClientesDialog}
+        />
+      </div>
+      <div style={{ display: "none" }}>
+        <BoxCtaCorriente
+          onCloseDeudaClientes={handleClosePreciosClientes}
+          onOpenPreciosClientesDialog={handleOpenDeudasClientesDialog}
         />
       </div>
     </Paper>
