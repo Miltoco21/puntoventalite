@@ -262,6 +262,10 @@ const BoxSumaProd = ({ venta }) => {
                       placeholder="Ingresa Código"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
+                      inputProps={{
+                        inputMode: "numeric", // Establece el modo de entrada como numérico
+                        pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                      }}
                     />
                   )}
                   onChange={(event, newValue) => {
@@ -289,7 +293,7 @@ const BoxSumaProd = ({ venta }) => {
               >
                 PLU
               </Button>
-              <Button
+              {/* <Button
                 sx={{
                   margin: "1px",
                   backgroundColor: " #283048",
@@ -303,7 +307,7 @@ const BoxSumaProd = ({ venta }) => {
                 onClick={handleOpenPeso}
               >
                 Peso
-              </Button>
+              </Button> */}
             </div>
           </Grid>
         </Paper>
@@ -345,7 +349,11 @@ const BoxSumaProd = ({ venta }) => {
                             : newValue;
                           setSalesData(updatedSalesData);
                         }}
-                        style={{ width: 80 }}
+                        style={{ width: 70 }}
+                        inputProps={{
+                          inputMode: "numeric", // Establece el modo de entrada como numérico
+                          pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                        }}
                       />
                     </TableCell>
                     <TableCell>{sale.descripcion}</TableCell>

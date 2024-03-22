@@ -464,6 +464,10 @@ const IngresoClientes = () => {
                 fullWidth
                 value={formData.rut}
                 onChange={handleInputChange}
+                inputProps={{
+                  inputMode: "numeric", // Establece el modo de entrada como numérico
+                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -500,6 +504,10 @@ const IngresoClientes = () => {
                 fullWidth
                 value={formData.telefono}
                 onChange={handleInputChange}
+                inputProps={{
+                  inputMode: "numeric", // Establece el modo de entrada como numérico
+                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                }}
               />
             </Grid>
 
@@ -771,6 +779,10 @@ const IngresoClientes = () => {
                     margin="dense"
                     value={branchData.rutResponsable}
                     onChange={handleBranchDataChange}
+                    inputProps={{
+                      inputMode: "numeric", // Establece el modo de entrada como numérico
+                      pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                    }}
                   />
                   <TextField
                     label="Nombre Responsable"
@@ -799,6 +811,10 @@ const IngresoClientes = () => {
                     name="telefono"
                     value={branchData.telefono}
                     onChange={handleBranchDataChange}
+                    inputProps={{
+                      inputMode: "numeric", // Establece el modo de entrada como numérico
+                      pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                    }}
                   />
                   <TextField
                     margin="dense"

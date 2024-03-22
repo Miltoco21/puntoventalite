@@ -1,5 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import {
+  Paper,
+  Avatar,
   Box,
   Grid,
   Stack,
@@ -27,6 +29,8 @@ const BoxCtaCorriente = () => {
 
   
   const {
+    precioData,
+    setPrecioData,
     ventaData,
     setVentaData,
     selectedCodigoCliente,
@@ -271,6 +275,49 @@ const BoxCtaCorriente = () => {
           Cuenta Corriente
         </Typography>
       </Grid>
+      {precioData && precioData.clientesProductoPrecioMostrar && (
+  <Grid container spacing={2} justifyContent="center">
+    <Grid item xs={12} md={12} lg={12}>
+      <Paper>
+        <Box
+          display="flex"
+          p={1.5}
+          gap={2}
+          bgcolor={"#f5f5f5"}
+          borderRadius={4}
+          sx={{ alignItems: "center" }}
+        >
+          <Box>
+            <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            {/* <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              {precioData.clientesProductoPrecioMostrar[0] &&
+                precioData.clientesProductoPrecioMostrar[0]
+                  .codigoCliente}{" "}
+            </Typography> */}
+            <Typography variant="body2" sx={{ color: "#696c6f" }}>
+              ID:
+              {precioData.clientesProductoPrecioMostrar[0] &&
+                precioData.clientesProductoPrecioMostrar[0]
+                  .codigoCliente}{" "}
+              {" " + " "}
+              <br />
+              {precioData.clientesProductoPrecioMostrar[0] &&
+                precioData.clientesProductoPrecioMostrar[0]
+                  .nombreCliente}{" "}
+            </Typography>
+          </Box>
+          {/* <Box ml={1}>
+            <Button size="small">
+              <Add />
+            </Button>
+          </Box> */}
+        </Box>
+      </Paper>
+    </Grid>
+  </Grid>
+)}
       <Grid item xs={12}>
         {ventaData && ventaData.length > 0 && (
           <TableContainer>
@@ -356,6 +403,10 @@ const BoxCtaCorriente = () => {
               value={montoPagado}
               onChange={(e) => setMontoPagado(e.target.value)}
               fullWidth
+              inputProps={{
+                inputMode: "numeric", // Establece el modo de entrada como numérico
+                pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+              }}
             />
             <Grid container spacing={2}>
               <Grid item xs={6} sm={3}>

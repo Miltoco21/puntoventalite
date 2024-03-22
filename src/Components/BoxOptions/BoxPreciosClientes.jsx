@@ -4,6 +4,7 @@ import {
   Paper,
   Grid,
   Card,
+  Avatar,
   Chip,
   TextField,
   Typography,
@@ -21,6 +22,8 @@ import {
   TableRow,
   Snackbar,
 } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import IconButton from "@mui/material/IconButton";
 
 import axios from "axios";
 
@@ -52,8 +55,8 @@ const BoxPreciosClientes = ({
   } = useContext(SelectedOptionsContext);
   console.log("PrecioDataAA:", precioData);
   console.log("searchResults:", searchResults);
-  console.log("selectedCodigoCliente:",selectedCodigoCliente);
-  console.log("selectedCodigoClienteSucursal:",selectedCodigoClienteSucursal);
+  console.log("selectedCodigoCliente:", selectedCodigoCliente);
+  console.log("selectedCodigoClienteSucursal:", selectedCodigoClienteSucursal);
 
   const [preciosModificados, setPreciosModificados] = useState({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -143,44 +146,116 @@ const BoxPreciosClientes = ({
 
   return (
     <>
-      {precioData && searchResults &&(
+      {precioData && precioData.clientesProductoPrecioMostrar && (
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} md={12} lg={12}>
             <Paper>
-              <Card
-                sx={{
-                  backgroundColor: "#2196f3",
-                  padding: "5px",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-                p={2}
+              <Box
+                display="flex"
+                p={1.5}
+                gap={2}
+                bgcolor={"#f5f5f5"}
+                borderRadius={4}
+                sx={{ alignItems: "center" }}
               >
-                {precioData && precioData.clientesProductoPrecioMostrar && (
-                  <Typography variant="h7" id="codCliente">
-                    ID Cliente:{" "}
+                <Box>
+                  <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  {/* <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+        {precioData.clientesProductoPrecioMostrar[0] &&
+                      precioData.clientesProductoPrecioMostrar[0]
+                        .codigoCliente}{" "}
+        </Typography> */}
+                  <Typography variant="body2" sx={{ color: "#696c6f" }}>
+                    ID:
                     {precioData.clientesProductoPrecioMostrar[0] &&
                       precioData.clientesProductoPrecioMostrar[0]
                         .codigoCliente}{" "}
-                  </Typography>
-                )}
-                {precioData && precioData.clientesProductoPrecioMostrar && (
-                  <Typography variant="h7">
-                    Nombre Cliente:{" "}
+                    {" " + " "}
+                    <br />
                     {precioData.clientesProductoPrecioMostrar[0] &&
                       precioData.clientesProductoPrecioMostrar[0]
                         .nombreCliente}{" "}
                   </Typography>
-                )}
-              </Card>
-              <TableContainer sx={{ overflowX: "auto" }}>
+                </Box>
+                {/* <Box ml={1}>
+        <Button size="small">
+          <Add />
+        </Button>
+      </Box> */}
+              </Box>
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={10} >
+                  <TableContainer>
+                    <Table sx={{ minWidth: 500 }}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ width: "1%" }}>ID</TableCell>
+                          <TableCell sx={{ width: "1%" }}>Producto</TableCell>
+                          <TableCell sx={{ width: "3%" }}>Precio</TableCell>
+                          <TableCell sx={{ width: "6%" }}>Guardar</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {precioData.clientesProductoPrecioMostrar.map(
+                          (item) => (
+                            <TableRow key={item.idProducto}>
+                              <TableCell>{item.idProducto}</TableCell>
+                              <TableCell>{item.nombre}</TableCell>
+                              <TableCell>
+                                <TextField
+                                  variant="outlined"
+                                  fullWidth
+                                  value={
+                                    preciosModificados[item.idProducto] !==
+                                    undefined
+                                      ? preciosModificados[item.idProducto]
+                                      : item.precio
+                                  }
+                                  onChange={(e) =>
+                                    handlePrecioChange(e, item.idProducto)
+                                  }
+                                  inputProps={{
+                                    inputMode: "numeric",
+                                    pattern: "[0-9]*",
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  onClick={() => {
+                                    handleSaveChanges(
+                                      item.idProducto,
+                                      precioData
+                                        .clientesProductoPrecioMostrar[0]
+                                        .codigoCliente,
+                                      precioData
+                                        .clientesProductoPrecioMostrar[0]
+                                        .codigoClienteSucursal
+                                    );
+                                  }}
+                                >
+                                  Guardar
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              </Grid>
+
+              {/* <TableContainer sx={{ overflowX: "auto", maxWidth: "100%" }}>
                 <Table sx={{ minWidth: 650 }}>
                   <TableHead>
                     <TableRow>
                       <TableCell sx={{ width: "3%" }}>ID </TableCell>
-                      <TableCell sx={{ width: "9%" }}>
-                        Nombre Producto
-                      </TableCell>
+                      <TableCell sx={{ width: "9%" }}>Producto</TableCell>
                       <TableCell sx={{ width: "8%" }}>Precio</TableCell>
                       <TableCell sx={{ width: "8%" }}>Guardar</TableCell>
                     </TableRow>
@@ -188,9 +263,13 @@ const BoxPreciosClientes = ({
                   <TableBody>
                     {precioData.clientesProductoPrecioMostrar.map((item) => (
                       <TableRow key={item.idProducto}>
-                        <TableCell>{item.idProducto}</TableCell>
-                        <TableCell>{item.nombre}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ width: "3%" }}>
+                          {item.idProducto}
+                        </TableCell>
+                        <TableCell sx={{ width: "9%" }}>
+                          {item.nombre}
+                        </TableCell>
+                        <TableCell sx={{ width: "8%" }}>
                           <TextField
                             variant="outlined"
                             fullWidth
@@ -202,6 +281,10 @@ const BoxPreciosClientes = ({
                             onChange={(e) =>
                               handlePrecioChange(e, item.idProducto)
                             }
+                            inputProps={{
+                              inputMode: "numeric", // Establece el modo de entrada como numérico
+                              pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                            }}
                           />
                         </TableCell>
                         <TableCell>
@@ -217,6 +300,7 @@ const BoxPreciosClientes = ({
                                   .codigoClienteSucursal
                               );
                             }}
+                            sx={{ width: "8%" }}
                           >
                             Guardar
                           </Button>
@@ -225,7 +309,7 @@ const BoxPreciosClientes = ({
                     ))}
                   </TableBody>
                 </Table>
-              </TableContainer>
+              </TableContainer> */}
             </Paper>
           </Grid>
         </Grid>

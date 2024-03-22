@@ -24,15 +24,15 @@ import {
 
 const Step4Component = ({ data, onNext }) => {
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockInicial, setStockInical] = useState(data.stockInicial||"");
-  const [precioVenta, setPrecioVenta] = useState(data.precioVenta||"");
-  const [selectedFormatoId, setSelectedFormatoId] = useState(data.selectedFormatoId||"");
-  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
+  const [stockInicial, setStockInical] = useState(data.stockInicial || "");
+  const [precioVenta, setPrecioVenta] = useState(data.precioVenta || "");
+  const [selectedFormatoId, setSelectedFormatoId] = useState(
+    data.selectedFormatoId || ""
+  );
+  const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
 
   const [openDialog1, setOpenDialog1] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
-
-  
 
   const handleNext = () => {
     //  if (!selectedFormatoId || !precioVenta || !stockInicial) {
@@ -41,8 +41,7 @@ const Step4Component = ({ data, onNext }) => {
     // }
     const stepData = {
       selectedFormatoId,
-      precioVenta
-
+      precioVenta,
     };
     console.log("Step 4 Data:", stepData); // Log the data for this step
     onNext(stepData);
@@ -101,40 +100,40 @@ const Step4Component = ({ data, onNext }) => {
     { id: 10, unidad: "MALLA" },
   ];
 
- return (
-  <Paper
-    elevation={3}
-    sx={{
-      padding: "16px",
-      width: "100%",
-    }}
-  >
-    <Grid container spacing={2} alignItems="center">
-      <Grid item xs={12} md={9}>
-        <InputLabel>Formato de venta</InputLabel>
-        <Box display="flex" alignItems="center">
-          <Select
-            sx={{
-              width: "100%",
-              maxWidth: "700px",
-              marginLeft: "16px",
-              height: "56px",
-              paddingTop: "8px", // Alinear verticalmente el texto
-              paddingBottom: "8px", // Alinear verticalmente el texto
-            }}
-            value={selectedFormatoId}
-            onChange={(e) => handleFormatoSelect(e.target.value)}
-            label="Selecciona Formato Venta"
-          >
-            {formatos.map((formato) => (
-              <MenuItem key={formato.id} value={formato.id}>
-                {formato.unidad}
-              </MenuItem>
-            ))}
-          </Select>
-        </Box>
-      </Grid>
-      {/* <Grid item xs={12} md={3}>
+  return (
+    <Paper
+      elevation={3}
+      sx={{
+        padding: "16px",
+        width: "100%",
+      }}
+    >
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12} md={9}>
+          <InputLabel>Formato de venta</InputLabel>
+          <Box display="flex" alignItems="center">
+            <Select
+              sx={{
+                width: "100%",
+                maxWidth: "700px",
+                marginLeft: "16px",
+                height: "56px",
+                paddingTop: "8px", // Alinear verticalmente el texto
+                paddingBottom: "8px", // Alinear verticalmente el texto
+              }}
+              value={selectedFormatoId}
+              onChange={(e) => handleFormatoSelect(e.target.value)}
+              label="Selecciona Formato Venta"
+            >
+              {formatos.map((formato) => (
+                <MenuItem key={formato.id} value={formato.id}>
+                  {formato.unidad}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+        </Grid>
+        {/* <Grid item xs={12} md={3}>
         <Box display="flex" alignItems="center" justifyContent="flex-end">
           <Button
             style={{
@@ -151,17 +150,14 @@ const Step4Component = ({ data, onNext }) => {
           </Button>
         </Box>
       </Grid> */}
-      <Grid item xs={12}>
-        <InputLabel>Ingresa Precio Venta</InputLabel>
-        
+        <Grid item xs={12}>
+          <InputLabel>Ingresa Precio Venta</InputLabel>
+
           <TextField
             sx={{
-             
               width: "100%",
-           
               marginLeft: "16px",
             }}
-           
             fullWidth
             value={precioVenta}
             onChange={(e) => setPrecioVenta(e.target.value)}
@@ -185,72 +181,68 @@ const Step4Component = ({ data, onNext }) => {
           >
             +
           </Button> */}
-        
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            sx={{ marginLeft: "16px", marginTop: "16px", marginBottom: "16px" }}
+            variant="contained"
+            color="secondary"
+            onClick={handleNext}
+          >
+            Guardar y continuar
+          </Button>
+        </Grid>
+        <Grid item xs={12} md={8}>
+          <Box mt={2}>
+            {(!selectedFormatoId || !precioVenta || !stockInicial) && (
+              <Typography variant="body2" color="error">
+                {emptyFieldsMessage}
+              </Typography>
+            )}
+          </Box>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Button
-          sx={{ marginLeft: "16px", marginTop: "16px", marginBottom: "16px" }}
-          variant="contained"
-          color="secondary"
-          onClick={handleNext}
-        >
-          Guardar y continuar
-        </Button>
-      </Grid>
-      <Grid item xs={12} md={8}>
-        <Box mt={2}>
-          {(!selectedFormatoId || !precioVenta || !stockInicial) && (
-            <Typography variant="body2" color="error">
-              {emptyFieldsMessage}
-            </Typography>
-          )}
-        </Box>
-      </Grid>
-    </Grid>
 
-    <Dialog open={openDialog1} onClose={handleCloseDialog1}>
-      <DialogTitle>Crear Unidad de Venta</DialogTitle>
-      <DialogContent sx={{ marginTop: "9px" }}>
-        <TextField
-          label="Ingresa Unidad de Venta"
-          fullWidth
-          value={newUnidad}
-          onChange={(e) => setNewUnidad(e.target.value)}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog1} color="primary">
-          Cancelar
-        </Button>
-        <Button onClick={handleCreateUnidad} color="primary">
-          Crear
-        </Button>
-      </DialogActions>
-    </Dialog>
-    <Dialog open={openDialog2} onClose={handleCloseDialog2}>
-      <DialogTitle>Plantilla de Venta</DialogTitle>
-      <DialogContent sx={{ marginTop: "9px" }}>
-        <TextField
-          label="Plantilla"
-          fullWidth
-          value={newUnidad}
-          onChange={(e) => setNewUnidad(e.target.value)}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog1} color="primary">
-          Cancelar
-        </Button>
-        <Button onClick={handleCreateUnidad} color="primary">
-          Crear
-        </Button>
-      </DialogActions>
-    </Dialog>
-  </Paper>
-);
-
-  
-  
+      <Dialog open={openDialog1} onClose={handleCloseDialog1}>
+        <DialogTitle>Crear Unidad de Venta</DialogTitle>
+        <DialogContent sx={{ marginTop: "9px" }}>
+          <TextField
+            label="Ingresa Unidad de Venta"
+            fullWidth
+            value={newUnidad}
+            onChange={(e) => setNewUnidad(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog1} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleCreateUnidad} color="primary">
+            Crear
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openDialog2} onClose={handleCloseDialog2}>
+        <DialogTitle>Plantilla de Venta</DialogTitle>
+        <DialogContent sx={{ marginTop: "9px" }}>
+          <TextField
+            label="Plantilla"
+            fullWidth
+            value={newUnidad}
+            onChange={(e) => setNewUnidad(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog1} color="primary">
+            Cancelar
+          </Button>
+          <Button onClick={handleCreateUnidad} color="primary">
+            Crear
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Paper>
+  );
 };
 
 export default Step4Component;

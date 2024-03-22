@@ -24,28 +24,67 @@ import {
 
 const Step3Component = ({ data, onNext }) => {
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockInicial, setStockInicial] = useState((data.stockInicial||""));
-  const [precioCosto, setPrecioCosto] = useState((data.precioCosto||""));
-  const [selectedUnidadId, setSelectedUnidadId] = useState(data.selectedUnidadId||"");
-  const [emptyFieldsMessage,setEmptyFieldsMessage]= useState("");
+  const [stockInicial, setStockInicial] = useState(data.stockInicial || "");
+  const [precioCosto, setPrecioCosto] = useState(data.precioCosto || "");
+  const [selectedUnidadId, setSelectedUnidadId] = useState(
+    data.selectedUnidadId || ""
+  );
+  const [precioVenta, setPrecioVenta] = useState(data.precioVenta || "");
+  const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
   const [openDialog1, setOpenDialog1] = useState(false);
 
- 
-
-  const handleNext = () => {
-    // if (!selectedUnidadId || !precioCosto || !stockInicial) {
-    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
-    //   return;
-    // }
-    const stepData = {
-      selectedUnidadId,
-      precioCosto,
-      stockInicial
+  const handleNext = async () => {
+    // Crear objeto con los datos del paso 1
+    const step1Data = {
+      selectedCategoryId: data.selectedCategoryId,
+      selectedSubCategoryId: data.selectedSubCategoryId,
+      selectedFamilyId: data.selectedFamilyId,
+      selectedSubFamilyId: data.selectedSubFamilyId,
+      marca: data.marca,
+      // Agrega más campos del paso 1 si es necesario
     };
-    console.log("Step 3 Data:", stepData); // Log the data for this step
-    onNext(stepData);
-  };
 
+    // Crear objeto con los datos del paso 3
+    const step3Data = {
+      // selectedUnidadId,
+      precioCosto,
+      stockInicial,
+      precioVenta,
+    };
+
+    // Combinar datos del paso 1 y paso 3
+    const combinedData = {
+      ...step1Data,
+      ...step3Data,
+    };
+
+    console.log("Combined Data:", combinedData);
+
+    try {
+      // Enviar petición POST con los datos combinados
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
+        combinedData
+      );
+      // Manejar respuesta de la API
+      console.log("Response:", response);
+      // Llamar a la función onNext para continuar con el siguiente paso
+      onNext(combinedData, 3);
+    } catch (error) {
+      // Manejar error de la petición
+      console.error("Error:", error);
+      // Mostrar mensaje de error
+      // Por ejemplo:
+      // if (error.response) {
+      //   console.log("Error response:", error.response.data);
+      //   console.log("Error status:", error.response.status);
+      // } else if (error.request) {
+      //   console.log("Error request:", error.request);
+      // } else {
+      //   console.log("Error message:", error.message);
+      // }
+    }
+  };
 
   const handleOpenDialog1 = () => {
     setOpenDialog1(true);
@@ -101,78 +140,113 @@ const Step3Component = ({ data, onNext }) => {
         width: "100%",
       }}
     >
-       <Grid container spacing={2} item xs={12} md={12}>
-        <Grid item xs={12} md={8}>
-        <InputLabel>Unidad de Compra</InputLabel>
-          <Grid display="flex" alignItems="center">
-            
-            <Select
-              sx={{ width: "70%", marginLeft: "16px" }}
-              value={selectedUnidadId}
-              onChange={(e) => handleUnidadSelect(e.target.value)}
-              label="Selecciona Unidad"
-            >
-              {unidades.map((unidad) => (
-                <MenuItem key={unidad.id} value={unidad.id}>
-                  {unidad.unidad}
-                </MenuItem>
-              ))}
-            </Select>
-            <Button
+      {" "}
+      <form onSubmit={handleNext}>
+        <Grid container spacing={2} item xs={12} md={12}>
+          <Grid item xs={12} md={6}>
+            <InputLabel>Unidad de Compra</InputLabel>
+            <Grid display="flex" alignItems="center">
+              <Select
+                fullWidth
+                sx={{ width: "100%" }}
+                value={selectedUnidadId}
+                onChange={(e) => handleUnidadSelect(e.target.value)}
+                label="Selecciona Unidad"
+              >
+                {unidades.map((unidad) => (
+                  <MenuItem key={unidad.id} value={unidad.id}>
+                    {unidad.unidad}
+                  </MenuItem>
+                ))}
+              </Select>
+              {/* <Button
               size="large"
               variant="outlined"
               style={{ marginLeft: "18px", padding: "14px" }}
               onClick={handleOpenDialog1}
             >
               +
+            </Button> */}
+            </Grid>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box>
+              <InputLabel>Ingresa Precio Costo</InputLabel>
+              <TextField
+                sx={{ width: "100%" }}
+                label="Precio Costo"
+                fullWidth
+                value={precioCosto}
+                onChange={(e) => setPrecioCosto(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric", // Establece el modo de entrada como numérico
+                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                }}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box>
+              <InputLabel>Ingresa Precio Venta</InputLabel>
+
+              <TextField
+                sx={{
+                  width: "100%",
+                }}
+                fullWidth
+                value={precioVenta}
+                onChange={(e) => setPrecioVenta(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric", // Establece el modo de entrada como numérico
+                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                }}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Box>
+              <InputLabel>Ingresa Stock Inicial</InputLabel>
+              <TextField
+                sx={{ width: "100%" }}
+                label="Stock Inicial"
+                fullWidth
+                value={stockInicial}
+                onChange={(e) => setStockInicial(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric", // Establece el modo de entrada como numérico
+                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                }}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              sx={{
+                marginLeft: "40px",
+                marginTop: "5px",
+                marginBottom: "12px",
+              }}
+              variant="contained"
+              color="secondary"
+              onClick={handleNext}
+            >
+              Guardar y continuar
             </Button>
           </Grid>
+          <Grid item xs={12} md={8}>
+            <Box mt={2}>
+              {(!selectedUnidadId ||
+                !precioCosto ||
+                !stockInicial ||
+                !precioVenta) && (
+                <Typography variant="body2" color="error">
+                  {emptyFieldsMessage}
+                </Typography>
+              )}
+            </Box>
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Box>
-            <InputLabel>Ingresa Precio Costo</InputLabel>
-            <TextField
-              sx={{ marginTop: "6px", width: "70%" }}
-              label="Precio Costo"
-              fullWidth
-              value={precioCosto}
-              onChange={(e) => setPrecioCosto(e.target.value)}
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <Box>
-            <InputLabel>Ingresa Stock Inicial</InputLabel>
-            <TextField
-              sx={{ marginTop: "6px", width: "70%" }}
-              label="Stock Inicial"
-              fullWidth
-              value={stockInicial}
-              onChange={(e) => setStockInicial(e.target.value)}
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            sx={{ marginLeft: "40px", marginTop: "5px", marginBottom: "12px" }}
-            variant="contained"
-            color="secondary"
-            onClick={handleNext}
-          >
-            Guardar y continuar
-          </Button>
-        </Grid>
-        <Grid item xs={12} md={8}>
-        <Box mt={2}>
-          {(!selectedUnidadId || !precioCosto || !stockInicial) && (
-            <Typography variant="body2" color="error">
-              {emptyFieldsMessage}
-            </Typography>
-          )}
-        </Box>
-      </Grid>
-      </Grid>
-
+      </form>
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>
         <DialogTitle>Crear Unidad de Compra</DialogTitle>
         <DialogContent sx={{ marginTop: "9px" }}>

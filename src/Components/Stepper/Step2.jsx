@@ -169,14 +169,14 @@ const Step2Component = ({ data, onNext }) => {
               </MenuItem>
             ))}
           </Select>
-          <Button
+          {/* <Button
             size="large"
             variant="outlined"
             style={{ marginLeft: "18px", padding:"14px"}}
             onClick={handleOpenDialog1}
           >
             +
-          </Button>
+          </Button> */}
         </Box>
       </Grid>
       <Grid item xs={12}>

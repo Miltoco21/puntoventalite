@@ -68,8 +68,8 @@ const Step1Component = ({ data, onNext }) => {
     //   return;
     // }
     const stepData = {
-      respuestaSINO,
-      pesoSINO,
+      // respuestaSINO,
+      // pesoSINO,
       selectedCategoryId,
       selectedSubCategoryId,
       selectedFamilyId,
@@ -78,7 +78,7 @@ const Step1Component = ({ data, onNext }) => {
       nombre,
     };
     console.log("Step 1 Data:", stepData); // Log the data for this step
-    onNext(stepData);
+    onNext(stepData,1);
   };
 
   // const handleOpenDialog1 = () => {
@@ -235,7 +235,7 @@ const Step1Component = ({ data, onNext }) => {
       }}
     >
       <Grid container spacing={2} item xs={12} md={12}>
-        <Grid item xs={12} md={8} disabled={true} style={{ pointerEvents: "none" }}>
+        {/* <Grid item xs={12} md={8} disabled={true} style={{ pointerEvents: "none" }}>
           <Typography>¿Este producto requiere trazabilidad?</Typography>
           <FormControl component="fieldset">
             <RadioGroup
@@ -264,8 +264,8 @@ const Step1Component = ({ data, onNext }) => {
               </Grid>
             </RadioGroup>
           </FormControl>
-        </Grid>
-        <Grid item xs={12} md={8}>
+        </Grid> */}
+        <Grid item xs={12} md={6}>
           <InputLabel>Selecciona Categoría</InputLabel>
           <Select
             fullWidth
@@ -280,7 +280,7 @@ const Step1Component = ({ data, onNext }) => {
             ))}
           </Select>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={6}>
           <InputLabel>Selecciona Sub-Categoría</InputLabel>
           <Select
             fullWidth
@@ -298,7 +298,7 @@ const Step1Component = ({ data, onNext }) => {
             ))}
           </Select>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={6}>
           <InputLabel>Selecciona Familia</InputLabel>
           <Select
             fullWidth
@@ -313,7 +313,7 @@ const Step1Component = ({ data, onNext }) => {
             ))}
           </Select>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={6}>
           <InputLabel>Selecciona Subfamilia</InputLabel>
           <Select
             fullWidth
@@ -331,7 +331,7 @@ const Step1Component = ({ data, onNext }) => {
             ))}
           </Select>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={6}>
           <TextField
             fullWidth
             label="Ingrese Nombre"
@@ -339,7 +339,7 @@ const Step1Component = ({ data, onNext }) => {
             onChange={(e) => setNombre(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={6}>
           <TextField
             fullWidth
             label="Ingrese Marca"
