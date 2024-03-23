@@ -22,7 +22,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const Step3Component = ({ data, onNext }) => {
+const Step3Component = ({ data, onNext,stepData }) => {
   const [newUnidad, setNewUnidad] = useState("");
   const [stockInicial, setStockInicial] = useState(data.stockInicial || "");
   const [precioCosto, setPrecioCosto] = useState(data.precioCosto || "");
@@ -33,46 +33,79 @@ const Step3Component = ({ data, onNext }) => {
   const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
   const [openDialog1, setOpenDialog1] = useState(false);
 
+  console.log("data:",data)
+  // console.log("onNext:",onNext)
+  // console.log("stepData:",stepData)
+  useEffect(() => {
+    if (!selectedUnidadId || !precioCosto || !stockInicial || !precioVenta) {
+      setEmptyFieldsMessage("Todos los campos son obligatorios.");
+    } else {
+      setEmptyFieldsMessage(""); // Si todos los campos están llenos, limpiar el mensaje de error
+    }
+  }, [selectedUnidadId, precioCosto, stockInicial, precioVenta]);
+
   const handleNext = async () => {
     // Crear objeto con los datos del paso 1
     const step1Data = {
-      selectedCategoryId: data.selectedCategoryId,
-      selectedSubCategoryId: data.selectedSubCategoryId,
-      selectedFamilyId: data.selectedFamilyId,
-      selectedSubFamilyId: data.selectedSubFamilyId,
+      respuestaSINO: "string",
+      pesoSINO: "string",
       marca: data.marca,
-      // Agrega más campos del paso 1 si es necesario
+      categoriaID: data.selectedCategoryId || 0, // Utilizamos 0 si el valor es undefined
+      subCategoriaID: data.selectedSubCategoryId || 0,
+      familiaID: data.selectedFamilyId || 0,
+      subFamilia: data.selectedSubFamilyId || 0,
+      nombre: data.nombre // Debes proporcionar un valor adecuado aquí
     };
-
+  
     // Crear objeto con los datos del paso 3
     const step3Data = {
-      // selectedUnidadId,
-      precioCosto,
-      stockInicial,
-      precioVenta,
+      unidad:selectedUnidadId, // Debes proporcionar un valor adecuado aquí
+      precioCosto: parseFloat(precioCosto) || 0, // Convertir a número y usar 0 si no hay valor
+      stockInicial: parseInt(stockInicial) || 0 // Convertir a número entero y usar 0 si no hay valor
+    };
+  
+    // Crear objeto con los datos del paso 4
+    const step4Data = {
+      formatoVenta: 0, // Debes proporcionar un valor adecuado aquí
+      precioVenta: parseFloat(precioVenta) || 0 // Convertir a número y usar 0 si no hay valor
+    };
+  
+    // Combinar todos los pasos en un solo objeto
+    const requestData = {
+      name: "string", // Debes proporcionar un valor adecuado aquí
+      step1: step1Data,
+      step2: {
+        bodega: "string", // Debes proporcionar un valor adecuado aquí
+        proveedor: "string" // Debes proporcionar un valor adecuado aquí
+      },
+      step3: step3Data,
+      step4: step4Data,
+      step5: {
+        stockCritico: 0, // Debes proporcionar un valor adecuado aquí
+        impuesto: "string", // Debes proporcionar un valor adecuado aquí
+        selectedFile: {}, // Debes proporcionar un valor adecuado aquí
+        nota: "string" // Debes proporcionar un valor adecuado aquí
+      }
     };
 
-    // Combinar datos del paso 1 y paso 3
-    const combinedData = {
-      ...step1Data,
-      ...step3Data,
-    };
-
-    console.log("Combined Data:", combinedData);
-
+     console.log("Datos objeto productos",requestData) 
+  
     try {
-      // Enviar petición POST con los datos combinados
+      // Enviar la petición POST al endpoint con los datos combinados
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
-        combinedData
+        requestData
       );
-      // Manejar respuesta de la API
+      
+      // Manejar la respuesta de la API
       console.log("Response:", response);
+      
       // Llamar a la función onNext para continuar con el siguiente paso
-      onNext(combinedData, 3);
+      onNext(requestData, 3);
     } catch (error) {
-      // Manejar error de la petición
+      // Manejar el error de la petición
       console.error("Error:", error);
+      
       // Mostrar mensaje de error
       // Por ejemplo:
       // if (error.response) {
@@ -85,6 +118,7 @@ const Step3Component = ({ data, onNext }) => {
       // }
     }
   };
+  
 
   const handleOpenDialog1 = () => {
     setOpenDialog1(true);
@@ -230,7 +264,7 @@ const Step3Component = ({ data, onNext }) => {
               color="secondary"
               onClick={handleNext}
             >
-              Guardar y continuar
+              Guardar Producto 
             </Button>
           </Grid>
           <Grid item xs={12} md={8}>

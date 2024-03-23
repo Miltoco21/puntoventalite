@@ -21,15 +21,29 @@ const StepperSI = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
-  const [step1Data, setStep1Data] = useState({});
-  const [step3Data, setStep3Data] = useState({});
+ 
+
+  const [stepData, setStepData] = useState({
+    selectedCategoryId: "",
+    selectedSubCategoryId: "",
+    selectedFamilyId: "",
+    selectedSubFamilyId: "",
+    marca: "",
+    nombre: "",
+    selectedUnidadId:"",
+    precioCosto:"",
+    stockInicial:"",
+    precioVenta:"",
+
+    // Otros campos necesarios para el paso 3
+  });
 
   useEffect(() => {
     const storedData = localStorage.getItem("stepperData");
     if (storedData) {
       const parsedData = JSON.parse(storedData);
-      setStep1Data(parsedData.step1 || {});
-      setStep3Data(parsedData.step3 || {});
+      setStepData(parsedData.step1 || {});
+      setStepData(parsedData.step3 || {});
     }
   }, []);
 
@@ -39,15 +53,11 @@ const StepperSI = () => {
   //     setData(JSON.parse(storedData));
   //   }
   // }, []);
-
-  const handleNext = (stepData, step) => {
-    if (step === 1) {
-      setStep1Data(stepData); // Guardar los datos del primer paso
-    } else if (step === 2) {
-      // Aquí guardarías los datos del segundo paso si los hubiera
-      setStep3Data(stepData);
-    }
-    setActiveStep(step); // Actualizar el estado de activeStep para pasar al siguiente paso
+  
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    setStepData((prevData) => ({ ...prevData,  }));
+   
   };
   
 
@@ -105,9 +115,9 @@ const StepperSI = () => {
   const getStepContent = (step) => {
     switch (step) {
       case 0:
-        return <Step1 data={step1Data} onNext={handleNext} />;
+        return <Step1 data={stepData} onNext={handleNext} setStepData={setStepData} />;
       case 1:
-        return <Step3 data={step3Data} onNext={handleNext} />;
+        return <Step3 data={stepData} onNext={handleNext}setStepData={setStepData}  />;
       // return <Step2 data={data.step2} onNext={handleNext} />;
       case 2:
       // return <Step6 data={data.step6} onNext={handleNext} />;
@@ -142,7 +152,7 @@ const StepperSI = () => {
               <Button disabled={activeStep === 0} onClick={handleBack}>
                 Volver
               </Button>
-              {activeStep === steps.length - 1 && (
+              {/* {activeStep === steps.length - 1 && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -151,7 +161,7 @@ const StepperSI = () => {
                 >
                   Enviar
                 </Button>
-              )}
+              )} */}
             </div>
           </div>
         )}

@@ -22,18 +22,18 @@ import {
   Radio,
 } from "@mui/material";
 
-const Step1Component = ({ data, onNext }) => {
+const Step1Component = ({ data, onNext,setStepData }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(
-    data.selectedCategoryId || ""
+    data.selectedCategoryId || 0
   );
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(
-    data.selectedSubCategoryId || ""
+    data.selectedSubCategoryId || 0
   );
   const [selectedFamilyId, setSelectedFamilyId] = useState(
-    data.selectedFamilyId || ""
+    data.selectedFamilyId || 0
   );
   const [selectedSubFamilyId, setSelectedSubFamilyId] = useState(
-    data.selectedSubFamilyId || ""
+    data.selectedSubFamilyId || 0
   );
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubCategories] = useState([]);
@@ -62,14 +62,35 @@ const Step1Component = ({ data, onNext }) => {
     const value = e.target.value;
     setPesoSINO(value);
   };
+  const validateFields = () => {
+    if (
+      !selectedCategoryId ||
+      !selectedSubCategoryId ||
+      !selectedFamilyId ||
+      !selectedSubFamilyId ||
+      !nombre ||
+      !marca
+    ) {
+      setEmptyFieldsMessage("Todos los campos son obligatorios.");
+    } else {
+      setEmptyFieldsMessage(""); // Si todos los campos están llenos, limpiar el mensaje de error
+    }
+  };
+  
+  // Llamamos a la función validateFields cada vez que cambie uno de los estados relevantes
+  useEffect(() => {
+    validateFields();
+  }, [
+    selectedCategoryId,
+    selectedSubCategoryId,
+    selectedFamilyId,
+    selectedSubFamilyId,
+    nombre,
+    marca,
+  ]);
+
   const handleNext = () => {
-    // if (!respuestaSINO || !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) {
-    //   setEmptyFieldsMessage('Por favor, completa todos los campos antes de continuar.');
-    //   return;
-    // }
-    const stepData = {
-      // respuestaSINO,
-      // pesoSINO,
+    const step1Data = {
       selectedCategoryId,
       selectedSubCategoryId,
       selectedFamilyId,
@@ -77,8 +98,8 @@ const Step1Component = ({ data, onNext }) => {
       marca,
       nombre,
     };
-    console.log("Step 1 Data:", stepData); // Log the data for this step
-    onNext(stepData,1);
+    setStepData((prevData) => ({ ...prevData, ...step1Data }));
+    onNext();
   };
 
   // const handleOpenDialog1 = () => {
@@ -359,15 +380,15 @@ const Step1Component = ({ data, onNext }) => {
         </Grid>
 
         {/* Mensaje de validación */}
-        {/* <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={8}>
         <Box mt={2}>
-          {(!respuestaSINO || !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) && (
+          {( !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) && (
             <Typography variant="body2" color="error">
               {emptyFieldsMessage}
             </Typography>
           )}
         </Box>
-      </Grid> */}
+      </Grid>
       </Grid>
 
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>
