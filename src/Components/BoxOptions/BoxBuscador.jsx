@@ -53,6 +53,17 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
 
   const [selectedChipIndex, setSelectedChipIndex] = useState(null);
+  const [showPreciosClientes, setShowPreciosClientes] = useState(false);
+  const [showCtaCorriente, setShowCtaCorriente] = useState(false);
+
+
+  useEffect(() => {
+    // Cuando se realiza una búsqueda vacía o se borran los términos de búsqueda,
+    // ocultar los componentes de precios y cta corriente
+    if (searchText.trim() === "" || searchResults.length === 0) {
+      
+    }
+  }, [searchText, searchResults]);
 
   const handleChipClick = (index, result) => {
     // Verificar si el usuario seleccionado es el mismo que el usuario actualmente seleccionado
@@ -67,6 +78,8 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       setSelectedUser(null);
       // Establecer el índice del chip seleccionado a null
       setSelectedChipIndex(null);
+      setSearchResults("")
+      
     } else {
       // Si es un usuario diferente, realizar las acciones normales de selección
       setSelectedUser(result); // Establecer el usuario seleccionado
@@ -80,10 +93,11 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      // handleOpenDeudasClientesDialog(
-      //   result.codigoCliente,
-      //   result.codigoClienteSucursal
-      // );
+    
+      handleOpenDeudasClientesDialog(
+        result.codigoCliente,
+        result.codigoClienteSucursal
+      );
       clearSalesData();
     }
   };
@@ -115,7 +129,11 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     setSearchText(inputValue);
     if (inputValue.trim() === "") {
       setSearchResults([]);
+      setSelectedCodigoCliente(0),
+      clearSalesData();
+
     }
+
   };
   const handleUltimaCompraCliente = async (
     codigoCliente,
@@ -278,8 +296,23 @@ const BoxBuscador = (handleClosePreciosClientes) => {
           </Grid>
         </Grid>
       </Grid>
-
-      <div style={{ display: "none" }}>
+      {showPreciosClientes && (
+        <div style={{ display: "none" }}>
+          <BoxPreciosClientes
+            onClosePreciosClientes={handleClosePreciosClientes}
+            onOpenPreciosClientesDialog={handleOpenPreciosClientesDialog}
+          />
+        </div>
+      )}
+      {showCtaCorriente && (
+        <div style={{ display: "none" }}>
+          <BoxCtaCorriente
+            onCloseDeudaClientes={handleClosePreciosClientes}
+            onOpenPreciosClientesDialog={handleOpenDeudasClientesDialog}
+          />
+        </div>
+      )}
+      {/* <div style={{ display: "none" }}>
         <BoxPreciosClientes
           onClosePreciosClientes={handleClosePreciosClientes}
           onOpenPreciosClientesDialog={handleOpenPreciosClientesDialog}
@@ -290,7 +323,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
           onCloseDeudaClientes={handleClosePreciosClientes}
           onOpenPreciosClientesDialog={handleOpenDeudasClientesDialog}
         />
-      </div>
+      </div> */}
     </Paper>
   );
 };

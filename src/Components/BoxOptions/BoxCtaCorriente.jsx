@@ -30,6 +30,7 @@ const BoxCtaCorriente = () => {
   
   const {
     precioData,
+    searchResults,
     setPrecioData,
     ventaData,
     setVentaData,
@@ -54,7 +55,7 @@ const BoxCtaCorriente = () => {
     };
   useEffect(() => {
     fetchDeudaData();
-  }, [selectedCodigoCliente, selectedCodigoClienteSucursal]);
+  }, [selectedCodigoCliente, selectedCodigoClienteSucursal,ventaData]);
 
   
 
