@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext,useRef } from "react";
 import {
   Paper,
   Grid,
@@ -54,7 +54,10 @@ const BoxSumaProd = ({ venta }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+
   const [searchTerm, setSearchTerm] = useState("");
+
+  const inputRef = useRef(null)
   const [productInfo, setProductInfo] = useState(null);
   const [plu, setPlu] = useState("");
   const [peso, setPeso] = useState("");
@@ -142,6 +145,10 @@ const BoxSumaProd = ({ venta }) => {
       setProducts([]); // Si el término de búsqueda está vacío, limpiar la lista de productos
     }
   }, [searchTerm]);
+
+  useEffect(() => {
+    console.log("inputRef.current:", inputRef.current);
+  }, [inputRef]);
 
   const handleAddProductToSales = (product) => {
     if (product) {
@@ -232,47 +239,18 @@ const BoxSumaProd = ({ venta }) => {
         >
           <Grid item xs={12} lg={14} sx={{ minWidth: 200, width: "80%" }}>
             <div style={{ display: "flex" }}>
-              <Grid item xs={12} md={6} lg={14} sx={{ margin: "1px" }}>
-                <Autocomplete
+               <Grid item xs={12} md={6} lg={14} sx={{ margin: "1px" }}>
+                <TextField
                   sx={{
                     backgroundColor: "white",
-                    borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
-                    // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Ajusta el sombreado según tus preferencias
+                    borderRadius: "5px",
                   }}
-                  options={
-                    searchTerm
-                      ? products.filter((product) =>
-                          product.nombre
-                            .toLowerCase()
-                            .includes(searchTerm.toLowerCase())
-                        )
-                      : products
-                  }
-                  getOptionLabel={(product) => product.nombre}
-                  renderInput={(params) => (
-                    <TextField
-                      sx={{
-                        backgroundColor: "white",
-                        borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
-                        // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Ajusta el sombreado según tus preferencias
-                      }}
-                      {...params}
-                      fullWidth
-                      focused
-                      placeholder="Ingresa Código"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      inputProps={{
-                        inputMode: "numeric", // Establece el modo de entrada como numérico
-                        pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
-                      }}
-                    />
-                  )}
-                  onChange={(event, newValue) => {
-                    setSelectedProduct(newValue);
-                    handleAddProductToSales(newValue); // Agregar el producto seleccionado a salesData
-                  }}
-                  style={{ maxWidth: "100%" }}
+                  inputRef={inputRef}
+                  fullWidth
+                  focused
+                  placeholder="Ingresa Código"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </Grid>
               <Button
@@ -312,6 +290,49 @@ const BoxSumaProd = ({ venta }) => {
           </Grid>
         </Paper>
       </Grid>
+
+      <Grid item xs={12}>
+  <Paper
+    elevation={1}
+    sx={{
+      background: "#859398",
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      margin: "5px",
+    }}
+  >
+    <TableContainer component={Paper} style={{ overflowX: "auto",maxHeight: "200px"  }}>
+      <Table>
+        <TableHead sx={{ background: "#859398", height: "30%" }}>
+          
+        </TableHead>
+        <TableBody style={{ maxHeight: "200px", overflowY: "auto" }}>
+          {products.length > 0 && products.map((product) => (
+            <TableRow key={product.id} sx={{ height: "15%" }}>
+              <TableCell>{product.nombre}</TableCell>
+              <TableCell>{product.precio}</TableCell>
+              <TableCell>
+                <Button
+                 onClick={() => {
+                  addToSalesData(product);
+                  setProducts(0); // Cerrar la búsqueda después de agregar el producto
+                }}
+  
+                  variant="contained"
+                  color="secondary"
+                >
+                  Agregar
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Paper>
+</Grid>
+
 
       <Grid item xs={12}>
         <Paper

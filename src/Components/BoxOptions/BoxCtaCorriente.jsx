@@ -26,8 +26,6 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
 const BoxCtaCorriente = () => {
-
-  
   const {
     precioData,
     searchResults,
@@ -41,30 +39,25 @@ const BoxCtaCorriente = () => {
   console.log("selectedCodigoCliente:", selectedCodigoCliente);
   console.log("selectedCodigoClienteSucursal:", selectedCodigoClienteSucursal);
   const fetchDeudaData = async () => {
-      
-        try {
-          const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${selectedCodigoClienteSucursal}&codigoCliente=${selectedCodigoCliente}`
-          );
+    try {
+      const response = await axios.get(
+        `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${selectedCodigoClienteSucursal}&codigoCliente=${selectedCodigoCliente}`
+      );
 
-          console.log("Nuevas Deudas:", response.data);
-            setVentaData(response.data.clienteDeuda)
-        } catch (error) {
-          console.error("Error al obtener los nuevos precios:", error);
-        }
-    };
+      console.log("Nuevas Deudas:", response.data);
+      setVentaData(response.data.clienteDeuda);
+    } catch (error) {
+      console.error("Error al obtener los nuevos precios:", error);
+    }
+  };
   useEffect(() => {
     fetchDeudaData();
-  }, [selectedCodigoCliente, selectedCodigoClienteSucursal,ventaData]);
-
-  
+  }, [searchResults]);
 
   useEffect(() => {
     // Aquí puedes agregar más efectos secundarios si es necesario
     console.log("Se montó el componente BoxCtaCorriente");
   }, []);
-
-
 
   const [selectedDeuda, setSelectedDeuda] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -74,6 +67,10 @@ const BoxCtaCorriente = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
+  const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
+  const [rut, setRut] = useState(""); // Estado para almacenar el rut
+  const [numeroCuenta, setNumeroCuenta] = useState(""); // Estado para almacenar el número de cuenta
+  const [numeroOperacion, setNumeroOperacion] = useState(""); // Estado para almacenar el número de operación
 
   const [tipoCuenta, setTipoCuenta] = useState(""); // Estado para almacenar el tipo de cuenta seleccionado
   const tiposDeCuenta = {
@@ -109,7 +106,6 @@ const BoxCtaCorriente = () => {
     // Agrega más bancos según sea necesario
   ];
 
-  
   const obtenerFechaActual = () => {
     const fecha = new Date();
     const year = fecha.getFullYear();
@@ -188,21 +184,38 @@ const BoxCtaCorriente = () => {
   const handleTransferData = async () => {
     try {
       // Construir el objeto de datos de transferencia
-      const transferData = {
-        nombre: nombre, // Nombre del titular de la cuenta
-        rut: rut, // Rut del titular de la cuenta
-        banco: selectedBanco, // Banco seleccionado
-        tipoCuenta: tipoCuenta, // Tipo de cuenta seleccionado
-        numeroCuenta: numeroCuenta, // Número de cuenta
-        fecha: fecha, // Fecha de la transferencia
-        numeroOperacion: numeroOperacion, // Número de operación
+
+      const requestBody = {
+        deudaIds: [
+          {
+            idCuentaCorriente: selectedDeuda.id, // Usar el ID de la deuda seleccionada
+            idCabecera: selectedDeuda.idCabecera, // Usar el ID de la cabecera de la deuda seleccionada
+            total: selectedDeuda.total, // Usar el total de la deuda seleccionada
+          },
+        ],
+        montoPagado: montoPagado, // Usar el monto a pagar ingresado por el usuario
+        metodoPago: metodoPago,
+        transferencias: {
+          nombre: nombre, // Nombre del titular de la cuenta
+          rut: rut, // Rut del titular de la cuenta
+          banco: selectedBanco, // Banco seleccionado
+          tipoCuenta: tipoCuenta, // Tipo de cuenta seleccionado
+          numeroCuenta: numeroCuenta, // Número de cuenta
+          fecha: fecha, // Fecha de la transferencia
+          numeroOperacion: numeroOperacion, // Número de operación
+        },
+
+        // Método de pago (puedes cambiarlo según tus necesidades)
       };
 
       // Mostrar los datos de transferencia en la consola
-      console.log("Datos de transferencia:", transferData);
+      console.log("Datos de transferencia:", requestBody);
 
       // Realizar la solicitud POST utilizando Axios
-      const response = await axios.post("URL_DE_TU_API", transferData);
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
+        requestBody
+      );
 
       // Verificar la respuesta del servidor
       if (response.status === 200) {
@@ -276,49 +289,49 @@ const BoxCtaCorriente = () => {
           Cuenta Corriente
         </Typography>
       </Grid>
-      {precioData && precioData.clientesProductoPrecioMostrar && (
-  <Grid container spacing={2} justifyContent="center">
-    <Grid item xs={12} md={12} lg={12}>
-      <Paper>
-        <Box
-          display="flex"
-          p={1.5}
-          gap={2}
-          bgcolor={"#f5f5f5"}
-          borderRadius={4}
-          sx={{ alignItems: "center" }}
-        >
-          <Box>
-            <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            {/* <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+      {searchResults && precioData.clientesProductoPrecioMostrar && (
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper>
+              <Box
+                display="flex"
+                p={1.5}
+                gap={2}
+                bgcolor={"#f5f5f5"}
+                borderRadius={4}
+                sx={{ alignItems: "center" }}
+              >
+                <Box>
+                  <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  {/* <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
               {precioData.clientesProductoPrecioMostrar[0] &&
                 precioData.clientesProductoPrecioMostrar[0]
                   .codigoCliente}{" "}
             </Typography> */}
-            <Typography variant="body2" sx={{ color: "#696c6f" }}>
-              ID:
-              {precioData.clientesProductoPrecioMostrar[0] &&
-                precioData.clientesProductoPrecioMostrar[0]
-                  .codigoCliente}{" "}
-              {" " + " "}
-              <br />
-              {precioData.clientesProductoPrecioMostrar[0] &&
-                precioData.clientesProductoPrecioMostrar[0]
-                  .nombreCliente}{" "}
-            </Typography>
-          </Box>
-          {/* <Box ml={1}>
+                  <Typography variant="body2" sx={{ color: "#696c6f" }}>
+                    ID:
+                    {precioData.clientesProductoPrecioMostrar[0] &&
+                      precioData.clientesProductoPrecioMostrar[0]
+                        .codigoCliente}{" "}
+                    {" " + " "}
+                    <br />
+                    {precioData.clientesProductoPrecioMostrar[0] &&
+                      precioData.clientesProductoPrecioMostrar[0]
+                        .nombreCliente}{" "}
+                  </Typography>
+                </Box>
+                {/* <Box ml={1}>
             <Button size="small">
               <Add />
             </Button>
           </Box> */}
-        </Box>
-      </Paper>
-    </Grid>
-  </Grid>
-)}
+              </Box>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
       <Grid item xs={12}>
         {ventaData && ventaData.length > 0 && (
           <TableContainer>
@@ -485,10 +498,22 @@ const BoxCtaCorriente = () => {
         <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
-              <TextField label="Nombre " variant="outlined" fullWidth />
+              <TextField
+                label="Nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                variant="outlined"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField label="Rut " variant="outlined" fullWidth />
+              <TextField
+                label="Rut "
+                variant="outlined"
+                fullWidth
+                value={rut} // Asigna el estado `rut` como valor
+                onChange={(e) => setRut(e.target.value)}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -527,6 +552,8 @@ const BoxCtaCorriente = () => {
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
+                value={numeroCuenta} // Asigna el estado `numeroCuenta` como valor
+                onChange={(e) => setNumeroCuenta(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -547,6 +574,8 @@ const BoxCtaCorriente = () => {
                 label="Numero Operación"
                 variant="outlined"
                 fullWidth
+                value={numeroOperacion} // Asigna el estado `numeroOperacion` como valor
+                onChange={(e) => setNumeroOperacion(e.target.value)}
               />
             </Grid>
           </Grid>
@@ -558,7 +587,7 @@ const BoxCtaCorriente = () => {
             variant="contained"
             color="secondary"
           >
-            Guardar Datos
+            Guardar Datos Transferencia
           </Button>
         </DialogActions>
       </Dialog>
