@@ -467,7 +467,7 @@ const IngresoClientes = () => {
                 value={formData.rut}
                 onChange={handleInputChange}
                 inputProps={{
-                  inputMode: "text", // text Establece el modo de entrada como numérico
+                  inputMode: "numeric", // textEstablece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
                 }}
               />
