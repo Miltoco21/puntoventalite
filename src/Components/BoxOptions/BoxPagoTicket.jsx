@@ -22,8 +22,10 @@ const BoxPagoTicket = ({onCloseTicket}) => {
   const {
     grandTotal,
     userData,
+    setSalesData,
     salesData,
     addToSalesData,
+    clearSalesData,
     ventaData,
     searchResults,
     setVentaData,
@@ -65,7 +67,7 @@ const BoxPagoTicket = ({onCloseTicket}) => {
 
       console.log("Datos enviados por Axios:", ticket);
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/ImprimirTicket",
+        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
         ticket
       );
 
@@ -73,10 +75,12 @@ const BoxPagoTicket = ({onCloseTicket}) => {
       if (response.status === 200) {
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
+        clearSalesData();
         
         // Esperar 4 segundos antes de cerrar el modal
         setTimeout(() => {
           onCloseTicket();
+          
         }, 3000);
       }
 

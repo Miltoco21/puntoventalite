@@ -56,29 +56,28 @@ const BoxVendedor = () => {
             padding: "20px",
           }}
           variant="outlined"
-          rounded={true}
         >
           <Grid container item xs={12} lg={12} spacing={2} alignItems="center">
             <Grid item xs={6} md={6} lg={6}>
-            <Chip
-  sx={{
-    backgroundColor: "white",
-    borderRadius: "20px",
-    "& .MuiChip-label": {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    "& .highlighted": {
-      color: "blue", // Color para el texto entre comillas
-    },
-  }}
-  label={
-    <span>
-      Vendedor: <span className="highlighted">{vend.nombre}</span>
-    </span>
-  }
-/>
+              <Chip
+                sx={{
+                  backgroundColor: "white",
+                  borderRadius: "20px",
+                  "& .MuiChip-label": {
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                  "& .highlighted": {
+                    color: "blue", // Color para el texto entre comillas
+                  },
+                }}
+                label={
+                  <span>
+                    Vendedor: <span className="highlighted">{vend.nombre}</span>
+                  </span>
+                }
+              />
               {/* <Chip
                 sx={{
                   backgroundColor: "white",
@@ -93,44 +92,43 @@ const BoxVendedor = () => {
               /> */}
             </Grid>
             <Grid item xs={6} md={3} lg={6}>
-            <Chip
-  sx={{
-    backgroundColor: "white",
-    borderRadius: "20px",
-    "& .MuiChip-label": {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-    "& .highlighted": {
-      color: "blue", // Color para el texto entre comillas
-    },
-  }}
-  label={
-    <span>
-      Nº Última Operación: <span className="highlighted">{vend.operacion}</span>
-    </span>
-  }
-/>
-
-
+              <Chip
+                sx={{
+                  backgroundColor: "white",
+                  borderRadius: "20px",
+                  "& .MuiChip-label": {
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
+                  "& .highlighted": {
+                    color: "blue", // Color para el texto entre comillas
+                  },
+                }}
+                label={
+                  <span>
+                    Nº Última Operación:{" "}
+                    <span className="highlighted">{vend.operacion}</span>
+                  </span>
+                }
+              />
             </Grid>
             <Grid item xs={3} md={3} lg={3}>
-            <Chip
-  sx={{
-    backgroundColor: "white",
-    "& .MuiInputLabel-root": {
-      color: "blue", // Color del label editable
-    },
-  }}
-  fullWidth
-  label={
-    <span>
-      Código: <span style={{ color: "blue" }}>{vend.codigo}</span>
-    </span>
-  }
-  value={vend.codigo}
-/>
+              <Chip
+                sx={{
+                  backgroundColor: "white",
+                  "& .MuiInputLabel-root": {
+                    color: "blue", // Color del label editable
+                  },
+                }}
+                fullWidth
+                label={
+                  <span>
+                    Código: <span style={{ color: "blue" }}>{vend.codigo}</span>
+                  </span>
+                }
+                value={vend.codigo}
+              />
             </Grid>
             <Grid item xs={3} md={3} lg={2}>
               <Chip
@@ -163,7 +161,8 @@ const BoxVendedor = () => {
                 fullWidth
                 label={
                   <span>
-                    Última Boleta: <span style={{ color: "blue" }}>{vend.boleta}</span>
+                    Última Boleta:{" "}
+                    <span style={{ color: "blue" }}>{vend.boleta}</span>
                   </span>
                 }
                 value={vend.boleta}

@@ -27,6 +27,7 @@ import axios from "axios";
 
 const BoxCtaCorriente = () => {
   const {
+    userData,
     precioData,
     searchResults,
     setPrecioData,
@@ -35,6 +36,7 @@ const BoxCtaCorriente = () => {
     selectedCodigoCliente,
     selectedCodigoClienteSucursal,
   } = useContext(SelectedOptionsContext);
+  console.log("userData:", userData);
   console.log("ventaData:", ventaData);
   console.log("selectedCodigoCliente:", selectedCodigoCliente);
   console.log("selectedCodigoClienteSucursal:", selectedCodigoClienteSucursal);
@@ -45,6 +47,7 @@ const BoxCtaCorriente = () => {
       );
 
       console.log("Nuevas Deudas:", response.data);
+
       setVentaData(response.data.clienteDeuda);
     } catch (error) {
       console.error("Error al obtener los nuevos precios:", error);
@@ -59,6 +62,15 @@ const BoxCtaCorriente = () => {
     console.log("Se montó el componente BoxCtaCorriente");
   }, []);
 
+  ////////////
+  // const countSelectedCheckboxes = () => {
+  //   // Filtrar el array de ventaData para obtener solo las deudas seleccionadas
+  //   const selectedDeudas = ventaData.filter((deuda) => deuda.selected);
+
+  //   // Devolver la longitud del array de deudas seleccionadas
+  //   return selectedDeudas.length;
+  // };
+  //////////////////
   const [selectedDeuda, setSelectedDeuda] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
@@ -69,8 +81,11 @@ const BoxCtaCorriente = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
   const [rut, setRut] = useState(""); // Estado para almacenar el rut
-  const [numeroCuenta, setNumeroCuenta] = useState(""); // Estado para almacenar el número de cuenta
-  const [numeroOperacion, setNumeroOperacion] = useState(""); // Estado para almacenar el número de operación
+  const [nroCuenta, setNroCuenta] = useState(""); // Estado para almacenar el número de cuenta
+  
+  const [nroOperacion, setNroOperacion] = useState(""); // Estado para almacenar el número de operación
+
+  const [selectedDebts, setSelectedDebts] = useState([]);
 
   const [tipoCuenta, setTipoCuenta] = useState(""); // Estado para almacenar el tipo de cuenta seleccionado
   const tiposDeCuenta = {
@@ -128,10 +143,75 @@ const BoxCtaCorriente = () => {
     setSelectedBanco(event.target.value);
   };
 
-  const handleTransferenciaModalOpen = () => {
-    setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
-    setOpenTransferenciaModal(true); //
-  };
+  // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
+console.log("selectedDebts justo antes de abrir el diálogo de transferencia:", selectedDebts);
+useEffect(() => {
+  console.log("selectedDebts cambió:", selectedDebts);
+}, [selectedDebts]);
+
+const handleTransferenciaModalOpen = () => {
+  setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
+  setOpenTransferenciaModal(true);
+  setMontoPagado(getTotalSelected());
+  setTotal(getTotalSelected());
+  
+
+  // Verificar si ventaData está definido y es un array antes de intentar mapearlo
+  // if (Array.isArray(ventaData)) {
+  //   // Establecer elementos seleccionados aquí
+  //   const updatedVentaData = ventaData.map((item) => {
+  //     // Verificar si item y deuda no son null antes de acceder a sus propiedades
+  //     if (item !== null && deuda !== null) {
+  //       return {
+  //         ...item,
+  //         selected: item.total === deuda.total, // Establecer seleccionado si el total coincide
+  //       };
+  //     } else {
+  //       // Si item o deuda son null, simplemente retornar el item sin cambios
+  //       return item;
+  //     }
+  //   });
+  //   setSelectedDebts(updatedVentaData);
+  //   // const selectedDebts = updatedVentaData.filter((deuda) => deuda.selected);
+  //   // setSelectedDebts(selectedDebts); 
+  //   console.log(selectedDebts);// Actualizar selectedDebts con las deudas seleccionadas
+  // } else {
+  //   // Si ventaData no está definido o no es un array, mostrar un mensaje de advertencia o manejar la situación de acuerdo a tus necesidades
+  //   console.warn("VentaData no está definido o no es un array");
+  //   // Puedes mostrar una alerta, mensaje de consola, o tomar otra acción según lo requieras
+  // }
+};
+
+// Agrega este console.log para verificar el valor de selectedDebts cada vez que cambie
+
+
+  // const handleTransferenciaModalOpen = (deuda) => {
+  //   setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
+  //   setOpenTransferenciaModal(true);
+  //   setMontoPagado(getTotalSelected());
+
+  //   // Verificar si ventaData está definido y es un array antes de intentar mapearlo
+  //   if (Array.isArray(ventaData)) {
+  //     // Establecer elementos seleccionados aquí
+  //     const updatedVentaData = ventaData.map((item) => {
+  //       // Verificar si item y deuda no son null antes de acceder a sus propiedades
+  //       if (item !== null && deuda !== null) {
+  //         return {
+  //           ...item,
+  //           selected: item.total === deuda.total, // Establecer seleccionado si el total coincide
+  //         };
+  //       } else {
+  //         // Si item o deuda son null, simplemente retornar el item sin cambios
+  //         return item;
+  //       }
+  //     });
+  //     setVentaData(updatedVentaData);
+  //   } else {
+  //     // Si ventaData no está definido o no es un array, mostrar un mensaje de advertencia o manejar la situación de acuerdo a tus necesidades
+  //     console.warn("VentaData no está definido o no es un array");
+  //     // Puedes mostrar una alerta, mensaje de consola, o tomar otra acción según lo requieras
+  //   }
+  // };
 
   const handleTransferenciaModalClose = () => {
     setOpenTransferenciaModal(false);
@@ -148,12 +228,6 @@ const BoxCtaCorriente = () => {
     setSelectAll(!selectAll);
   };
 
-  const handleCheckboxChange = (index) => {
-    const updatedVentaData = [...ventaData];
-    updatedVentaData[index].selected = !updatedVentaData[index].selected;
-    setVentaData(updatedVentaData);
-  };
-
   const getTotalSelected = () => {
     let totalSelected = 0;
     ventaData.forEach((deuda) => {
@@ -168,10 +242,32 @@ const BoxCtaCorriente = () => {
     ? ventaData.reduce((total, deuda) => total + deuda.total, 0)
     : 0;
 
-  const handleOpenPaymentDialog = (deuda) => {
-    setSelectedDeuda(deuda);
-    setMontoPagado(getTotalSelected());
+  const handleOpenPaymentDialog = (selectedDebts) => {
     setOpenDialog(true);
+    // setSelectedDebts(selectedDebts);
+    // setSelectedDeuda(deuda);
+    setMontoPagado(getTotalSelected());
+    handleTransferData(selectedDebts, montoPagado, metodoPago, {
+      nombre: nombre,
+      rut: rut,
+      banco: selectedBanco,
+      tipoCuenta: tipoCuenta,
+      nroCuenta: nroCuenta,
+      fecha: fecha,
+      nroOperacion: nroOperacion,
+    });
+    console.log("selectedDebts en handleOpenPaymentDialog:", selectedDebts);
+  };
+  const handleCheckboxChange = (index) => {
+    const updatedVentaData = [...ventaData];
+    updatedVentaData[index].selected = !updatedVentaData[index].selected;
+    setVentaData(updatedVentaData);
+
+    // Identificar todos los objetos seleccionados
+    const selectedDebts = updatedVentaData.filter((deuda) => deuda.selected);
+    setSelectedDebts(selectedDebts);
+    // Mostrar los datos seleccionados en la consola
+    console.log("Datos seleccionados por checkbox:", selectedDebts);
   };
 
   const handleClosePaymentDialog = () => {
@@ -180,58 +276,118 @@ const BoxCtaCorriente = () => {
     setMontoPagado(0); // Reiniciar el valor del monto a pagar al cerrar el diálogo
     setMetodoPago("");
   };
-
-  const handleTransferData = async () => {
+  const handleTransferData = async (
+    selectedDebts,
+    montoPagado,
+    metodoPago,
+    transferencias
+  ) => {
     try {
-      // Construir el objeto de datos de transferencia
-
-      const requestBody = {
-        deudaIds: [
-          {
-            idCuentaCorriente: selectedDeuda.id, // Usar el ID de la deuda seleccionada
-            idCabecera: selectedDeuda.idCabecera, // Usar el ID de la cabecera de la deuda seleccionada
-            total: selectedDeuda.total, // Usar el total de la deuda seleccionada
-          },
-        ],
-        montoPagado: montoPagado, // Usar el monto a pagar ingresado por el usuario
-        metodoPago: metodoPago,
-        transferencias: {
-          nombre: nombre, // Nombre del titular de la cuenta
-          rut: rut, // Rut del titular de la cuenta
-          banco: selectedBanco, // Banco seleccionado
-          tipoCuenta: tipoCuenta, // Tipo de cuenta seleccionado
-          numeroCuenta: numeroCuenta, // Número de cuenta
-          fecha: fecha, // Fecha de la transferencia
-          numeroOperacion: numeroOperacion, // Número de operación
-        },
-
-        // Método de pago (puedes cambiarlo según tus necesidades)
-      };
-
-      // Mostrar los datos de transferencia en la consola
-      console.log("Datos de transferencia:", requestBody);
-
-      // Realizar la solicitud POST utilizando Axios
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
-        requestBody
-      );
-
-      // Verificar la respuesta del servidor
-      if (response.status === 200) {
-        // Si la solicitud es exitosa, puedes realizar acciones adicionales aquí
-        console.log("Transferencia realizada con éxito");
-        // Cerrar el modal de transferencia
-        handleTransferenciaModalClose();
-      } else {
-        // Manejar errores o respuestas no exitosas aquí
-        console.error("Error al realizar la transferencia");
+      console.log("Datos de transferencia:");
+      console.log("Monto pagado:", montoPagado);
+      console.log("Método de pago:", metodoPago);
+      console.log("Datos de transferencia:", transferencias);
+      console.log("Tipo de selectedDebts:", typeof selectedDebts);
+  
+      // Convertir selectedDebts en un array de valores
+      const selectedDebtsArray = Object.values(selectedDebts);
+  
+      // Iterar sobre el array selectedDebtsArray
+      for (const deuda of selectedDebtsArray) {
+        console.log("Deuda seleccionada:");
+        console.log("ID de la deuda:", deuda.id);
+        console.log("ID de la cabecera:", deuda.idCabecera);
+        console.log("Total de la deuda:", deuda.total);
+  
+        const requestBody = {
+          deudaIds: [
+            {
+              idCuentaCorriente: deuda.id,
+              idCabecera: deuda.idCabecera,
+              total: totalDeuda,
+            },
+          ],
+          montoPagado: montoPagado,
+          metodoPago: metodoPago,
+          idUsuario:userData.codigoUsuario,
+          transferencias: transferencias,
+        };
+  
+        console.log("Datos de la solicitud antes de enviarla:");
+        console.log(requestBody);
+  
+        // Aquí realizamos la llamada POST para cada deuda
+        const response = await axios.post(
+          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
+          requestBody
+        );
+  
+        if (response.status === 200) {
+          console.log("Transferencia realizada con éxito");
+        } else {
+          console.error("Error al realizar la transferencia");
+        }
       }
+  
+      handleTransferenciaModalClose();
     } catch (error) {
-      // Capturar y manejar cualquier error de la solicitud
       console.error("Error al realizar la transferencia:", error);
     }
   };
+  
+  // const handleTransferData = async (
+  //   selectedDebts,
+  //   montoPagado,
+  //   metodoPago,
+  //   transferencias
+  // ) => {
+  //   try {
+  //     console.log("Datos de transferencia:");
+  //     console.log("Monto pagado:", montoPagado);
+  //     console.log("Método de pago:", metodoPago);
+  //     console.log("Datos de transferencia:", transferencias);
+  //     console.log("Tipo de selectedDebts:", typeof selectedDebts);
+
+  //     for (const deuda of selectedDebts) {
+  //       console.log("Deuda seleccionada:");
+  //       console.log("ID de la deuda:", deuda.id);
+  //       console.log("ID de la cabecera:", deuda.idCabecera);
+  //       console.log("Total de la deuda:", deuda.total);
+
+  //       const requestBody = {
+  //         deudaIds: [
+  //           {
+  //             idCuentaCorriente: deuda.id,
+  //             idCabecera: deuda.idCabecera,
+  //             total: deuda.total,
+  //           },
+  //         ],
+  //         montoPagado: montoPagado,
+  //         metodoPago: metodoPago,
+  //         transferencias: transferencias,
+  //       };
+
+  //       console.log("Datos de la solicitud antes de enviarla:");
+  //       console.log(requestBody);
+
+  //       // Aquí realizamos la llamada POST para cada deuda
+  //       const response = await axios.post(
+  //         "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
+  //         requestBody
+  //       );
+
+  //       if (response.status === 200) {
+  //         console.log("Transferencia realizada con éxito");
+  //       } else {
+  //         console.error("Error al realizar la transferencia");
+  //       }
+  //     }
+
+  //     handleTransferenciaModalClose();
+  //   } catch (error) {
+  //     console.error("Error al realizar la transferencia:", error);
+  //   }
+  // };
 
   const handlePayment = async () => {
     try {
@@ -289,49 +445,43 @@ const BoxCtaCorriente = () => {
           Cuenta Corriente
         </Typography>
       </Grid>
-      {searchResults && precioData.clientesProductoPrecioMostrar && (
-        <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} md={12} lg={12}>
-            <Paper>
-              <Box
-                display="flex"
-                p={1.5}
-                gap={2}
-                bgcolor={"#f5f5f5"}
-                borderRadius={4}
-                sx={{ alignItems: "center" }}
-              >
-                <Box>
-                  <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
+      {searchResults &&
+        precioData &&
+        precioData.clientesProductoPrecioMostrar && (
+          <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} md={12} lg={12}>
+              <Paper>
+                <Box
+                  display="flex"
+                  p={1.5}
+                  gap={2}
+                  bgcolor={"#f5f5f5"}
+                  borderRadius={4}
+                  sx={{ alignItems: "center" }}
+                >
+                  <Box>
+                    <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
+                  </Box>
+                  <Box sx={{ flex: 1 }}>
+             
+                    <Typography variant="body2" sx={{ color: "#696c6f" }}>
+                      ID:
+                      {precioData.clientesProductoPrecioMostrar[0] &&
+                        precioData.clientesProductoPrecioMostrar[0]
+                          .codigoCliente}{" "}
+                      {" " + " "}
+                      <br />
+                      {precioData.clientesProductoPrecioMostrar[0] &&
+                        precioData.clientesProductoPrecioMostrar[0]
+                          .nombreCliente}{" "}
+                    </Typography>
+                  </Box>
+             
                 </Box>
-                <Box sx={{ flex: 1 }}>
-                  {/* <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              {precioData.clientesProductoPrecioMostrar[0] &&
-                precioData.clientesProductoPrecioMostrar[0]
-                  .codigoCliente}{" "}
-            </Typography> */}
-                  <Typography variant="body2" sx={{ color: "#696c6f" }}>
-                    ID:
-                    {precioData.clientesProductoPrecioMostrar[0] &&
-                      precioData.clientesProductoPrecioMostrar[0]
-                        .codigoCliente}{" "}
-                    {" " + " "}
-                    <br />
-                    {precioData.clientesProductoPrecioMostrar[0] &&
-                      precioData.clientesProductoPrecioMostrar[0]
-                        .nombreCliente}{" "}
-                  </Typography>
-                </Box>
-                {/* <Box ml={1}>
-            <Button size="small">
-              <Add />
-            </Button>
-          </Box> */}
-              </Box>
-            </Paper>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-      )}
+        )}
       <Grid item xs={12}>
         {ventaData && ventaData.length > 0 && (
           <TableContainer>
@@ -357,7 +507,7 @@ const BoxCtaCorriente = () => {
                   <TableRow key={deuda.id}>
                     <TableCell>
                       <Checkbox
-                        checked={deuda.selected}
+                        checked={deuda.selected || false}
                         onChange={() => handleCheckboxChange(index)}
                         color="primary"
                       />
@@ -366,6 +516,10 @@ const BoxCtaCorriente = () => {
                     <TableCell>{deuda.nroComprobante}</TableCell>
                     <TableCell>${deuda.totalPagadoParcial}</TableCell>
                     <TableCell>${deuda.total}</TableCell>
+                    <TableCell sx={{ display: "none" }}>
+                      ${deuda.idCabecera}
+                    </TableCell>
+
                     <TableCell>
                       {/* <Button
                         variant="outlined"
@@ -404,7 +558,7 @@ const BoxCtaCorriente = () => {
       </Grid>
 
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
-        <DialogTitle>Pagar Deuda</DialogTitle>
+        <DialogTitle>Pagar Deuda </DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
             <Typography variant="body1">
@@ -422,6 +576,7 @@ const BoxCtaCorriente = () => {
                 pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
               }}
             />
+
             <Grid container spacing={2}>
               <Grid item xs={6} sm={3}>
                 <Button
@@ -444,7 +599,7 @@ const BoxCtaCorriente = () => {
                   onClick={() => setMetodoPago("Tarjeta Débito")}
                   fullWidth
                 >
-                  Tarjeta Débito
+                  Tarjeta Débitoo
                 </Button>
               </Grid>
               <Grid item xs={6} sm={3}>
@@ -467,7 +622,7 @@ const BoxCtaCorriente = () => {
                   variant={
                     metodoPago === "Transferencia" ? "contained" : "outlined"
                   }
-                  onClick={handleTransferenciaModalOpen}
+                  onClick={() => handleTransferenciaModalOpen(selectedDebts)}
                   fullWidth
                 >
                   Transferencia
@@ -496,6 +651,27 @@ const BoxCtaCorriente = () => {
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
+          <Grid container spacing={2}>
+            {selectedDebts.map((deuda, index) => (
+              <Grid item xs={12} key={index}>
+                <Typography>ID: {deuda.id}</Typography>
+                <Typography>ID de Cabeceraaa: {deuda.idCabecera}</Typography>
+                <Typography>
+                  Descripción: {deuda.descripcionComprobante}
+                </Typography>
+                <Typography>
+                  Número de Comprobante: {deuda.nroComprobante}
+                </Typography>
+                <Typography>
+                  Total Pagado Parcial: ${deuda.totalPagadoParcial}
+                </Typography>
+                <Typography>Total: ${deuda.total}</Typography>
+                {/* Renderizar otros detalles de la deuda si es necesario */}
+              </Grid>
+            ))}
+          </Grid>
+
+        
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -552,8 +728,8 @@ const BoxCtaCorriente = () => {
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
-                value={numeroCuenta} // Asigna el estado `numeroCuenta` como valor
-                onChange={(e) => setNumeroCuenta(e.target.value)}
+                value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
+                onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -574,8 +750,8 @@ const BoxCtaCorriente = () => {
                 label="Numero Operación"
                 variant="outlined"
                 fullWidth
-                value={numeroOperacion} // Asigna el estado `numeroOperacion` como valor
-                onChange={(e) => setNumeroOperacion(e.target.value)}
+                value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
+                onChange={(e) => setNroOperacion(e.target.value)}
               />
             </Grid>
           </Grid>
@@ -583,7 +759,40 @@ const BoxCtaCorriente = () => {
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
-            onClick={handleTransferData}
+            onClick={() => {
+              // Convertir el objeto selectedDebts en un array de valores
+              const selectedDebtsArray = Object.values(selectedDebts);
+
+              // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
+              console.log(
+                "Tipo de selectedDebtsArray:",
+                Array.isArray(selectedDebtsArray)
+              );
+              console.log(
+                "Contenido de selectedDebtsArray:",
+                selectedDebtsArray
+              );
+
+              // Iterar sobre el array selectedDebtsArray
+              selectedDebtsArray.forEach((deuda) => {
+                // Realizar las operaciones necesarias con cada deuda
+                console.log("ID de la deuda:", deuda.id);
+                console.log("ID de la cabecera:", deuda.idCabecera);
+                console.log("Total de la deuda:", deuda.total);
+                // Agregar aquí el resto de la lógica necesaria
+              });
+
+              // Llamar a la función handleTransferData con los datos preparados
+              handleTransferData(selectedDebts, montoPagado, metodoPago, {
+                nombre: nombre,
+                rut: rut,
+                banco: selectedBanco,
+                tipoCuenta: tipoCuenta,
+                nroCuenta: nroCuenta,
+                fecha: fecha,
+                nroOperacion: nroOperacion,
+              });
+            }}
             variant="contained"
             color="secondary"
           >

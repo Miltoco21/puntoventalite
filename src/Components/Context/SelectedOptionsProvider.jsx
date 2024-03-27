@@ -20,7 +20,7 @@ export const SelectedOptionsProvider = ({ children }) => {
   const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
   const [precioData, setPrecioData] = useState(null);
-  const [ventaData, setVentaData] = useState("");
+  const [ventaData, setVentaData] = useState([]);
   const [salesData, setSalesData] = useState([]);
   const [grandTotal, setGrandTotal] = useState(0);
   const [products, setProducts] = useState([]);

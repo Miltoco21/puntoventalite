@@ -68,6 +68,7 @@ const IngresoClientes = () => {
     giro: "",
     urlPagina: "",
     formaPago: "",
+    razonSocial:"",
     usaCuentaCorriente: 0,
     // fechaIngreso: new Date().toISOString(),
     // fechaUltAct: new Date().toISOString(),
@@ -85,6 +86,7 @@ const IngresoClientes = () => {
         giro: "",
         urlPagina: "",
         formaPago: "",
+        razonSocial:"",
         usaCuentaCorriente: 0,
         // fechaIngreso: new Date().toISOString(),
         // fechaUltAct: new Date().toISOString(),
@@ -117,16 +119,11 @@ const IngresoClientes = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [rut, setRut] = useState("");
-  const [rutError, setRutError] = useState(false);
+  
 
   const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
 
-  const handleRutChange = (event) => {
-    const newRut = event.target.value;
-    setRut(newRut);
-    setRutError(!rutRegex.test(newRut));
-  };
+ 
 
 
   const [branchData, setBranchData] = useState({
@@ -142,6 +139,7 @@ const IngresoClientes = () => {
     giro: "",
     urlPagina: "",
     formaPago: "",
+    razonSocial:"",
     usaCuentaCorriente: 0,
     // Add other branch data fields
   });
@@ -192,6 +190,7 @@ const IngresoClientes = () => {
         comuna: branchData.comuna,
         correo: branchData.correo,
         giro: branchData.giro,
+        razonSocial:branchData.razonSocial,
         urlPagina: branchData.urlPagina,
         formaPago: branchData.formaPago,
         usaCuentaCorriente: branchData.usaCuentaCorriente,
@@ -339,10 +338,13 @@ const IngresoClientes = () => {
     }
 
 
-    const emptyFields = Object.values(formData).some((value) => value === "");
+    
 
-    if (emptyFields) {
-      setErrorMessage("Por favor completa todos los campos antes de enviar el formulario.");
+    const emptyFields = Object.entries(formData).filter(([key, value]) => value === "").map(([key]) => key);
+
+    if (emptyFields.length > 0) {
+      const emptyField = emptyFields[0]; // Tomamos el primer campo vacío
+      setErrorMessage(`El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`);
       return;
     } else {
       setErrorMessage("");
@@ -350,7 +352,7 @@ const IngresoClientes = () => {
   
     const formDataToSend = {
       ...formData,
-      rut: rut,//////
+      // rut:rut,//////
       region: String(formData.region),
       comuna: String(formData.comuna),
     };
@@ -456,7 +458,7 @@ const IngresoClientes = () => {
             lg={8}
             spacing={2}
           >
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+            {errorMessage && <p style={{ color: "red" }}>hol {errorMessage}</p>}
             <Grid item xs={12} sm={6} md={6}>
               <TextField
                 label="Rut"
@@ -574,7 +576,7 @@ const IngresoClientes = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Giro"
+                label="Girooooo"
                 name="giro"
                 fullWidth
                 value={formData.giro}
@@ -598,6 +600,15 @@ const IngresoClientes = () => {
                 value={formData.formaPago}
                 onChange={handleInputChange}
               />
+            </Grid>
+            <Grid  item xs={12} sm={6}>
+            <TextField
+                    margin="dense"
+                    label="Razón Social"
+                    name="razonSocial"
+                    value={formData.razonSocial}
+                    onChange={handleInputChange}
+                  />
             </Grid>
 
             <Grid item sx={{ marginBottom: "10px" }} xs={12}>
@@ -889,6 +900,7 @@ const IngresoClientes = () => {
                     value={branchData.formaPago}
                     onChange={handleBranchDataChange}
                   />
+                   
 
                   {/* Add other form fields based on your branch data */}
                 </DialogContent>
