@@ -146,6 +146,7 @@ const BoxPreciosClientes = ({
 
   return (
     <>
+    {console.log("searchResultsssss:", searchResults)}
       {precioData && precioData.clientesProductoPrecioMostrar && (
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} md={12} lg={12}>
@@ -169,21 +170,18 @@ const BoxPreciosClientes = ({
         </Typography> */}
                   <Typography variant="body2" sx={{ color: "#696c6f" }}>
                     ID:
-                    {precioData.clientesProductoPrecioMostrar[0] &&
+                   {searchResults[0].rutResponsable}
+                    {/* {precioData.clientesProductoPrecioMostrar[0] &&
                       precioData.clientesProductoPrecioMostrar[0]
                         .codigoCliente}{" "}
-                    {" " + " "}
+                    {" " + " "} */}
                     <br />
                     {precioData.clientesProductoPrecioMostrar[0] &&
                       precioData.clientesProductoPrecioMostrar[0]
                         .nombreCliente}{" "}
                   </Typography>
                 </Box>
-                {/* <Box ml={1}>
-        <Button size="small">
-          <Add />
-        </Button>
-      </Box> */}
+      
               </Box>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={10} >
@@ -250,66 +248,7 @@ const BoxPreciosClientes = ({
                 </Grid>
               </Grid>
 
-              {/* <TableContainer sx={{ overflowX: "auto", maxWidth: "100%" }}>
-                <Table sx={{ minWidth: 650 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ width: "3%" }}>ID </TableCell>
-                      <TableCell sx={{ width: "9%" }}>Producto</TableCell>
-                      <TableCell sx={{ width: "8%" }}>Precio</TableCell>
-                      <TableCell sx={{ width: "8%" }}>Guardar</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {precioData.clientesProductoPrecioMostrar.map((item) => (
-                      <TableRow key={item.idProducto}>
-                        <TableCell sx={{ width: "3%" }}>
-                          {item.idProducto}
-                        </TableCell>
-                        <TableCell sx={{ width: "9%" }}>
-                          {item.nombre}
-                        </TableCell>
-                        <TableCell sx={{ width: "8%" }}>
-                          <TextField
-                            variant="outlined"
-                            fullWidth
-                            value={
-                              preciosModificados[item.idProducto] !== undefined
-                                ? preciosModificados[item.idProducto]
-                                : item.precio
-                            }
-                            onChange={(e) =>
-                              handlePrecioChange(e, item.idProducto)
-                            }
-                            inputProps={{
-                              inputMode: "numeric", // Establece el modo de entrada como numérico
-                              pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => {
-                              handleSaveChanges(
-                                item.idProducto,
-                                precioData.clientesProductoPrecioMostrar[0]
-                                  .codigoCliente,
-                                precioData.clientesProductoPrecioMostrar[0]
-                                  .codigoClienteSucursal
-                              );
-                            }}
-                            sx={{ width: "8%" }}
-                          >
-                            Guardar
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer> */}
+             
             </Paper>
           </Grid>
         </Grid>

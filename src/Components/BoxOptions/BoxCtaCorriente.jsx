@@ -25,7 +25,7 @@ import {
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
-const BoxCtaCorriente = () => {
+const BoxCtaCorriente = ({onClose}) => {
   const {
     userData,
     precioData,
@@ -304,7 +304,7 @@ const handleTransferenciaModalOpen = () => {
             {
               idCuentaCorriente: deuda.id,
               idCabecera: deuda.idCabecera,
-              total: totalDeuda,
+              total: montoPagado,
             },
           ],
           montoPagado: montoPagado,
@@ -324,12 +324,23 @@ const handleTransferenciaModalOpen = () => {
   
         if (response.status === 200) {
           console.log("Transferencia realizada con éxito");
+          setSnackbarMessage(response.data.descripcion);
+          setSnackbarOpen(true);
+
+          setTimeout(() => {
+            
+            handleClosePaymentDialog();
+            handleTransferenciaModalClose();
+            onClose(); ////Cierre Modal al finalizar
+          }, 3000);
+
+          
         } else {
           console.error("Error al realizar la transferencia");
         }
       }
   
-      handleTransferenciaModalClose();
+     
     } catch (error) {
       console.error("Error al realizar la transferencia:", error);
     }
@@ -466,10 +477,12 @@ const handleTransferenciaModalOpen = () => {
              
                     <Typography variant="body2" sx={{ color: "#696c6f" }}>
                       ID:
-                      {precioData.clientesProductoPrecioMostrar[0] &&
+                    
+                   {searchResults[0].rutResponsable}
+                      {/* {precioData.clientesProductoPrecioMostrar[0] &&
                         precioData.clientesProductoPrecioMostrar[0]
                           .codigoCliente}{" "}
-                      {" " + " "}
+                      {" " + " "} */}
                       <br />
                       {precioData.clientesProductoPrecioMostrar[0] &&
                         precioData.clientesProductoPrecioMostrar[0]
@@ -623,7 +636,7 @@ const handleTransferenciaModalOpen = () => {
                     metodoPago === "Transferencia" ? "contained" : "outlined"
                   }
                   onClick={() => handleTransferenciaModalOpen(selectedDebts)}
-                  fullWidth
+                
                 >
                   Transferencia
                 </Button>
@@ -651,7 +664,7 @@ const handleTransferenciaModalOpen = () => {
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
-          <Grid container spacing={2}>
+          {/* <Grid container spacing={2}>
             {selectedDebts.map((deuda, index) => (
               <Grid item xs={12} key={index}>
                 <Typography>ID: {deuda.id}</Typography>
@@ -666,10 +679,10 @@ const handleTransferenciaModalOpen = () => {
                   Total Pagado Parcial: ${deuda.totalPagadoParcial}
                 </Typography>
                 <Typography>Total: ${deuda.total}</Typography>
-                {/* Renderizar otros detalles de la deuda si es necesario */}
+                
               </Grid>
             ))}
-          </Grid>
+          </Grid> */}
 
         
           <Grid container spacing={2}>

@@ -41,6 +41,8 @@ import BoxPreciosClientes from "./BoxPreciosClientes";
 import StepperSI from "../Stepper/StepperSI";
 import StepperNo from "../Stepper/StepperNo"
 import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente";
+import BoxBoleta from "./BoxBoleta";
+import Boxfactura from "./Boxfactura";
 
 const BoxGestionCaja = () => {
   const {
@@ -79,6 +81,8 @@ const BoxGestionCaja = () => {
   const [openPreciosClienteDialog, setOpenPreciosClienteDialog] =
     useState(false);
   const [openStockDialog, setOpenStockDialog] = useState(false);
+  const [openBoletaDialog, setOpenBoletaDialog] = useState(false);
+  const [openFacturaDialog, setOpenFacturaDialog] = useState(false);
   const [openTicketDialog, setOpenTicketDialog] = useState(false);
   const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false);
   const [openDevolucionDialog, setOpenDevolucionDialog] = useState(false);
@@ -506,6 +510,21 @@ const BoxGestionCaja = () => {
   const handleCloseDeudasDialog = () => {
     setOpenDeudasDialog(false);
   };
+  const handleOpenBoletaDialog = () => {
+    setOpenBoletaDialog(true);
+  };
+  const handleCloseBoletaDialog = () => {
+    setOpenBoletaDialog(false);
+  };
+
+  const handleOpenFacturaDialog = () => {
+    setOpenFacturaDialog(true);
+  };
+  const handleCloseFacturaDialog = () => {
+    setOpenFacturaDialog(false);
+  };
+
+
 
   return (
     <Paper
@@ -774,7 +793,7 @@ const BoxGestionCaja = () => {
                       color: "white",
                     },
                   }}
-                    onClick={handleOpenDialog}
+                    onClick={handleOpenBoletaDialog }
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
                     <Typography variant="h7"> Boleta</Typography>
@@ -794,7 +813,7 @@ const BoxGestionCaja = () => {
                       },
                     }}
                     
-                    onClick={handleOpenDialog}
+                    onClick={handleOpenFacturaDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
                     <Typography variant="h7">Factura</Typography>
@@ -945,10 +964,27 @@ const BoxGestionCaja = () => {
       </Dialog>
       <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
         <DialogContent onClose={handleCloseDeudasDialog}>
-          <BoxCtaCorriente />
+          <BoxCtaCorriente onClose={handleCloseDeudasDialog}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openBoletaDialog} onClose={handleCloseBoletaDialog}>
+        <DialogContent onClose={handleCloseBoletaDialog}>
+          <BoxBoleta onClose={handleCloseBoletaDialog}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseBoletaDialog}>Cerrar</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openFacturaDialog} onClose={handleCloseFacturaDialog}>
+        <DialogContent onClose={handleCloseFacturaDialog}>
+          <Boxfactura onClose={handleCloseFacturaDialog}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFacturaDialog}>Cerrar</Button>
         </DialogActions>
       </Dialog>
     </Paper>

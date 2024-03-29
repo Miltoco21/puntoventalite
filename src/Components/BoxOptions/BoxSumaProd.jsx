@@ -142,13 +142,11 @@ const BoxSumaProd = ({ venta }) => {
     if (searchTerm.trim() !== "") {
       fetchProducts();
     } else {
-      setProducts([]); // Si el término de búsqueda está vacío, limpiar la lista de productos
+      setProducts(0); // Si el término de búsqueda está vacío, limpiar la lista de productos
     }
   }, [searchTerm]);
 
-  useEffect(() => {
-    console.log("inputRef.current:", inputRef.current);
-  }, [inputRef]);
+ 
 
   const handleAddProductToSales = (product) => {
     if (product) {
@@ -327,6 +325,15 @@ const BoxSumaProd = ({ venta }) => {
               </TableCell>
             </TableRow>
           ))}
+           {products.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={1}>
+                <Typography variant="body4" color="error">
+                  Descripción o producto no encontrado...
+                </Typography>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

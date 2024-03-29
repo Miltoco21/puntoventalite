@@ -55,7 +55,7 @@ const BoxVendedor = () => {
             marginBottom: "20px",
             padding: "20px",
           }}
-          variant="outlined"
+        
         >
           <Grid container item xs={12} lg={12} spacing={2} alignItems="center">
             <Grid item xs={6} md={6} lg={6}>
@@ -121,7 +121,7 @@ const BoxVendedor = () => {
                     color: "blue", // Color del label editable
                   },
                 }}
-                fullWidth
+                
                 label={
                   <span>
                     Código: <span style={{ color: "blue" }}>{vend.codigo}</span>
@@ -139,7 +139,7 @@ const BoxVendedor = () => {
                     color: "blue", // Color del label editable
                   },
                 }}
-                fullWidth
+             
                 label={
                   <span>
                     Caja: <span style={{ color: "blue" }}>{vend.codigo}</span>
@@ -158,7 +158,7 @@ const BoxVendedor = () => {
                     color: "blue", // Color del label editable
                   },
                 }}
-                fullWidth
+             
                 label={
                   <span>
                     Última Boleta:{" "}

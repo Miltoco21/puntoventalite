@@ -46,12 +46,11 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const IngresoClientes = () => {
-
+const IngresoClientes = ({onClose}) => {
   const validarRutChileno = (rut) => {
     // Expresión regular para validar RUT chileno
     const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
-    
+
     // Comprobar si el RUT cumple con el formato
     return rutRegex.test(rut);
   };
@@ -68,40 +67,40 @@ const IngresoClientes = () => {
     giro: "",
     urlPagina: "",
     formaPago: "",
-    razonSocial:"",
+    razonSocial: "",
     usaCuentaCorriente: 0,
     // fechaIngreso: new Date().toISOString(),
     // fechaUltAct: new Date().toISOString(),
     // bajaLogica: true,
-    clientesSucursalAdd: [
-      {
-        rutResponsable: "",
-        nombreResponsable: "",
-        apellidoResponsable: "",
-        direccion: "",
-        telefono: "",
-        region: "",
-        comuna: "",
-        correo: "",
-        giro: "",
-        urlPagina: "",
-        formaPago: "",
-        razonSocial:"",
-        usaCuentaCorriente: 0,
-        // fechaIngreso: new Date().toISOString(),
-        // fechaUltAct: new Date().toISOString(),
-        // bajaLogica: true,
-      },
-    ],
+    // clientesSucursalAdd: [
+    //   {
+    //     rutResponsable: "",
+    //     nombreResponsable: "",
+    //     apellidoResponsable: "",
+    //     direccion: "",
+    //     telefono: "",
+    //     region: "",
+    //     comuna: "",
+    //     correo: "",
+    //     giro: "",
+    //     urlPagina: "",
+    //     formaPago: "",
+    //     razonSocial: "",
+    //     usaCuentaCorriente: 0,
+    //     // fechaIngreso: new Date().toISOString(),
+    //     // fechaUltAct: new Date().toISOString(),
+    //     // bajaLogica: true,
+    //   },
+    // ],
   });
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [selectedRegion, setSelectedRegion] = useState(null);
-  const [selectedComuna, setSelectedComuna] = useState(null);
-  const [selectedSucursalRegion, setSelectedSucursalRegion] = useState(null);
-  const [selectedSucursalComuna, setSelectedSucursalComuna] = useState(null);
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedComuna, setSelectedComuna] = useState("");
+  const [selectedSucursalRegion, setSelectedSucursalRegion] = useState("");
+  const [selectedSucursalComuna, setSelectedSucursalComuna] = useState("");
 
   const [regionOptions, setRegionOptions] = useState([]);
   const [comunaOptions, setComunaOptions] = useState([]);
@@ -114,17 +113,13 @@ const IngresoClientes = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
   const [busqueda, setBusqueda] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
-  
 
   const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
-
- 
-
 
   const [branchData, setBranchData] = useState({
     codigoCliente: 0,
@@ -139,7 +134,7 @@ const IngresoClientes = () => {
     giro: "",
     urlPagina: "",
     formaPago: "",
-    razonSocial:"",
+    razonSocial: "",
     usaCuentaCorriente: 0,
     // Add other branch data fields
   });
@@ -190,7 +185,7 @@ const IngresoClientes = () => {
         comuna: branchData.comuna,
         correo: branchData.correo,
         giro: branchData.giro,
-        razonSocial:branchData.razonSocial,
+        razonSocial: branchData.razonSocial,
         urlPagina: branchData.urlPagina,
         formaPago: branchData.formaPago,
         usaCuentaCorriente: branchData.usaCuentaCorriente,
@@ -247,12 +242,7 @@ const IngresoClientes = () => {
 
   //////////fin suursalcleinte///////////
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setOpenSnackbar(false);
-  };
+
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -323,6 +313,9 @@ const IngresoClientes = () => {
     fetchSucursalComunas();
   }, [selectedSucursalRegion]);
 
+  
+ 
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
@@ -330,36 +323,40 @@ const IngresoClientes = () => {
       [name]: value,
     }));
   };
-
   const handleSubmit = async () => {
-    if (!validarRutChileno(formData.rut)) {
-      setErrorMessage("Por favor ingresa un RUT válido.");
-      return;
-    }
-
-
-    
-
-    const emptyFields = Object.entries(formData).filter(([key, value]) => value === "").map(([key]) => key);
-
-    if (emptyFields.length > 0) {
-      const emptyField = emptyFields[0]; // Tomamos el primer campo vacío
-      setErrorMessage(`El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`);
-      return;
-    } else {
-      setErrorMessage("");
-    }
-  
-    const formDataToSend = {
-      ...formData,
-      // rut:rut,//////
-      region: String(formData.region),
-      comuna: String(formData.comuna),
-    };
-    console.log("Form Data before submission:", formDataToSend);
-
     try {
+      if (!validarRutChileno(formData.rut)) {
+        setErrorMessage("Por favor ingresa un RUT válido.");
+        return;
+      }
+
+      const emptyFields = Object.entries(formData)
+        .filter(([key, value]) => value === "")
+        .map(([key]) => key);
+
+      if (emptyFields.length > 0) {
+        const emptyField = emptyFields[0];
+        setErrorMessage(
+          `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setErrorMessage("");
+      }
+
+      const formDataToSend = {
+        ...formData,
+        rut: String(formData.rut),
+        region: String(formData.region),
+        comuna: String(formData.comuna),
+      };
+      console.log("Form Data antes de submit:", formDataToSend);
+
       const response = await axios.post(apiUrl, formDataToSend);
+      console.log(
+        "Propiedad 'cliente' en la respuesta:",
+        response.data.cliente
+      );
       if (response.status === 200) {
         const responseData = response.data;
         console.log("Form Data after submission:", responseData);
@@ -367,6 +364,11 @@ const IngresoClientes = () => {
         if (responseData) {
           setSnackbarMessage(responseData.descripcion);
           setOpenSnackbar(true);
+          setTimeout(() => {
+            
+            onClose(); ////Cierre Modal al finalizar
+          }, 3000);
+          
         } else {
           setSnackbarMessage("Error en la operación");
           setOpenSnackbar(true);
@@ -376,11 +378,63 @@ const IngresoClientes = () => {
         setOpenSnackbar(true);
       }
     } catch (error) {
-      console.error("API Request Error:", error);
+      console.error("Error en la solicitud:", error);
       setSnackbarMessage("Error en la operación");
       setOpenSnackbar(true);
     }
   };
+
+  // const handleSubmit = async () => {
+  //   if (!validarRutChileno(formData.rut)) {
+  //     setErrorMessage("Por favor ingresa un RUT válido.");
+  //     return;
+  //   }
+
+  //   const emptyFields = Object.entries(formData)
+  //     .filter(([key, value]) => value === "")
+  //     .map(([key]) => key);
+
+  //   if (emptyFields.length > 0) {
+  //     const emptyField = emptyFields[0]; // Tomamos el primer campo vacío
+  //     setErrorMessage(
+  //       `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+  //     );
+  //     return;
+  //   } else {
+  //     setErrorMessage("");
+  //   }
+
+  //   const formDataToSend = {
+  //     ...formData,
+  //     rut: String(formData.rut),
+  //     region: String(formData.region),
+  //     comuna: String(formData.comuna),
+  //   };
+  //   console.log("Form Data before submission:", formDataToSend);
+
+  //   try {
+  //     const response = await axios.post(apiUrl, formDataToSend);
+  //     if (response.status === 200) {
+  //       const responseData = response.data;
+  //       console.log("Form Data after submission:", responseData);
+
+  //       if (responseData) {
+  //         setSnackbarMessage(responseData.descripcion);
+  //         setOpenSnackbar(true);
+  //       } else {
+  //         setSnackbarMessage("Error en la operación");
+  //         setOpenSnackbar(true);
+  //       }
+  //     } else {
+  //       setSnackbarMessage("Error en la operación");
+  //       setOpenSnackbar(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("API Request Error:", error);
+  //     setSnackbarMessage("Error en la operación");
+  //     setOpenSnackbar(true);
+  //   }
+  // };
 
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -416,7 +470,6 @@ const IngresoClientes = () => {
     setShowDetails(!showDetails);
   };
 
-
   const handleToggleResults = () => {
     setShowResults(!showResults);
   };
@@ -424,12 +477,10 @@ const IngresoClientes = () => {
   ///Manejo de toglesursal////////
   const [showBranchDetails, setShowBranchDetails] = useState({});
 
-
-
   const toggleBranchDetails = (customerId) => {
     setShowBranchDetails((prevState) => ({
       ...prevState,
-      [customerId]: !prevState[customerId] // Invierte el estado anterior
+      [customerId]: !prevState[customerId], // Invierte el estado anterior
     }));
   };
   return (
@@ -458,7 +509,7 @@ const IngresoClientes = () => {
             lg={8}
             spacing={2}
           >
-            {errorMessage && <p style={{ color: "red" }}>hol {errorMessage}</p>}
+            {errorMessage && <p style={{ color: "red" }}> {errorMessage}</p>}
             <Grid item xs={12} sm={6} md={6}>
               <TextField
                 label="Rut"
@@ -576,7 +627,7 @@ const IngresoClientes = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Girooooo"
+                label="Giro"
                 name="giro"
                 fullWidth
                 value={formData.giro}
@@ -601,14 +652,14 @@ const IngresoClientes = () => {
                 onChange={handleInputChange}
               />
             </Grid>
-            <Grid  item xs={12} sm={6}>
-            <TextField
-                    margin="dense"
-                    label="Razón Social"
-                    name="razonSocial"
-                    value={formData.razonSocial}
-                    onChange={handleInputChange}
-                  />
+            <Grid item xs={12} sm={6}>
+              <TextField
+                margin="dense"
+                label="Razón Social"
+                name="razonSocial"
+                value={formData.razonSocial}
+                onChange={handleInputChange}
+              />
             </Grid>
 
             <Grid item sx={{ marginBottom: "10px" }} xs={12}>
@@ -620,16 +671,6 @@ const IngresoClientes = () => {
                 Enviar
               </Button>
             </Grid>
-
-            <Snackbar
-              open={openSnackbar}
-              autoHideDuration={6000}
-              onClose={handleSnackbarClose}
-            >
-              <Alert onClose={handleSnackbarClose} severity="success">
-                {snackbarMessage}
-              </Alert>
-            </Snackbar>
           </Grid>
         )}
 
@@ -645,7 +686,6 @@ const IngresoClientes = () => {
             xl={12}
             spacing={2}
           >
-            
             <Grid item xs={12} sm={6} md={12} lg={12}>
               <Paper>
                 <Grid
@@ -711,16 +751,18 @@ const IngresoClientes = () => {
                                 Agregar Sucursal
                               </Button>
                               <Button
-                  size="small"
-                  color="primary"
-                  variant="contained"
-                  onClick={() => handleShowBranch(customer.codigoCliente)}
-                >
-                  {/* Cambiar el texto del botón según si se están mostrando o no los detalles */}
-                  {showBranchDetails[customer.codigoCliente]
-                    ? "Ocultar Sucursal"
-                    : "Mostrar Sucursal"}
-                </Button>
+                                size="small"
+                                color="primary"
+                                variant="contained"
+                                onClick={() =>
+                                  handleShowBranch(customer.codigoCliente)
+                                }
+                              >
+                                {/* Cambiar el texto del botón según si se están mostrando o no los detalles */}
+                                {showBranchDetails[customer.codigoCliente]
+                                  ? "Ocultar Sucursal"
+                                  : "Mostrar Sucursal"}
+                              </Button>
                             </CardActions>
                             {selectedBranchData[customer.codigoCliente] &&
                               selectedBranchData[customer.codigoCliente].map(
@@ -733,11 +775,10 @@ const IngresoClientes = () => {
                                       <Typography variant="h6" component="h2">
                                         Sucursal : {index + 1}
                                       </Typography>
-                                      
+
                                       {/* Agregar otros campos según sea necesario */}
                                     </CardContent>
                                     <CardActions>
-                                      
                                       <Button
                                         size="small"
                                         color="primary"
@@ -752,17 +793,26 @@ const IngresoClientes = () => {
                                     </CardActions>
                                     {showDetails && (
                                       <CardContent>
-                                      <Typography variant="body1" component="p">
-                                        Responsable:{" "}
-                                        {sucursal.nombreResponsable}
-                                      </Typography>
-                                      <Typography variant="body1" component="p">
-                                        Apellido Responsable:{" "}
-                                        {sucursal.apellidoResponsable}
-                                      </Typography>
-                                      <Typography variant="body1" component="p">
-                                        Dirección: {sucursal.direccion}
-                                      </Typography>
+                                        <Typography
+                                          variant="body1"
+                                          component="p"
+                                        >
+                                          Responsable:{" "}
+                                          {sucursal.nombreResponsable}
+                                        </Typography>
+                                        <Typography
+                                          variant="body1"
+                                          component="p"
+                                        >
+                                          Apellido Responsable:{" "}
+                                          {sucursal.apellidoResponsable}
+                                        </Typography>
+                                        <Typography
+                                          variant="body1"
+                                          component="p"
+                                        >
+                                          Dirección: {sucursal.direccion}
+                                        </Typography>
                                         {/* Otros detalles específicos de la sucursal */}
                                       </CardContent>
                                     )}
@@ -900,7 +950,6 @@ const IngresoClientes = () => {
                     value={branchData.formaPago}
                     onChange={handleBranchDataChange}
                   />
-                   
 
                   {/* Add other form fields based on your branch data */}
                 </DialogContent>
@@ -922,6 +971,13 @@ const IngresoClientes = () => {
             {/* Aquí mostrar sucursales seleccionadas */}
           </Grid>
         )}
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          // onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+        />
       </Grid>
     </Paper>
   );
