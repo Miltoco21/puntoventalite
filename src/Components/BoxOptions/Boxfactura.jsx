@@ -5,15 +5,18 @@ import {
   Grid,
   Stack,
   Typography,
+  Snackbar,
   TextField,
   Button,
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
-const Boxfactura = () => {
+const Boxfactura = ({onClose}) => {
   const {
     userData,
     ventaData,
+    grandTotal,
+    clearSalesData,
     salesData,
     setVentaData,
     searchResults,
@@ -23,19 +26,23 @@ const Boxfactura = () => {
 
   const [montoPagado, setMontoPagado] = useState(0);
   const [metodoPago, setMetodoPago] = useState("");
+  const [error, setError] = useState(null);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   console.log("salesData:", salesData);
   console.log("searchResults FACTURA:", searchResults);
-  const [clienteDatosFactura, setClienteDatosFactura] = useState({
-    rut: searchResults[0].rutResponsable,
-    razonSocial: searchResults[0].razonSocial,
-    nombre: searchResults[0].nombreResponsable,
-    apellido: searchResults[0].apellidoResponsable,
-    direccion: searchResults[0].direccion,
-    region: searchResults[0].region,
-    comuna: searchResults[0].comuna,
-    giro: searchResults[0].giro,
-  });
+  // const [clienteDatosFactura, setClienteDatosFactura] = useState({
+  //   rut: searchResults[0].rutResponsable,
+  //   razonSocial: searchResults[0].razonSocial,
+  //   nombre: searchResults[0].nombreResponsable,
+  //   apellido: searchResults[0].apellidoResponsable,
+  //   direccion: searchResults[0].direccion,
+  //   region: searchResults[0].region,
+  //   comuna: searchResults[0].comuna,
+  //   giro: searchResults[0].giro,
+  // });
 
 
   useEffect(() => {
@@ -48,13 +55,18 @@ const Boxfactura = () => {
     setMontoPagado(totalVenta);
   }, [salesData]);
 
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
+
   const handlePagoFactura = async () => {
+    
     try {
       const pagoFactura = {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: selectedCodigoClienteSucursal,
         codigoCliente: selectedCodigoCliente,
-        total: montoPagado,
+        total: grandTotal,
         products: salesData.map((producto) => ({
           codProducto: producto.idProducto,
           cantidad: producto.quantity,
@@ -62,30 +74,58 @@ const Boxfactura = () => {
           descripcion: producto.descripcion,
         })),
         metodoPago: metodoPago,
-        clienteDatosFactura: clienteDatosFactura,
+        clienteDatosFactura: {
+          rut: searchResults[0].rutResponsable,
+          razonSocial: searchResults[0].razonSocial,
+          nombre: searchResults[0].nombreResponsable,
+          apellido: searchResults[0].apellidoResponsable,
+          direccion: searchResults[0].direccion,
+          region: searchResults[0].region,
+          comuna: searchResults[0].comuna,
+          giro: searchResults[0].giro,
+        }
       };
 
-      console.log("Datos antes de enviar la solicitud:", pagoFactura);
+      console.log("Datos Factura antes de enviar la solicitud:", pagoFactura);
 
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/GestionDTE/GenerarFacturaDTE",
         pagoFactura
       );
+      if (response.status === 200) {
+        setSnackbarMessage("Factura guardada exitosamente");
+        setSnackbarOpen(true);
+        setTimeout(() => {
+         
+          onClose(); ////Cierre Modal al finalizar
+        }, 2000);
+        clearSalesData();
+        
+      }
+      
 
       console.log("Datos después de enviar la solicitud:", response.data);
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
+      setSnackbarMessage("Error en el proceso");
     }
   };
   return (
     <Grid item xs={12}>
       <Typography variant="h5">Pagar Factura</Typography>
       <Stack spacing={2}>
+      {error && (
+        <Grid item xs={12}>
+          <Typography variant="body1" color="error">
+            {error}
+          </Typography>
+        </Grid>
+      )}
         <TextField
           margin="dense"
           label="Monto a Pagar"
           variant="outlined"
-          value={montoPagado}
+          value={grandTotal}
           onChange={(e) => setMontoPagado(e.target.value)}
           fullWidth
           inputProps={{
@@ -138,6 +178,12 @@ const Boxfactura = () => {
           Pagar
         </Button>
       </Stack>
+      <Snackbar
+        open={snackbarOpen}
+        
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </Grid>
   );
 };

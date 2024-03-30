@@ -22,6 +22,7 @@ const BoxPagoTicket = ({onCloseTicket}) => {
   const {
     grandTotal,
     userData,
+    setSearchResults,
     setSalesData,
     salesData,
     addToSalesData,
@@ -48,6 +49,10 @@ const BoxPagoTicket = ({onCloseTicket}) => {
   };
 
   const handleGenerarTicket = async () => {
+    if (grandTotal === 0) {
+      setError("No se puede generar el ticket de pago porque el total a pagar es cero.");
+      return;
+    }
     const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
     const codigoCliente = searchResults[0].codigoCliente;
     try {
@@ -75,6 +80,7 @@ const BoxPagoTicket = ({onCloseTicket}) => {
       if (response.status === 200) {
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
+        setSearchResults([]);
         clearSalesData();
         
         // Esperar 4 segundos antes de cerrar el modal
@@ -95,6 +101,7 @@ const BoxPagoTicket = ({onCloseTicket}) => {
       <Grid item xs={12}>
         <Typography variant="h4">Pago de Ticket</Typography>
       </Grid>
+      
       <Grid item xs={12} sm={6} md={6} lg={6}>
         <TextField
           margin="dense"

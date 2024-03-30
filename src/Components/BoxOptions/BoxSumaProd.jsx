@@ -155,45 +155,7 @@ const BoxSumaProd = ({ venta }) => {
     }
   };
 
-  // const handleDescripcionSearchButtonClick = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
-  //     );
-  //     console.log("Respuesta de la API:", response.data);
-
-  //     console.log("Cantidad registros:", response.data.cantidadRegistros);
-  //     if (response.data.cantidadRegistros > 0) {
-  //       const productoEncontrado = response.data.productos;
-  //        // Agregar el producto con cantidad 1
-  //       setProductByCodigo(productoEncontrado); // Actualizar el estado con el producto encontrado
-  //     } else {
-  //       console.log("Producto no encontrado.");
-  //       setProductByCodigo(null); // Limpiar el estado si no se encontró ningún producto
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al buscar el producto por descripción:", error);
-  //     // Manejar el error, mostrar un mensaje al usuario, etc.
-  //   }
-  // };
-
-  // const handleSearchButtonClick = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
-  //     );
-  //     console.log("Respuesta de la API:", response.data);
-
-  //     console.log("CAntidad registros:", response.data.cantidadRegistros);
-  //     if (response.data.cantidadRegistros)
-  //       setProductByCodigo(response.data.productos[0]);
-  //     console.log("productByCodigo:", productByCodigo);
-  //     // Corrección aquí
-  //   } catch (error) {
-  //     console.error("Error al buscar el producto:", error);
-  //     // Manejar el error, mostrar un mensaje al usuario, etc.
-  //   }
-  // };
+ 
 
   const handlePesoSubmit = (pesoValue) => {
     setPeso(pesoValue);
@@ -306,7 +268,7 @@ const BoxSumaProd = ({ venta }) => {
           
         </TableHead>
         <TableBody style={{ maxHeight: "200px", overflowY: "auto" }}>
-          {products.length > 0 && products.map((product) => (
+          {searchTerm.trim() !== "" && products.length > 0 && products.map((product) => (
             <TableRow key={product.id} sx={{ height: "15%" }}>
               <TableCell>{product.nombre}</TableCell>
               <TableCell>{product.precio}</TableCell>
@@ -314,7 +276,7 @@ const BoxSumaProd = ({ venta }) => {
                 <Button
                  onClick={() => {
                   addToSalesData(product);
-                  setProducts(0); // Cerrar la búsqueda después de agregar el producto
+                  setProducts([]); // Cerrar la búsqueda después de agregar el producto
                 }}
   
                   variant="contained"
@@ -325,6 +287,7 @@ const BoxSumaProd = ({ venta }) => {
               </TableCell>
             </TableRow>
           ))}
+          
            {products.length === 0 && (
             <TableRow>
               <TableCell colSpan={1}>

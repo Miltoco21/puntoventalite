@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Paper,
   Grid,
@@ -20,13 +19,25 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import { Settings } from "@mui/icons-material";
-
+import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
+import { useNavigate } from "react-router-dom";
 const NavBar = () => {
+  const {
+    userData,
+    setUserData,
+    ventaData,
+    salesData,
+    setVentaData,
+    searchResults,
+    selectedCodigoCliente,
+    selectedCodigoClienteSucursal,
+    clearSessionData 
+  } = useContext(SelectedOptionsContext);
   const [dateTime, setDateTime] = useState(new Date());
   const [anchorEl, setAnchorEl] = useState(null);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const [isEstablishmentVisible, setIsEstablishmentVisible] = useState(true);
-
+  const navigate = useNavigate();
   useEffect(() => {
     // Update the date and time every second (1000 milliseconds)
     const intervalId = setInterval(() => {
@@ -36,6 +47,8 @@ const NavBar = () => {
     // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, []);
+
+
 
   const formattedDate = dateTime.toLocaleDateString();
   const formattedTime = dateTime.toLocaleTimeString();
@@ -49,15 +62,16 @@ const NavBar = () => {
   };
 
   const handleLogout = () => {
-    // Implement your logout logic here
-    // For example, you can clear user session and redirect to the login page
-    console.log("Logging out...");
-    // Replace the following line with your actual logout logic
-    // logout();
-  };
+    
+    // Clear userData from localStorage
+    localStorage.removeItem("userData");
+    // Clear userData from context
+    clearSessionData();
+    
 
-  const handleEstablishmentToggle = (event, newValue) => {
-    setIsEstablishmentVisible(newValue === "show");
+    // Close the logout dialog
+    
+    navigate("/login");
   };
 
   return (
@@ -81,10 +95,7 @@ const NavBar = () => {
                 backgroundColor: "white",
                 width: "90%",
               }}
-            >
-              {" "}
-              ESTABLECIMIENTO
-            </Chip>
+            ></Chip>
           </Grid>
           <Grid item xs={2} sm={2} md={1}>
             <IconButton onClick={handleMenuOpen} style={{ padding: "8px" }}>
@@ -98,12 +109,10 @@ const NavBar = () => {
               <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
                 Cerrar sesión
               </MenuItem>
-              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
+              {/* <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
                 Configuración
-              </MenuItem>
-              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
-                Más
-              </MenuItem>
+              </MenuItem> */}
+              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>Más</MenuItem>
             </Menu>
           </Grid>
         </Grid>
@@ -147,18 +156,18 @@ const NavBar = () => {
         open={isLogoutDialogOpen}
         onClose={() => setIsLogoutDialogOpen(false)}
       >
-        <DialogTitle>Logout</DialogTitle>
+        <DialogTitle>Cerrar Sesión</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to logout?
+           Deseas cerrar sesión?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsLogoutDialogOpen(false)} color="primary">
-            Cancel
+            Cancelar
           </Button>
           <Button onClick={handleLogout} color="primary">
-            Logout
+            Confirmar
           </Button>
         </DialogActions>
       </Dialog>

@@ -117,6 +117,7 @@ const IngresoClientes = ({onClose}) => {
   const [busqueda, setBusqueda] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
 
+
   const [errorMessage, setErrorMessage] = useState("");
 
   const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
@@ -362,7 +363,7 @@ const IngresoClientes = ({onClose}) => {
         console.log("Form Data after submission:", responseData);
 
         if (responseData) {
-          setSnackbarMessage(responseData.descripcion);
+          setSnackbarMessage("Cliente generado exitosamente");
           setOpenSnackbar(true);
           setTimeout(() => {
             

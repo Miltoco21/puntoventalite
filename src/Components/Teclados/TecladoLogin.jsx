@@ -7,8 +7,10 @@ import {
   Box,
   Grid,
   CircularProgress,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
-
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
@@ -16,6 +18,7 @@ import axios from "axios";
 const Login = () => {
   const [rutOrCode, setRutOrCode] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // 
   const [error, setError] = useState(null);
   const [activeInput, setActiveInput] = useState("rutOrCode");
   const [loading, setLoading] = useState(false);
@@ -23,6 +26,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { updateUserData } = useContext(SelectedOptionsContext);
+  const saveSessionData = (userData) => {
+    localStorage.setItem('userData', JSON.stringify(userData));
+  };
 
   const handleLogin = async () => {
     try {
@@ -79,6 +85,10 @@ const Login = () => {
       setLoading(false); // Asegúrate de que setLoading se restablezca incluso si hay un error
     }
   };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword); // Alternar entre mostrar y ocultar la contraseña
+  };
   const handleNumberClick = (number) => {
     if (activeInput === "rutOrCode") {
       setRutOrCode((prevRutOrCode) => prevRutOrCode + number);
@@ -129,22 +139,30 @@ const Login = () => {
             onFocus={() => setActiveInput("rutOrCode")}
             onChange={(e) => setRutOrCode(e.target.value)}
             inputProps={{
-              inputMode: "text", // Establece el modo de entrada como numérico
-              pattern: "[0-9 -]*" // Asegura que solo se puedan ingresar números
+              inputMode: "decimal", // Establece el modo de entrada como numérico
+              pattern: "[0-9]*" // Asegura que solo se puedan ingresar números
             }}
           />
-          <TextField
+         <TextField
             margin="normal"
             required
             fullWidth
             label="Clave"
-            type="password"
+            type={showPassword ? "text" : "password"} // Cambia dinámicamente el tipo del campo de contraseña
             value={password}
             onFocus={() => setActiveInput("password")}
             onChange={(e) => setPassword(e.target.value)}
-            inputProps={{
-              inputMode: "numeric", // Establece el modo de entrada como numérico
-              pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+            InputProps={{ // Componente de entrada personalizada para agregar el botón de visualización de contraseña
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={handleTogglePasswordVisibility}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
             }}
           />
 

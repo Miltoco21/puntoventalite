@@ -40,6 +40,7 @@ export const SelectedOptionsProvider = ({ children }) => {
   const updateUserData = (data) => {
     setUserData(data);
   };
+  
 
   const calculateTotalPrice = (quantity, price) => {
     return quantity * price;
@@ -84,34 +85,11 @@ export const SelectedOptionsProvider = ({ children }) => {
   };
 
   //////LOGIN//////
-  const handleLogin = async () => {
-    try {
-      // Lógica de inicio de sesión
-
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Usuarios/LoginUsuario",
-        {
-          codigoUsuario: 0,
-          rut: rutOrCode,
-          clave: password,
-        }
-      );
-      console.log("Respuesta del servidor:", response.data);
-
-      if (response.responseUsuario) {
-        // Almacena los datos del usuario en el estado
-        setUserData(response.responseUsuario);
-
-        // Resto del código para el inicio de sesión exitoso
-      } else {
-        setError("Error de inicio de sesión. Verifica tus credencialesBBBBB.");
-      }
-    } catch (error) {
-      setError(
-        "Error de inicio de sesión. Verifica tus credencialesAAAAkkokok."
-      );
-    }
+  const clearSessionData = () => {
+    localStorage.removeItem('userData');
+    // Limpia cualquier otro dato de sesión que puedas tener
   };
+  
 
   const clearSalesData = () => {
     setSalesData([]);
@@ -230,7 +208,7 @@ export const SelectedOptionsProvider = ({ children }) => {
         quantity,
         selectedUser,
         setSelectedUser,
-
+        clearSessionData, 
         calculateTotalPrice,
         description,
         setDescription,

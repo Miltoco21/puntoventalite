@@ -6,23 +6,28 @@ import {
   Stack,
   Typography,
   TextField,
+  Snackbar,
   Button,
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
-const BoxBoleta = () => {
+const BoxBoleta = ({onClose}) => {
   const {
     userData,
     ventaData,
+    grandTotal,
     salesData,
     setVentaData,
     selectedCodigoCliente,
     selectedCodigoClienteSucursal,
+    clearSalesData
   } = useContext(SelectedOptionsContext);
 
   const [montoPagado, setMontoPagado] = useState(0);
   const [metodoPago, setMetodoPago] = useState("");
-
+  const [snackMessage, setSnackMessage] = useState(""); // 2. Nuevo estado para el mensaje del snack
+  const [snackOpen, setSnackOpen] = useState(false); // Estado para controlar la visibilidad del Snackbar
+  const [error, setError] = useState(null);
   console.log("salesData:",salesData)
 
   useEffect(() => {
@@ -33,12 +38,16 @@ const BoxBoleta = () => {
   }, [salesData]);
 
   const handlePagoBoleta = async () => {
+    if (grandTotal === 0) {
+      setError("No se puede generar el ticket de pago porque el total a pagar es cero.");
+      return;
+    }
     try {
       const pagoData = {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: selectedCodigoClienteSucursal,
         codigoCliente: selectedCodigoCliente,
-        total: montoPagado,
+        total: grandTotal,
         products: salesData.map((producto) => ({
           codProducto: producto.idProducto,
           cantidad: producto.quantity,
@@ -48,7 +57,7 @@ const BoxBoleta = () => {
         metodoPago: metodoPago,
       };
 
-      console.log("Datos antes de enviar la solicitud:", pagoData);
+      console.log("Datos Boleta antes de enviar la solicitud:", pagoData);
 
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE",
@@ -56,6 +65,16 @@ const BoxBoleta = () => {
       );
 
       console.log("Datos después de enviar la solicitud:", response.data);
+      if (response.status === 200) {
+        setSnackMessage("Boleta guardada exitosamente");
+        setSnackOpen(true);
+        setTimeout(() => {
+         
+          onClose(); ////Cierre Modal al finalizar
+        }, 2000);
+        clearSalesData();
+        
+      }
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
     }
@@ -65,11 +84,18 @@ const BoxBoleta = () => {
     <Grid item xs={12}>
       <Typography variant="h5">Pagar Boleta</Typography>
       <Stack spacing={2}>
+      {error && (
+        <Grid item xs={12}>
+          <Typography variant="body1" color="error">
+            {error}
+          </Typography>
+        </Grid>
+      )}
         <TextField
         margin="dense"
           label="Monto a Pagar"
           variant="outlined"
-          value={montoPagado}
+          value={grandTotal}
           onChange={(e) => setMontoPagado(e.target.value)}
           fullWidth
           inputProps={{
