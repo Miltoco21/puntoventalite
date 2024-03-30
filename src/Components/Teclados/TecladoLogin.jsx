@@ -164,6 +164,10 @@ const Login = () => {
                 </InputAdornment>
               ),
             }}
+            inputProps={{
+              inputMode: "numeric", // Establece el modo de entrada como numérico
+              pattern: "[0-9]*" // Asegura que solo se puedan ingresar números
+            }}
           />
 
           <Grid container justifyContent="center" spacing={1} sx={{ mt: 2 }}>
