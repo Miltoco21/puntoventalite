@@ -30,7 +30,9 @@ const BoxCtaCorriente = ({onClose}) => {
     userData,
     precioData,
     searchResults,
+    setSearchResults,
     setPrecioData,
+    clearSalesData,
     ventaData,
     setVentaData,
     selectedCodigoCliente,
@@ -326,11 +328,17 @@ const handleTransferenciaModalOpen = () => {
           console.log("Transferencia realizada con éxito");
           setSnackbarMessage(response.data.descripcion);
           setSnackbarOpen(true);
+         
+          setSearchResults([]);
+          
+          clearSalesData(); 
+         
+         
 
           setTimeout(() => {
             
-            handleClosePaymentDialog();
-            handleTransferenciaModalClose();
+            handleClosePaymentDialog(true);
+            handleTransferenciaModalClose(true);
             onClose(); ////Cierre Modal al finalizar
           }, 3000);
 
@@ -651,13 +659,7 @@ const handleTransferenciaModalOpen = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        message={snackbarMessage}
-      />
+     
       <Dialog
         open={openTransferenciaModal}
         onClose={handleTransferenciaModalClose}
@@ -767,6 +769,13 @@ const handleTransferenciaModalOpen = () => {
                 onChange={(e) => setNroOperacion(e.target.value)}
               />
             </Grid>
+            <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={snackbarOpen}
+     
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
           </Grid>
         </DialogContent>
         <DialogActions>
