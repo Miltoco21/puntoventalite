@@ -30,12 +30,14 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import TecladoPLU from "../Teclados/TecladoPLU";
 import TecladoPeso from "../Teclados/TecladoPeso";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
+import { AlignVerticalBottomOutlined } from "@mui/icons-material";
 
 const BoxSumaProd = ({ venta }) => {
   const {
@@ -69,7 +71,7 @@ const BoxSumaProd = ({ venta }) => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-
+  const [errorMessage, setErrorMessage] = useState("");
   const calculateTotalPrice = (quantity, price) => quantity * price;
 
   const handlePluSubmit = (productInfo) => {
@@ -92,38 +94,59 @@ const BoxSumaProd = ({ venta }) => {
         const response = await axios.get(
           `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
         );
-        console.log("Respuesta de la API:", response.data);
+        console.log("Respuesta de la IdBYCODIGO:", response.data);
         console.log("Cantidad registros:", response.data.cantidadRegistros);
         if (response.data.cantidadRegistros > 0) {
           const productoEncontrado = response.data.productos[0];
           addToSalesData(productoEncontrado, quantity);
           setProductByCodigo(productoEncontrado);
-        } else {
+          
+
+        }
+        if (response.data.cantidadRegistros === 0) {
+         
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'El PLU no se encontró!',
+            confirmButtonText: 'Entendido'
+          });
+        
+        }
+        
+        else {
           console.log("Producto no encontrado.");
           setProductByCodigo(null);
+          
         }
       } catch (error) {
         console.error("Error al buscar el producto:", error);
+        setErrorMessage("Error al buscar el producto por PLU");
+
       }
     }
   };
 
   const handleDescripcionSearchButtonClick = async () => {
+
     if (searchTerm.trim() !== "") {
       try {
         const response = await axios.get(
           `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
         );
-        console.log("Respuesta de la API:", response.data);
+        console.log("Respuesta deScrpcion:", response.data);
         console.log("Cantidad registros:", response.data.cantidadRegistros);
         if (response.data.cantidadRegistros > 0) {
           setProducts(response.data.productos);
         } else {
           console.log("Producto no encontrado.");
           setProducts([]);
+          setErrorMessage("Descripción o producto no encontrado");
         }
       } catch (error) {
         console.error("Error al buscar el producto por descripción:", error);
+        setErrorMessage("Error al buscar el producto por descripción");
+
       }
     }
   };
@@ -134,6 +157,7 @@ const BoxSumaProd = ({ venta }) => {
           `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
         );
         setProducts(response.data.productos);
+
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -212,6 +236,7 @@ const BoxSumaProd = ({ venta }) => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                
               </Grid>
               <Button
                 sx={{
@@ -247,6 +272,11 @@ const BoxSumaProd = ({ venta }) => {
                 Peso
               </Button> */}
             </div>
+            {searchTerm.trim() !== ""  && searchTerm.length > 2 &&errorMessage && (
+    <Typography variant="body4" color="error">
+      {errorMessage}
+    </Typography>
+  )}
           </Grid>
         </Paper>
       </Grid>
@@ -264,40 +294,40 @@ const BoxSumaProd = ({ venta }) => {
   >
     <TableContainer component={Paper} style={{ overflowX: "auto",maxHeight: "200px"  }}>
       <Table>
-        <TableHead sx={{ background: "#859398", height: "30%" }}>
-          
+        <TableHead sx={{ background: "white", height: "30%" }}>
+        <TableBody style={{ maxHeight: "100px", overflowY: "auto" }}>
+  {searchTerm.trim() !== "" && products.length > 0 ? (
+    products.map((product) => (
+      <TableRow key={product.id} sx={{ height: "15%" }}>
+        <TableCell>{product.nombre}</TableCell>
+        <TableCell sx={{ width: "21%" }}>Plu:{""}{product.idProducto}</TableCell>
+        <TableCell sx={{ width: "21%" }}>
+          <Button
+            onClick={() => {
+              addToSalesData(product);
+              setProducts([]); // Cerrar la búsqueda después de agregar el producto
+            }}
+            variant="contained"
+            color="secondary"
+          >
+            Agregar
+          </Button>
+        </TableCell>
+      </TableRow>
+    ))
+  ) : searchTerm.trim() !== "" && searchTerm.length < 2 && !isNaN(searchTerm) ? (
+    <TableRow>
+      <TableCell colSpan={1}>
+        <Typography variant="body4" color="error">
+        {errorMessage}
+        </Typography>
+      </TableCell>
+    </TableRow>
+  ) : null}
+</TableBody>
         </TableHead>
-        <TableBody style={{ maxHeight: "200px", overflowY: "auto" }}>
-          {searchTerm.trim() !== "" && products.length > 0 && products.map((product) => (
-            <TableRow key={product.id} sx={{ height: "15%" }}>
-              <TableCell>{product.nombre}</TableCell>
-              <TableCell>{product.precio}</TableCell>
-              <TableCell>
-                <Button
-                 onClick={() => {
-                  addToSalesData(product);
-                  setProducts([]); // Cerrar la búsqueda después de agregar el producto
-                }}
-  
-                  variant="contained"
-                  color="secondary"
-                >
-                  Agregar
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          
-           {products.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={1}>
-                <Typography variant="body4" color="error">
-                  Descripción o producto no encontrado...
-                </Typography>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+      
+
       </Table>
     </TableContainer>
   </Paper>
@@ -380,12 +410,7 @@ const BoxSumaProd = ({ venta }) => {
           </TableContainer>
         </Paper>
       </Grid>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogContent>{/* Componente de TecladoPLU */}</DialogContent>
-      </Dialog>
-      <Dialog open={openPeso} onClose={handleClosePeso}>
-        <DialogContent>{/* Componente de TecladoPeso */}</DialogContent>
-      </Dialog>
+    
     </Paper>
   );
 };

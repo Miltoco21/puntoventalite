@@ -53,6 +53,10 @@ const BoxPagoTicket = ({onCloseTicket}) => {
       setError("No se puede generar el ticket de pago porque el total a pagar es cero.");
       return;
     }
+    if (isNaN(cantidadPagada) || cantidadPagada < 0) {
+      setError("Por favor, ingresa una cantidad pagada válida.");
+      return;
+    }
     const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
     const codigoCliente = searchResults[0].codigoCliente;
     try {
@@ -114,7 +118,7 @@ const BoxPagoTicket = ({onCloseTicket}) => {
         <TextField
           margin="dense"
           fullWidth
-          
+          InputProps={{ readOnly: true }}
           label="Cantidad pagada"
           value={cantidadPagada}
           onChange={(e) => setCantidadPagada(parseFloat(e.target.value))}

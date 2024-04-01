@@ -25,7 +25,7 @@ import {
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
-const BoxCtaCorriente = ({onClose}) => {
+const BoxCtaCorriente = ({ onClose }) => {
   const {
     userData,
     precioData,
@@ -84,7 +84,7 @@ const BoxCtaCorriente = ({onClose}) => {
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
   const [rut, setRut] = useState(""); // Estado para almacenar el rut
   const [nroCuenta, setNroCuenta] = useState(""); // Estado para almacenar el número de cuenta
-  
+
   const [nroOperacion, setNroOperacion] = useState(""); // Estado para almacenar el número de operación
 
   const [selectedDebts, setSelectedDebts] = useState([]);
@@ -146,46 +146,47 @@ const BoxCtaCorriente = ({onClose}) => {
   };
 
   // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
-console.log("selectedDebts justo antes de abrir el diálogo de transferencia:", selectedDebts);
-useEffect(() => {
-  console.log("selectedDebts cambió:", selectedDebts);
-}, [selectedDebts]);
+  console.log(
+    "selectedDebts justo antes de abrir el diálogo de transferencia:",
+    selectedDebts
+  );
+  useEffect(() => {
+    console.log("selectedDebts cambió:", selectedDebts);
+  }, [selectedDebts]);
 
-const handleTransferenciaModalOpen = () => {
-  setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
-  setOpenTransferenciaModal(true);
-  setMontoPagado(getTotalSelected());
-  setTotal(getTotalSelected());
-  
+  const handleTransferenciaModalOpen = () => {
+    setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
+    setOpenTransferenciaModal(true);
+    setMontoPagado(getTotalSelected());
+    setTotal(getTotalSelected());
 
-  // Verificar si ventaData está definido y es un array antes de intentar mapearlo
-  // if (Array.isArray(ventaData)) {
-  //   // Establecer elementos seleccionados aquí
-  //   const updatedVentaData = ventaData.map((item) => {
-  //     // Verificar si item y deuda no son null antes de acceder a sus propiedades
-  //     if (item !== null && deuda !== null) {
-  //       return {
-  //         ...item,
-  //         selected: item.total === deuda.total, // Establecer seleccionado si el total coincide
-  //       };
-  //     } else {
-  //       // Si item o deuda son null, simplemente retornar el item sin cambios
-  //       return item;
-  //     }
-  //   });
-  //   setSelectedDebts(updatedVentaData);
-  //   // const selectedDebts = updatedVentaData.filter((deuda) => deuda.selected);
-  //   // setSelectedDebts(selectedDebts); 
-  //   console.log(selectedDebts);// Actualizar selectedDebts con las deudas seleccionadas
-  // } else {
-  //   // Si ventaData no está definido o no es un array, mostrar un mensaje de advertencia o manejar la situación de acuerdo a tus necesidades
-  //   console.warn("VentaData no está definido o no es un array");
-  //   // Puedes mostrar una alerta, mensaje de consola, o tomar otra acción según lo requieras
-  // }
-};
+    // Verificar si ventaData está definido y es un array antes de intentar mapearlo
+    // if (Array.isArray(ventaData)) {
+    //   // Establecer elementos seleccionados aquí
+    //   const updatedVentaData = ventaData.map((item) => {
+    //     // Verificar si item y deuda no son null antes de acceder a sus propiedades
+    //     if (item !== null && deuda !== null) {
+    //       return {
+    //         ...item,
+    //         selected: item.total === deuda.total, // Establecer seleccionado si el total coincide
+    //       };
+    //     } else {
+    //       // Si item o deuda son null, simplemente retornar el item sin cambios
+    //       return item;
+    //     }
+    //   });
+    //   setSelectedDebts(updatedVentaData);
+    //   // const selectedDebts = updatedVentaData.filter((deuda) => deuda.selected);
+    //   // setSelectedDebts(selectedDebts);
+    //   console.log(selectedDebts);// Actualizar selectedDebts con las deudas seleccionadas
+    // } else {
+    //   // Si ventaData no está definido o no es un array, mostrar un mensaje de advertencia o manejar la situación de acuerdo a tus necesidades
+    //   console.warn("VentaData no está definido o no es un array");
+    //   // Puedes mostrar una alerta, mensaje de consola, o tomar otra acción según lo requieras
+    // }
+  };
 
-// Agrega este console.log para verificar el valor de selectedDebts cada vez que cambie
-
+  // Agrega este console.log para verificar el valor de selectedDebts cada vez que cambie
 
   // const handleTransferenciaModalOpen = (deuda) => {
   //   setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
@@ -290,17 +291,17 @@ const handleTransferenciaModalOpen = () => {
       console.log("Método de pago:", metodoPago);
       console.log("Datos de transferencia:", transferencias);
       console.log("Tipo de selectedDebts:", typeof selectedDebts);
-  
+
       // Convertir selectedDebts en un array de valores
       const selectedDebtsArray = Object.values(selectedDebts);
-  
+
       // Iterar sobre el array selectedDebtsArray
       for (const deuda of selectedDebtsArray) {
         console.log("Deuda seleccionada:");
         console.log("ID de la deuda:", deuda.id);
         console.log("ID de la cabecera:", deuda.idCabecera);
         console.log("Total de la deuda:", deuda.total);
-  
+
         const requestBody = {
           deudaIds: [
             {
@@ -311,49 +312,42 @@ const handleTransferenciaModalOpen = () => {
           ],
           montoPagado: montoPagado,
           metodoPago: metodoPago,
-          idUsuario:userData.codigoUsuario,
+          idUsuario: userData.codigoUsuario,
           transferencias: transferencias,
         };
-  
+
         console.log("Datos de la solicitud antes de enviarla:");
         console.log(requestBody);
-  
+
         // Aquí realizamos la llamada POST para cada deuda
         const response = await axios.post(
           "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
           requestBody
         );
-  
+
         if (response.status === 200) {
           console.log("Transferencia realizada con éxito");
           setSnackbarMessage(response.data.descripcion);
           setSnackbarOpen(true);
-         
+
           setSearchResults([]);
-          
-          clearSalesData(); 
-         
-         
+
+          clearSalesData();
 
           setTimeout(() => {
-            
             handleClosePaymentDialog(true);
             handleTransferenciaModalClose(true);
             onClose(); ////Cierre Modal al finalizar
           }, 3000);
-
-          
         } else {
           console.error("Error al realizar la transferencia");
         }
       }
-  
-     
     } catch (error) {
       console.error("Error al realizar la transferencia:", error);
     }
   };
-  
+
   // const handleTransferData = async (
   //   selectedDebts,
   //   montoPagado,
@@ -482,11 +476,9 @@ const handleTransferenciaModalOpen = () => {
                     <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
                   </Box>
                   <Box sx={{ flex: 1 }}>
-             
                     <Typography variant="body2" sx={{ color: "#696c6f" }}>
                       ID:
-                    
-                   {searchResults[0].rutResponsable}
+                      {searchResults[0].rutResponsable}
                       {/* {precioData.clientesProductoPrecioMostrar[0] &&
                         precioData.clientesProductoPrecioMostrar[0]
                           .codigoCliente}{" "}
@@ -497,7 +489,6 @@ const handleTransferenciaModalOpen = () => {
                           .nombreCliente}{" "}
                     </Typography>
                   </Box>
-             
                 </Box>
               </Paper>
             </Grid>
@@ -553,6 +544,14 @@ const handleTransferenciaModalOpen = () => {
                   </TableRow>
                 ))}
               </TableBody>
+
+              <TableRow >
+              <TableCell colSpan={3} align="right">
+                <Typography> Total Deuda : ${totalDeuda}</Typography>
+              </TableCell>
+                
+              </TableRow>
+
               <TableRow>
                 <TableCell colSpan={3} align="right">
                   <Button
@@ -565,12 +564,6 @@ const handleTransferenciaModalOpen = () => {
                   </Button>
                 </TableCell>
 
-                <TableCell sx={{ height: "200%" }} colSpan={3} align="right">
-                  <Button variant="contained" color="secondary">
-                    Total Deuda ${totalDeuda}
-                  </Button>
-                </TableCell>
-                <TableCell></TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </Table>
@@ -583,7 +576,7 @@ const handleTransferenciaModalOpen = () => {
         <DialogContent>
           <Stack spacing={2}>
             <Typography variant="body1">
-              Total a Pagar: ${selectedDeuda ? selectedDeuda.total : ""}
+            Monto a Pagar: 
             </Typography>
 
             <TextField
@@ -592,6 +585,7 @@ const handleTransferenciaModalOpen = () => {
               value={montoPagado}
               onChange={(e) => setMontoPagado(e.target.value)}
               fullWidth
+              InputProps={{ readOnly: true }}
               inputProps={{
                 inputMode: "numeric", // Establece el modo de entrada como numérico
                 pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
@@ -644,7 +638,6 @@ const handleTransferenciaModalOpen = () => {
                     metodoPago === "Transferencia" ? "contained" : "outlined"
                   }
                   onClick={() => handleTransferenciaModalOpen(selectedDebts)}
-                
                 >
                   Transferencia
                 </Button>
@@ -659,7 +652,7 @@ const handleTransferenciaModalOpen = () => {
           </Button>
         </DialogActions>
       </Dialog>
-     
+
       <Dialog
         open={openTransferenciaModal}
         onClose={handleTransferenciaModalClose}
@@ -686,7 +679,6 @@ const handleTransferenciaModalOpen = () => {
             ))}
           </Grid> */}
 
-        
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -770,12 +762,11 @@ const handleTransferenciaModalOpen = () => {
               />
             </Grid>
             <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={snackbarOpen}
-     
-        onClose={handleSnackbarClose}
-        message={snackbarMessage}
-      />
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              open={snackbarOpen}
+              onClose={handleSnackbarClose}
+              message={snackbarMessage}
+            />
           </Grid>
         </DialogContent>
         <DialogActions>

@@ -65,24 +65,80 @@ export const SelectedOptionsProvider = ({ children }) => {
     // Example: Log a message
     console.log("Sales data :", salesData);
   }, [salesData]);
-
-  const addToSalesData = (product, quantity = 1) => {
+  const addToSalesData = (product, quantity) => {
     const precioVenta = product.precioVenta || 0;
+    const cantidad = quantity !== undefined ? quantity : (product.cantidad || 1);
 
-    const newSale = {
-      quantity: quantity, // Cambiar 'cantidad' a 'quantity'
-      descripcion: product.nombre,
-      precio: precioVenta,
-      total: calculateTotalPrice(quantity, precioVenta),
-      idProducto: product.idProducto,
-    };
+    // Busca si el producto ya está en la lista de ventas
+    const existingProductIndex = salesData.findIndex((sale) => sale.idProducto === product.idProducto);
 
-    setSalesData((prevSalesData) => {
-      const updatedSalesData = [...prevSalesData, newSale];
-      return updatedSalesData;
-      setGrandTotal((prevTotal) => prevTotal + newSale.total);
-    });
-  };
+    if (existingProductIndex !== -1) {
+        // Si el producto ya está en la lista, actualiza su cantidad sumando la cantidad adicional
+        const updatedSalesData = [...salesData];
+        updatedSalesData[existingProductIndex].quantity += cantidad;
+        updatedSalesData[existingProductIndex].total = calculateTotalPrice(updatedSalesData[existingProductIndex].quantity, precioVenta);
+
+        // Actualiza el gran total sumando el total del nuevo producto o la cantidad adicional del producto existente
+        setGrandTotal((prevTotal) => prevTotal + (cantidad * precioVenta));
+
+        // Actualiza el estado de salesData con los cambios
+        setSalesData(updatedSalesData);
+    } else {
+        // Si el producto no está en la lista, agrégalo normalmente
+        const newSale = {
+            quantity: cantidad,
+            descripcion: product.nombre,
+            precio: precioVenta,
+            total: calculateTotalPrice(cantidad, precioVenta),
+            idProducto: product.idProducto,
+        };
+
+        setSalesData((prevSalesData) => {
+            const updatedSalesData = [...prevSalesData, newSale];
+            // Actualiza el gran total sumando el total del nuevo producto
+            setGrandTotal((prevTotal) => prevTotal + newSale.total);
+            return updatedSalesData;
+        });
+    }
+};
+
+
+//   const addToSalesData = (product, quantity) => {
+//     const precioVenta = product.precioVenta || 0;
+//     const cantidad = quantity !== undefined ? quantity : (product.cantidad || 1); // Usar la cantidad del producto si está disponible
+
+//     const newSale = {
+//         quantity: cantidad, // Cambiar 'cantidad' a 'quantity'
+//         descripcion: product.nombre,
+//         precio: precioVenta,
+//         total: calculateTotalPrice(cantidad, precioVenta),
+//         idProducto: product.idProducto,
+//     };
+
+//     setSalesData((prevSalesData) => {
+//         const updatedSalesData = [...prevSalesData, newSale];
+//         setGrandTotal((prevTotal) => prevTotal + newSale.total);
+//         return updatedSalesData; // Asegúrate de que el retorno esté fuera de la función de setSalesData
+//     });
+// };
+
+  // const addToSalesData = (product, quantity=1 ) => {
+  //   const precioVenta = product.precioVenta || 0;
+
+  //   const newSale = {
+  //     quantity:quantity, // Cambiar 'cantidad' a 'quantity'
+  //     descripcion: product.nombre,
+  //     precio: precioVenta,
+  //     total: calculateTotalPrice(quantity, precioVenta),
+  //     idProducto: product.idProducto,
+  //   };
+
+  //   setSalesData((prevSalesData) => {
+  //     const updatedSalesData = [...prevSalesData, newSale];
+  //     return updatedSalesData;
+  //     setGrandTotal((prevTotal) => prevTotal + newSale.total);
+  //   });
+  // };
 
   //////LOGIN//////
   const clearSessionData = () => {
