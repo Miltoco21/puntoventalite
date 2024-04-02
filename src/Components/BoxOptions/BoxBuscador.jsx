@@ -52,9 +52,10 @@ const BoxBuscador = (handleClosePreciosClientes) => {
 
   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
 
-  const [selectedChipIndex, setSelectedChipIndex] = useState(null);
-  const [showPreciosClientes, setShowPreciosClientes] = useState(false);
-  const [showCtaCorriente, setShowCtaCorriente] = useState(false);
+  const [selectedChipIndex, setSelectedChipIndex] = useState([]);
+  
+
+ console.log("selectedUser:",selectedUser);
 
 
   useEffect(() => {
@@ -65,26 +66,30 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     }
   }, [searchText, searchResults]);
 
+  useEffect(() => {
+    if (searchResults.length===0) {
+      // Si no hay usuario seleccionado, limpiar los datos relacionados
+      clearSalesData();
+      setSelectedChipIndex([]);
+      setSelectedUser([]);
+       // Limpiar el índice del chip seleccionado
+    }
+  }, [selectedUser]);
+
   const handleChipClick = (index, result) => {
-    // Verificar si el usuario seleccionado es el mismo que el usuario actualmente seleccionado
     if (
-      selectedUser !== null &&
+      selectedUser &&
       selectedUser.codigoCliente === result.codigoCliente &&
       selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
     ) {
-      // Si es el mismo usuario, limpiar los datos de la venta
       clearSalesData();
-      // Desseleccionar el usuario estableciendo selectedUser a null
       setSelectedUser(null);
-      // Establecer el índice del chip seleccionado a null
-      setSelectedChipIndex(null);
-      setSearchResults("")
-      
+      setSelectedChipIndex([]);
+      setSearchResults([]);
+      setSelectedCodigoCliente(0);
     } else {
-      // Si es un usuario diferente, realizar las acciones normales de selección
-      setSelectedUser(result); // Establecer el usuario seleccionado
-      setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
-      // Llamar a las funciones asociadas al clic en el chip seleccionado
+      setSelectedUser(result);
+      setSelectedChipIndex(index);
       handleUltimaCompraCliente(
         result.codigoCliente,
         result.codigoClienteSucursal
@@ -93,7 +98,6 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-    
       handleOpenDeudasClientesDialog(
         result.codigoCliente,
         result.codigoClienteSucursal
@@ -101,6 +105,42 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       clearSalesData();
     }
   };
+  // const handleChipClick = (index, result) => {
+  //   // Verificar si el usuario seleccionado es el mismo que el usuario actualmente seleccionado
+  //   if (
+  //     selectedUser !== null &&
+  //     selectedUser.codigoCliente === result.codigoCliente &&
+  //     selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
+  //   ) {
+  //     // Si es el mismo usuario, limpiar los datos de la venta
+  //     clearSalesData();
+  //     // Desseleccionar el usuario estableciendo selectedUser a null
+  //     setSelectedUser([]);
+  //     // Establecer el índice del chip seleccionado a null
+  //     setSelectedChipIndex([]);
+  //     updateSearchResults([]);
+      
+  //   } else {
+  //     // Si es un usuario diferente, realizar las acciones normales de selección
+  //     setSelectedUser(result); // Establecer el usuario seleccionado
+  //     setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
+  //     // Llamar a las funciones asociadas al clic en el chip seleccionado
+  //     handleUltimaCompraCliente(
+  //       result.codigoCliente,
+  //       result.codigoClienteSucursal
+  //     );
+  //     handleOpenPreciosClientesDialog(
+  //       result.codigoCliente,
+  //       result.codigoClienteSucursal
+  //     );
+    
+  //     handleOpenDeudasClientesDialog(
+  //       result.codigoCliente,
+  //       result.codigoClienteSucursal
+  //     );
+  //     clearSalesData();
+  //   }
+  // };
 
   const handleSearch = async () => {
     try {
@@ -296,56 +336,10 @@ const BoxBuscador = (handleClosePreciosClientes) => {
           </Grid>
         </Grid>
       </Grid>
-      {showPreciosClientes && (
-        <div style={{ display: "none" }}>
-          <BoxPreciosClientes
-            onClosePreciosClientes={handleClosePreciosClientes}
-            onOpenPreciosClientesDialog={handleOpenPreciosClientesDialog}
-          />
-        </div>
-      )}
-      {showCtaCorriente && (
-        <div style={{ display: "none" }}>
-          <BoxCtaCorriente
-            onCloseDeudaClientes={handleClosePreciosClientes}
-            onOpenPreciosClientesDialog={handleOpenDeudasClientesDialog}
-          />
-        </div>
-      )}
-      {/* <div style={{ display: "none" }}>
-        <BoxPreciosClientes
-          onClosePreciosClientes={handleClosePreciosClientes}
-          onOpenPreciosClientesDialog={handleOpenPreciosClientesDialog}
-        />
-      </div>
-      <div style={{ display: "none" }}>
-        <BoxCtaCorriente
-          onCloseDeudaClientes={handleClosePreciosClientes}
-          onOpenPreciosClientesDialog={handleOpenDeudasClientesDialog}
-        />
-      </div> */}
+    
     </Paper>
   );
 };
 
 export default BoxBuscador;
-{
-  /* <Chip
-                          sx={{ display: "flex", margin: "auto" }}
-                          label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
-                          onClick={() => {
-                            handleUltimaCompraCliente(
-                              result.codigoCliente,
-                              result.codigoClienteSucursal
-                            );
-                            handleOpenPreciosClientesDialog(
-                              result.codigoCliente,
-                              result.codigoClienteSucursal
-                            );
-                            handleOpenDeudasClientesDialog(
-                              result.codigoCliente,
-                              result.codigoClienteSucursal
-                            );
-                          }}
-                        /> */
-}
+

@@ -44,9 +44,12 @@ const BoxPreciosClientes = ({
   const {
     precioData,
     setPrecioData,
+    clearSalesData,
     userData,
     setUserData,
     searchResults,
+    selectedUser,
+    setSelectedUser,
     setSearchResults,
     selectedCodigoCliente,
     selectedCodigoClienteSucursal,
@@ -78,6 +81,22 @@ const BoxPreciosClientes = ({
   useEffect(() => {
     fetchPrecioData();
   }, [selectedCodigoCliente, selectedCodigoClienteSucursal, setPrecioData]);
+
+  // useEffect(() => {
+  //   // Cuando se realiza una búsqueda vacía o se borran los términos de búsqueda,
+  //   // ocultar los componentes de precios y cta corriente
+  //   if (searchText.trim() === "" || searchResults.length === 0) {
+      
+  //   }
+  // }, [searchText, searchResults]);
+
+  useEffect(() => {
+    if (!selectedUser) {
+      // Si no hay usuario seleccionado, limpiar los datos relacionados
+      clearSalesData();
+      setSelectedChipIndex([]); // Limpiar el índice del chip seleccionado
+    }
+  }, [selectedUser, clearSalesData]);
 
   const handlePrecioChange = (e, itemId) => {
     const updatedPrices = {
@@ -147,7 +166,7 @@ const BoxPreciosClientes = ({
   return (
     <>
     {console.log("searchResultsssss:", searchResults)}
-      {precioData && precioData.clientesProductoPrecioMostrar && (
+      {searchResults&&searchResults.length > 0 && selectedUser && precioData && precioData.clientesProductoPrecioMostrar && (
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12} md={12} lg={12}>
             <Paper>
@@ -163,14 +182,10 @@ const BoxPreciosClientes = ({
                   <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  {/* <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-        {precioData.clientesProductoPrecioMostrar[0] &&
-                      precioData.clientesProductoPrecioMostrar[0]
-                        .codigoCliente}{" "}
-        </Typography> */}
+                  
                   <Typography variant="body2" sx={{ color: "#696c6f" }}>
                     ID:
-                   {searchResults[0].rutResponsable}
+                   { searchResults&&searchResults[0].rutResponsable}
                     {/* {precioData.clientesProductoPrecioMostrar[0] &&
                       precioData.clientesProductoPrecioMostrar[0]
                         .codigoCliente}{" "}

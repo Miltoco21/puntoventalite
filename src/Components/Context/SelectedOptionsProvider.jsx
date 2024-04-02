@@ -29,7 +29,7 @@ export const SelectedOptionsProvider = ({ children }) => {
   const [selectedCodigoCliente, setSelectedCodigoCliente] = useState("");
   const [selectedCodigoClienteSucursal, setSelectedCodigoClienteSucursal] = useState("");
 
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState([]);
 
   const [searchResults, setSearchResults] = useState([]);
   const updateSearchResults = (results) => {

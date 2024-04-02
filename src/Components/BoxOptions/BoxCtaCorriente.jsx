@@ -33,6 +33,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     setSearchResults,
     setPrecioData,
     clearSalesData,
+    selectedUser,
     ventaData,
     setVentaData,
     selectedCodigoCliente,
@@ -220,15 +221,25 @@ const BoxCtaCorriente = ({ onClose }) => {
     setOpenTransferenciaModal(false);
   };
 
+  // const handleSelectAll = () => {
+  //   const updatedVentaData = ventaData.map((deuda) => {
+  //     return {
+  //       ...deuda,
+  //       selected: !selectAll,
+  //     };
+  //   });
+  //   setVentaData(updatedVentaData);
+  //   setSelectAll(!selectAll);
+  // };
   const handleSelectAll = () => {
-    const updatedVentaData = ventaData.map((deuda) => {
-      return {
-        ...deuda,
-        selected: !selectAll,
-      };
-    });
-    setVentaData(updatedVentaData);
+    // Invertir el estado de selección de todas las deudas
     setSelectAll(!selectAll);
+    // Actualizar el estado de selección de cada deuda en ventaData
+    const updatedVentaData = ventaData.map((deuda) => ({
+      ...deuda,
+      selected: !selectAll,
+    }));
+    setVentaData(updatedVentaData);
   };
 
   const getTotalSelected = () => {
@@ -458,7 +469,7 @@ const BoxCtaCorriente = ({ onClose }) => {
           Cuenta Corriente
         </Typography>
       </Grid>
-      {searchResults &&
+      {searchResults && searchResults.length > 0 && selectedUser&& 
         precioData &&
         precioData.clientesProductoPrecioMostrar && (
           <Grid container spacing={2} justifyContent="center">
@@ -478,7 +489,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" sx={{ color: "#696c6f" }}>
                       ID:
-                      {searchResults[0].rutResponsable}
+                      {searchResults&&searchResults[0].rutResponsable}
                       {/* {precioData.clientesProductoPrecioMostrar[0] &&
                         precioData.clientesProductoPrecioMostrar[0]
                           .codigoCliente}{" "}
@@ -501,11 +512,11 @@ const BoxCtaCorriente = ({ onClose }) => {
               <TableHead>
                 <TableRow>
                   <TableCell>
-                    {/* <Checkbox
+                    <Checkbox
                       checked={selectAll}
                       onChange={handleSelectAll}
                       color="primary"
-                    /> */}
+                    />
                   </TableCell>
                   <TableCell>Descripción</TableCell>
                   <TableCell>Folio</TableCell>
@@ -545,11 +556,10 @@ const BoxCtaCorriente = ({ onClose }) => {
                 ))}
               </TableBody>
 
-              <TableRow >
-              <TableCell colSpan={3} align="right">
-                <Typography> Total Deuda : ${totalDeuda}</Typography>
-              </TableCell>
-                
+              <TableRow>
+                <TableCell colSpan={3} align="right">
+                  <Typography> Total Deuda : ${totalDeuda}</Typography>
+                </TableCell>
               </TableRow>
 
               <TableRow>
@@ -574,12 +584,11 @@ const BoxCtaCorriente = ({ onClose }) => {
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda </DialogTitle>
         <DialogContent>
-          <Stack spacing={2}>
-            <Typography variant="body1">
-            Monto a Pagar: 
-            </Typography>
+          <Grid spacing={2}>
+            {/* <Typography variant="body1">Monto a Pagar:</Typography> */}
 
             <TextField
+              margin="dense"
               label="Monto a Pagar"
               variant="outlined"
               value={montoPagado}
@@ -591,9 +600,18 @@ const BoxCtaCorriente = ({ onClose }) => {
                 pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
               }}
             />
+              <Typography variant="body1">Selecciona método de pago:</Typography>
 
-            <Grid container spacing={2}>
-              <Grid item xs={6} sm={3}>
+            <Grid
+              container
+              item
+              sm={12}
+              md={12}
+              sx={{ width: "100%",display:"flex",justifyContent:"center" }}
+              spacing={2}
+            >
+              <Grid item xs={6} sm={3} md={3}>
+                
                 <Button
                   sx={{ height: "100%" }}
                   id="efectivo-btn"
@@ -604,7 +622,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                   Efectivo
                 </Button>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid item xs={6} sm={3} md={3}>
                 <Button
                   sx={{ height: "100%" }}
                   id="debito-btn"
@@ -617,7 +635,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                   Tarjeta Débitoo
                 </Button>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid item xs={6} sm={3} md={3}>
                 <Button
                   sx={{ height: "100%" }}
                   id="credito-btn"
@@ -630,7 +648,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                   Tarjeta Crédito
                 </Button>
               </Grid>
-              <Grid item xs={6} sm={3}>
+              <Grid item xs={6} sm={3} md={3}>
                 <Button
                   sx={{ height: "100%" }}
                   id="transferencia-btn"
@@ -643,7 +661,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                 </Button>
               </Grid>
             </Grid>
-          </Stack>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePaymentDialog}>Cerrar</Button>
