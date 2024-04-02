@@ -183,18 +183,16 @@ const BoxPreciosClientes = ({
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   
-                  <Typography variant="body2" sx={{ color: "#696c6f" }}>
-                    ID:
-                   { searchResults&&searchResults[0].rutResponsable}
-                    {/* {precioData.clientesProductoPrecioMostrar[0] &&
-                      precioData.clientesProductoPrecioMostrar[0]
-                        .codigoCliente}{" "}
-                    {" " + " "} */}
-                    <br />
-                    {precioData.clientesProductoPrecioMostrar[0] &&
-                      precioData.clientesProductoPrecioMostrar[0]
-                        .nombreCliente}{" "}
-                  </Typography>
+                <Typography variant="body2" sx={{ color: "#696c6f" }}>
+                      ID:
+                      {selectedUser.rutResponsable}
+                      {/* {precioData.clientesProductoPrecioMostrar[0] &&
+                        precioData.clientesProductoPrecioMostrar[0]
+                          .codigoCliente}{" "}
+                      {" " + " "} */}
+                      <br />
+                     {selectedUser.nombreResponsable}{""} {selectedUser.apellidoResponsable}
+                    </Typography>
                 </Box>
       
               </Box>

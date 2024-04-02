@@ -85,11 +85,8 @@ const BoxCtaCorriente = ({ onClose }) => {
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
   const [rut, setRut] = useState(""); // Estado para almacenar el rut
   const [nroCuenta, setNroCuenta] = useState(""); // Estado para almacenar el número de cuenta
-
   const [nroOperacion, setNroOperacion] = useState(""); // Estado para almacenar el número de operación
-
   const [selectedDebts, setSelectedDebts] = useState([]);
-
   const [tipoCuenta, setTipoCuenta] = useState(""); // Estado para almacenar el tipo de cuenta seleccionado
   const tiposDeCuenta = {
     "Cuenta Corriente": "Cuenta Corriente",
@@ -99,6 +96,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     "Cuenta de Depósito a Plazo (CDP)": "Cuenta de Depósito a Plazo (CDP)",
     "Cuenta de Inversión": "Cuenta de Inversión",
   };
+  
   const handleChangeTipoCuenta = (event) => {
     setTipoCuenta(event.target.value); // Actualizar el estado del tipo de cuenta seleccionado
   };
@@ -461,6 +459,41 @@ const BoxCtaCorriente = ({ onClose }) => {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
+  
+  const validateRut = () => {
+    // Expresión regular para validar el formato del RUT chileno
+    const rutRegex = /^[0-9]+[-|‐]{1}[0-9kK]{1}$/;
+    
+    if (!rutRegex.test(rut)) {
+      alert('El RUT ingresado no tiene el formato correcto.');
+      return false;
+    }
+
+    // Dividir el RUT en número y dígito verificador
+    const rutParts = rut.split('-');
+    const rutNumber = rutParts[0];
+    const rutDV = rutParts[1].toUpperCase();
+
+    // Calcular el dígito verificador esperado
+    let suma = 0;
+    let multiplo = 2;
+    for (let i = rutNumber.length - 1; i >= 0; i--) {
+      suma += rutNumber.charAt(i) * multiplo;
+      multiplo = multiplo === 7 ? 2 : multiplo + 1;
+    }
+
+    const dvEsperado = 11 - (suma % 11);
+    const dv = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+
+    // Comparar el dígito verificador ingresado con el esperado
+    if (dv !== rutDV) {
+      alert('El RUT ingresado no es válido.');
+      return false;
+    }
+
+    return true;
+  };
+
 
   return (
     <Grid container spacing={2}>
@@ -489,15 +522,13 @@ const BoxCtaCorriente = ({ onClose }) => {
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" sx={{ color: "#696c6f" }}>
                       ID:
-                      {searchResults&&searchResults[0].rutResponsable}
+                      {selectedUser.rutResponsable}
                       {/* {precioData.clientesProductoPrecioMostrar[0] &&
                         precioData.clientesProductoPrecioMostrar[0]
                           .codigoCliente}{" "}
                       {" " + " "} */}
                       <br />
-                      {precioData.clientesProductoPrecioMostrar[0] &&
-                        precioData.clientesProductoPrecioMostrar[0]
-                          .nombreCliente}{" "}
+                     {selectedUser.nombreResponsable}{""} {selectedUser.apellidoResponsable}
                     </Typography>
                   </Box>
                 </Box>
@@ -790,45 +821,56 @@ const BoxCtaCorriente = ({ onClose }) => {
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
-            onClick={() => {
-              // Convertir el objeto selectedDebts en un array de valores
-              const selectedDebtsArray = Object.values(selectedDebts);
+  onClick={() => {
+    // Convertir el objeto selectedDebts en un array de valores
+    const selectedDebtsArray = Object.values(selectedDebts);
 
-              // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
-              console.log(
-                "Tipo de selectedDebtsArray:",
-                Array.isArray(selectedDebtsArray)
-              );
-              console.log(
-                "Contenido de selectedDebtsArray:",
-                selectedDebtsArray
-              );
+    // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
+    console.log(
+      "Tipo de selectedDebtsArray:",
+      Array.isArray(selectedDebtsArray)
+    );
+    console.log(
+      "Contenido de selectedDebtsArray:",
+      selectedDebtsArray
+    );
 
-              // Iterar sobre el array selectedDebtsArray
-              selectedDebtsArray.forEach((deuda) => {
-                // Realizar las operaciones necesarias con cada deuda
-                console.log("ID de la deuda:", deuda.id);
-                console.log("ID de la cabecera:", deuda.idCabecera);
-                console.log("Total de la deuda:", deuda.total);
-                // Agregar aquí el resto de la lógica necesaria
-              });
+    // Validar campos y RUT
+    const isFieldsValid = validateFields();
+    const isRutValid = validateRut();
 
-              // Llamar a la función handleTransferData con los datos preparados
-              handleTransferData(selectedDebts, montoPagado, metodoPago, {
-                nombre: nombre,
-                rut: rut,
-                banco: selectedBanco,
-                tipoCuenta: tipoCuenta,
-                nroCuenta: nroCuenta,
-                fecha: fecha,
-                nroOperacion: nroOperacion,
-              });
-            }}
-            variant="contained"
-            color="secondary"
-          >
-            Guardar Datos Transferencia
-          </Button>
+    if (isFieldsValid && isRutValid) {
+      // Iterar sobre el array selectedDebtsArray
+      selectedDebtsArray.forEach((deuda) => {
+        // Realizar las operaciones necesarias con cada deuda
+        console.log("ID de la deuda:", deuda.id);
+        console.log("ID de la cabecera:", deuda.idCabecera);
+        console.log("Total de la deuda:", deuda.total);
+        // Agregar aquí el resto de la lógica necesaria
+      });
+
+      // Llamar a la función handleTransferData con los datos preparados
+      handleTransferData(selectedDebts, montoPagado, metodoPago, {
+        nombre: nombre,
+        rut: rut,
+        banco: selectedBanco,
+        tipoCuenta: tipoCuenta,
+        nroCuenta: nroCuenta,
+        fecha: fecha,
+        nroOperacion: nroOperacion,
+      });
+    } else {
+      console.log("Error: campos inválidos");
+      // Puedes mostrar un mensaje de error aquí si lo deseas
+    }
+  }}
+  variant="contained"
+  color="secondary"
+
+>
+  Guardar Datos Transferencia
+</Button>
+
         </DialogActions>
       </Dialog>
     </Grid>
