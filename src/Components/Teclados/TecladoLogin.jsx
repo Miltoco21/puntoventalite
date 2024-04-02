@@ -139,7 +139,7 @@ const Login = () => {
             onFocus={() => setActiveInput("rutOrCode")}
             onChange={(e) => setRutOrCode(e.target.value)}
             inputProps={{
-              inputMode: "tel", // Establece el modo de entrada como numérico
+              inputMode: "decimal", // Establece el modo de entrada como numérico
               pattern: "[0-9]*" // Asegura que solo se puedan ingresar números
             }}
           />
