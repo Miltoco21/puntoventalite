@@ -708,25 +708,7 @@ const BoxCtaCorriente = ({ onClose }) => {
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
-          {/* <Grid container spacing={2}>
-            {selectedDebts.map((deuda, index) => (
-              <Grid item xs={12} key={index}>
-                <Typography>ID: {deuda.id}</Typography>
-                <Typography>ID de Cabeceraaa: {deuda.idCabecera}</Typography>
-                <Typography>
-                  Descripción: {deuda.descripcionComprobante}
-                </Typography>
-                <Typography>
-                  Número de Comprobante: {deuda.nroComprobante}
-                </Typography>
-                <Typography>
-                  Total Pagado Parcial: ${deuda.totalPagadoParcial}
-                </Typography>
-                <Typography>Total: ${deuda.total}</Typography>
-                
-              </Grid>
-            ))}
-          </Grid> */}
+      
 
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
