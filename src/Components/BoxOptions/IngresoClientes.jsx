@@ -46,15 +46,57 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const IngresoClientes = ({onClose}) => {
+const IngresoClientes = ({ onClose }) => {
+  const [rutError, setRutError] = useState("");
+
   const validarRutChileno = (rut) => {
-    // Expresión regular para validar RUT chileno
-    const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
-
-    // Comprobar si el RUT cumple con el formato
-    return rutRegex.test(rut);
+    // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
+    const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
+  
+    console.log("Input RUT:", rut);
+  
+    
+  
+    // Eliminar puntos del RUT
+    const rutWithoutDots = rut.replace(/\./g, '');
+  
+    // Dividir el RUT en número y dígito verificador
+    const rutParts = rutWithoutDots.split('-');
+    const rutNumber = rutParts[0];
+    const rutDV = rutParts[1].toUpperCase();
+  
+    console.log("RUT Number:", rutNumber);
+    console.log("RUT DV:", rutDV);
+  
+    // Calcular el dígito verificador esperado
+    let suma = 0;
+    let multiplo = 2;
+    for (let i = rutNumber.length - 1; i >= 0; i--) {
+      suma += rutNumber.charAt(i) * multiplo;
+      multiplo = multiplo === 7 ? 2 : multiplo + 1;
+    }
+  
+    const dvEsperado = 11 - (suma % 11);
+    const dv = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+    console.log("Expected DV:", dv);
+  
+    // Comparar el dígito verificador ingresado con el esperado
+    if (dv !== rutDV) {
+      setRutError('El RUT ingresado no es válido.');
+      return false;
+    }
+    if (dv === rutDV) {
+      console.log("rut coincide");
+      setRutError('');
+      return false;
+    }
+    // if (!rutRegex.test(rut)) {
+    //   console.log('El RUT ingresado no tiene el formato correcto.');
+    //   return false;
+    // }
+  
+    return true;
   };
-
   const [formData, setFormData] = useState({
     rut: "",
     nombre: "",
@@ -116,7 +158,6 @@ const IngresoClientes = ({onClose}) => {
   const [selectedCustomerId, setSelectedCustomerId] = useState("");
   const [busqueda, setBusqueda] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
 
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -243,8 +284,6 @@ const IngresoClientes = ({onClose}) => {
 
   //////////fin suursalcleinte///////////
 
-
-
   useEffect(() => {
     const fetchRegions = async () => {
       try {
@@ -314,20 +353,17 @@ const IngresoClientes = ({onClose}) => {
     fetchSucursalComunas();
   }, [selectedSucursalRegion]);
 
-  
- 
-
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value,
+      [name]: value.trim(),
     }));
   };
   const handleSubmit = async () => {
     try {
       if (!validarRutChileno(formData.rut)) {
-        setErrorMessage("Por favor ingresa un RUT válido.");
+        setErrorMessage("Por favor ingresa un RUT válidoooo.");
         return;
       }
 
@@ -366,10 +402,8 @@ const IngresoClientes = ({onClose}) => {
           setSnackbarMessage("Cliente generado exitosamente");
           setOpenSnackbar(true);
           setTimeout(() => {
-            
             onClose(); ////Cierre Modal al finalizar
           }, 3000);
-          
         } else {
           setSnackbarMessage("Error en la operación");
           setOpenSnackbar(true);
@@ -384,58 +418,6 @@ const IngresoClientes = ({onClose}) => {
       setOpenSnackbar(true);
     }
   };
-
-  // const handleSubmit = async () => {
-  //   if (!validarRutChileno(formData.rut)) {
-  //     setErrorMessage("Por favor ingresa un RUT válido.");
-  //     return;
-  //   }
-
-  //   const emptyFields = Object.entries(formData)
-  //     .filter(([key, value]) => value === "")
-  //     .map(([key]) => key);
-
-  //   if (emptyFields.length > 0) {
-  //     const emptyField = emptyFields[0]; // Tomamos el primer campo vacío
-  //     setErrorMessage(
-  //       `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
-  //     );
-  //     return;
-  //   } else {
-  //     setErrorMessage("");
-  //   }
-
-  //   const formDataToSend = {
-  //     ...formData,
-  //     rut: String(formData.rut),
-  //     region: String(formData.region),
-  //     comuna: String(formData.comuna),
-  //   };
-  //   console.log("Form Data before submission:", formDataToSend);
-
-  //   try {
-  //     const response = await axios.post(apiUrl, formDataToSend);
-  //     if (response.status === 200) {
-  //       const responseData = response.data;
-  //       console.log("Form Data after submission:", responseData);
-
-  //       if (responseData) {
-  //         setSnackbarMessage(responseData.descripcion);
-  //         setOpenSnackbar(true);
-  //       } else {
-  //         setSnackbarMessage("Error en la operación");
-  //         setOpenSnackbar(true);
-  //       }
-  //     } else {
-  //       setSnackbarMessage("Error en la operación");
-  //       setOpenSnackbar(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("API Request Error:", error);
-  //     setSnackbarMessage("Error en la operación");
-  //     setOpenSnackbar(true);
-  //   }
-  // };
 
   const handleDialogClose = () => {
     setOpenDialog(false);
@@ -510,11 +492,12 @@ const IngresoClientes = ({onClose}) => {
             lg={8}
             spacing={2}
           >
-            {errorMessage && <p style={{ color: "red" }}> {errorMessage}</p>}
+            {rutError&& <p style={{ color: "red" }}> {rutError}</p>}
             <Grid item xs={12} sm={6} md={6}>
               <TextField
-                label="Rut"
+                label="Ingrese RUT "
                 name="rut"
+                placeholder="Ingrese rut con puntos y con guión"
                 fullWidth
                 value={formData.rut}
                 onChange={handleInputChange}
