@@ -32,6 +32,8 @@ const BoxBoleta = ({ onClose }) => {
     ventaData,
     grandTotal,
     salesData,
+    setSearchResults,
+    setSelectedUser,
     setVentaData,
     selectedCodigoCliente,
     selectedCodigoClienteSucursal,
@@ -171,8 +173,11 @@ const BoxBoleta = ({ onClose }) => {
 
       console.log("Datos después de enviar la solicitud:", response.data);
       if (response.status === 200) {
-        setSnackbarMessage("Boleta guardada exitosamente");
         setSnackbarOpen(true);
+        setSnackbarMessage("Boleta guardada exitosamente");
+      
+        setSearchResults([]);
+        setSelectedUser([])
         setTimeout(() => {
           onClose(); ////Cierre Modal al finalizar
         }, 2000);
@@ -247,6 +252,7 @@ const BoxBoleta = ({ onClose }) => {
           setSnackbarOpen(true);
 
           setSearchResults([]);
+          setSelectedUser([])
 
           clearSalesData();
 
@@ -356,6 +362,14 @@ const BoxBoleta = ({ onClose }) => {
             </Grid>
           </Grid>
         </Grid>
+
+        <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={snackbarOpen}
+       
+        onClose={onClose}
+        message={snackbarMessage}
+      />
       </Grid>
 
       <Dialog
