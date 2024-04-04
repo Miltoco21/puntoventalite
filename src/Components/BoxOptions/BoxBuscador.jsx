@@ -55,7 +55,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   const [selectedChipIndex, setSelectedChipIndex] = useState([]);
   
 
- console.log("selectedUser:",selectedUser);
+
 
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       setSelectedUser([]);
        // Limpiar el índice del chip seleccionado
     }
-  }, [selectedUser]);
+  }, [searchResults]);
 
   const handleChipClick = (index, result) => {
     if (

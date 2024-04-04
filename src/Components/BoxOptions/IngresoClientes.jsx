@@ -87,6 +87,7 @@ const IngresoClientes = ({ onClose }) => {
     }
     if (dv === rutDV) {
       console.log("rut coincide");
+    
       setRutError('');
       return false;
     }
@@ -357,15 +358,12 @@ const IngresoClientes = ({ onClose }) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value.trim(),
+      [name]: value
     }));
   };
   const handleSubmit = async () => {
     try {
-      if (!validarRutChileno(formData.rut)) {
-        setErrorMessage("Por favor ingresa un RUT válidoooo.");
-        return;
-      }
+      (validarRutChileno(formData.rut))
 
       const emptyFields = Object.entries(formData)
         .filter(([key, value]) => value === "")
