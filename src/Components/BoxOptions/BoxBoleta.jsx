@@ -25,7 +25,6 @@ import {
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
-
 const BoxBoleta = ({ onClose }) => {
   const {
     userData,
@@ -55,8 +54,8 @@ const BoxBoleta = ({ onClose }) => {
   const [nroCuenta, setNroCuenta] = useState(""); // Estado para almacenar el número de cuenta
   const [nroOperacion, setNroOperacion] = useState(""); // Estado para almacenar el número de operación
   const [selectedDebts, setSelectedDebts] = useState([]);
-  const [tipoCuenta, setTipoCuenta] = useState(""); 
-  const [errorTransferenciaError, setTransferenciaError] = useState(""); 
+  const [tipoCuenta, setTipoCuenta] = useState("");
+  const [errorTransferenciaError, setTransferenciaError] = useState("");
   const tiposDeCuenta = {
     "Cuenta Corriente": "Cuenta Corriente",
     "Cuenta de Ahorro": "Cuenta de Ahorro",
@@ -69,7 +68,6 @@ const BoxBoleta = ({ onClose }) => {
   const handleChangeTipoCuenta = (event) => {
     setTipoCuenta(event.target.value); // Actualizar el estado del tipo de cuenta seleccionado
   };
-
 
   const bancosChile = [
     { id: 1, nombre: "Banco de Chile" },
@@ -126,7 +124,6 @@ const BoxBoleta = ({ onClose }) => {
   const handleTransferenciaModalOpen = () => {
     setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
-   
   };
   const handleTransferenciaModalClose = () => {
     setOpenTransferenciaModal(false);
@@ -145,7 +142,7 @@ const BoxBoleta = ({ onClose }) => {
   const handlePagoBoleta = async () => {
     if (grandTotal === 0) {
       setError(
-        "No se puede generar el ticket de pago porque el total a pagar es cero."
+        "No se puede generar el boleta de pago porque el total a pagar es cero."
       );
       return;
     }
@@ -162,6 +159,16 @@ const BoxBoleta = ({ onClose }) => {
           descripcion: producto.descripcion,
         })),
         metodoPago: metodoPago,
+        transferencias: {
+          nombre: nombre,
+          rut: rut,
+          banco: selectedBanco,
+          tipoCuenta: tipoCuenta,
+          nroCuenta: nroCuenta,
+          fecha: fecha,
+          nroOperacion: nroOperacion,
+        }, 
+
       };
 
       console.log("Datos Boleta antes de enviar la solicitud:", pagoData);
@@ -175,9 +182,9 @@ const BoxBoleta = ({ onClose }) => {
       if (response.status === 200) {
         setSnackbarOpen(true);
         setSnackbarMessage("Boleta guardada exitosamente");
-      
+
         setSearchResults([]);
-        setSelectedUser([])
+        setSelectedUser([]);
         setTimeout(() => {
           onClose(); ////Cierre Modal al finalizar
         }, 2000);
@@ -191,84 +198,73 @@ const BoxBoleta = ({ onClose }) => {
     setSnackbarOpen(false);
   };
 
-  const handleTransferData = async (
-    selectedDebts,
-    montoPagado,
-    metodoPago,
-    transferencias
-  ) => {
+  const handleTransferData = async () => {
     try {
-      console.log("Datos de transferencia:");
-      console.log("Monto pagado:", montoPagado);
-      console.log("Método de pago:", metodoPago);
-      console.log("Datos de transferencia:", transferencias);
-      console.log("Tipo de selectedDebts:", typeof selectedDebts);
-
-      // Convertir selectedDebts en un array de valores
-      const selectedDebtsArray = Object.values(selectedDebts);
-
-      // Iterar sobre el array selectedDebtsArray
-      for (const deuda of selectedDebtsArray) {
-        console.log("Deuda seleccionada:");
-        console.log("ID de la deuda:", deuda.id);
-        console.log("ID de la cabecera:", deuda.idCabecera);
-        console.log("Total de la deuda:", deuda.total);
-
-        const requestBody = {
-          deudaIds: [
-            {
-              idCuentaCorriente: deuda.id,
-              idCabecera: deuda.idCabecera,
-              total:  grandTotal,
-            },
-          ],
-          montoPagado: grandTotal,
-          metodoPago: metodoPago,
-          idUsuario: userData.codigoUsuario,
-          transferencias: {
-            // idCuentaCorrientePago: 0,
-            nombre: nombre,
-            rut: rut,
-            banco: banco,
-            tipoCuenta: tipoCuenta,
-            nroCuenta: nroCuenta,
-            fecha: fecha,
-            nroOperacion: nroOperacion,
-          },
-        };
-
-        console.log("Datos de la solicitud antes de enviarla:");
-        console.log(requestBody);
-
-        // Aquí realizamos la llamada POST para cada deuda
-        const response = await axios.post(
-          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
-          requestBody
+      if (
+        !nombre ||
+        !rut ||
+        !selectedBanco ||
+        !tipoCuenta ||
+        !nroCuenta ||
+        !fecha ||
+        !nroOperacion
+      ) {
+        setTransferenciaError(
+          "Por favor complete todos los campos obligatorios."
         );
-
-        if (response.status === 200) {
-          console.log("Transferencia realizada con éxito");
-          setSnackbarMessage(response.data.descripcion);
-          setSnackbarOpen(true);
-
-          setSearchResults([]);
-          setSelectedUser([])
-
-          clearSalesData();
-
-          setTimeout(() => {
-            handleClosePaymentDialog(true);
-            handleTransferenciaModalClose(true);
-            onClose(); ////Cierre Modal al finalizar
-          }, 3000);
-        } else {
-          console.error("Error al realizar la transferencia");
-        }
+        return;
+      }
+  
+      const requestBody = {
+        deudaIds: selectedDebts.map(deuda => ({
+          idCuentaCorriente: selectedCodigoCliente,
+          idCabecera: deuda.idCabecera,
+          total:  grandTotal,
+        })),
+        montoPagado: grandTotal,
+        metodoPago: metodoPago,
+        idUsuario: userData.codigoUsuario,
+        transferencias: {
+          nombre: nombre,
+          rut: rut,
+          banco: selectedBanco,
+          tipoCuenta: tipoCuenta,
+          nroCuenta: nroCuenta,
+          fecha: fecha,
+          nroOperacion: nroOperacion,
+        },
+      };
+  
+      console.log("Datos de la solicitud antes de enviarla:", requestBody);
+  
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
+        requestBody
+      );
+  
+      console.log("Datos de la respuesta después de enviarla:", response);
+  
+      if (response.status === 200) {
+        setSnackbarMessage(response.data.descripcion);
+        setSnackbarOpen(true);
+  
+        setSearchResults([]);
+        setSelectedUser([]);
+        clearSalesData();
+  
+        setTimeout(() => {
+          handleClosePaymentDialog(true);
+          handleTransferenciaModalClose(true);
+          onClose(); ////Cierre Modal al finalizar
+        }, 3000);
+      } else {
+        console.error("Error al realizar la transferencia");
       }
     } catch (error) {
       console.error("Error al realizar la transferencia:", error);
     }
   };
+  
 
   return (
     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -342,15 +338,19 @@ const BoxBoleta = ({ onClose }) => {
                 variant={
                   metodoPago === "Transferencia" ? "contained" : "outlined"
                 }
-                onClick={() => handleTransferenciaModalOpen(selectedDebts)}
+                onClick={() => {
+                  setMetodoPago("Transferencia");
+                  handleTransferenciaModalOpen(selectedDebts);
+
+                }} // Ambas funciones separadas por punto y coma
                 fullWidth
               >
                 Transferencia
               </Button>
             </Grid>
             <Grid item xs={12} sm={6} md={12}>
-              <Button 
-               sx={{ height: "100%" }}
+              <Button
+                sx={{ height: "100%" }}
                 variant="contained"
                 fullWidth
                 color="secondary"
@@ -364,12 +364,11 @@ const BoxBoleta = ({ onClose }) => {
         </Grid>
 
         <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={snackbarOpen}
-       
-        onClose={onClose}
-        message={snackbarMessage}
-      />
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={snackbarOpen}
+          onClose={onClose}
+          message={snackbarMessage}
+        />
       </Grid>
 
       <Dialog
@@ -399,7 +398,9 @@ const BoxBoleta = ({ onClose }) => {
           </Grid> */}
 
           <Grid container spacing={2}>
-          {errorTransferenciaError&& <p style={{ color: "red" }}> {errorTransferenciaError}</p>}
+            {errorTransferenciaError && (
+              <p style={{ color: "red" }}> {errorTransferenciaError}</p>
+            )}
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Nombre"
@@ -493,57 +494,26 @@ const BoxBoleta = ({ onClose }) => {
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
-            onClick={() => {
-              if (
-                !nombre ||
-                !rut ||
-                !selectedBanco ||
-                !tipoCuenta ||
-                !nroCuenta ||
-                !fecha ||
-                !nroOperacion
-              ) {
-                setTransferenciaError("Por favor complete todos los campos obligatorios.");
-                return;
-              }
+            onClick={handleTransferData}
               // Convertir el objeto selectedDebts en un array de valores
-              const selectedDebtsArray = Object.values(selectedDebts);
+              // const selectedDebtsArray = Object.values(selectedDebts);
 
-              // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
-              console.log(
-                "Tipo de selectedDebtsArray:",
-                Array.isArray(selectedDebtsArray)
-              );
-              console.log(
-                "Contenido de selectedDebtsArray:",
-                selectedDebtsArray
-              );
+              // // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
 
-              // Validar campos y RUT
+              // // Validar campos y RUT
 
-              // Iterar sobre el array selectedDebtsArray
-              selectedDebtsArray.forEach((deuda) => {
-                // Realizar las operaciones necesarias con cada deuda
-                console.log("ID de la deuda:", deuda.id);
-                console.log("ID de la cabecera:", deuda.idCabecera);
-                console.log("Total de la deuda:", deuda.total);
-                // Agregar aquí el resto de la lógica necesaria
-              });
-
-              // Llamar a la función handleTransferData con los datos preparados
-              handleTransferData(selectedDebts, montoPagado, metodoPago, {
-                nombre: nombre,
-                rut: rut,
-                banco: selectedBanco,
-                tipoCuenta: tipoCuenta,
-                nroCuenta: nroCuenta,
-                fecha: fecha,
-                nroOperacion: nroOperacion,
-              });
-
+              // // Iterar sobre el array selectedDebtsArray
+              // selectedDebtsArray.forEach((deuda) => {
+              //   // Realizar las operaciones necesarias con cada deuda
+              //   console.log("ID de la deuda:", deuda.id);
+              //   console.log("ID de la cabecera:", deuda.idCabecera);
+              //   console.log("Total de la deuda:", deuda.total);
+              //   // Agregar aquí el resto de la lógica necesaria
+              // });
               
+
               // Puedes mostrar un mensaje de error aquí si lo deseas
-            }}
+           
             variant="contained"
             color="secondary"
           >
