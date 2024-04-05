@@ -195,7 +195,10 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         setTimeout(() => {
           onCloseTicket();
         }, 3000);
+        
       }
+      console.log("Información TICKET al servidor en:", new Date().toLocaleString());
+
     } catch (error) {
       console.error("Error al generar la boleta electrónica:", error);
       setError("Error al generar la boleta electrónica.");
@@ -261,6 +264,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           handleTransferenciaModalClose(true);
           onClose(); ////Cierre Modal al finalizar
         }, 3000);
+        console.log("Información TransferenciaTICKET al servidor en:", new Date().toLocaleString());
       } else {
         console.error("Error al realizar la transferencia");
       }

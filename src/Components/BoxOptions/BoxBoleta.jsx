@@ -190,6 +190,7 @@ const BoxBoleta = ({ onClose }) => {
         }, 2000);
         clearSalesData();
       }
+      console.log("Información BOLETA enviada al servidor en:", new Date().toLocaleString());
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
     }
@@ -257,6 +258,7 @@ const BoxBoleta = ({ onClose }) => {
           handleTransferenciaModalClose(true);
           onClose(); ////Cierre Modal al finalizar
         }, 3000);
+        console.log("Información TransferenciaBOLETA al servidor en:", new Date().toLocaleString());
       } else {
         console.error("Error al realizar la transferencia");
       }
