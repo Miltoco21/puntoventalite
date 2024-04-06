@@ -82,49 +82,47 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       selectedUser.codigoCliente === result.codigoCliente &&
       selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
     ) {
-      clearSalesData();
-      setSelectedUser(null);
-      setSelectedChipIndex([]);
-      setSearchResults([]);
-      setSelectedCodigoCliente(0);
+      clearSalesData(); // Limpia los datos de ventas
+      setSelectedUser(null); // Desmarca el usuario seleccionado
+      setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
+      setSearchResults([]); // Limpia los resultados de búsqueda
+      setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
+      handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
+      handleOpenDeudasClientesDialog(0, 0); // Limpia los datos del diálogo de deudas
     } else {
-      setSelectedUser(result);
-      setSelectedChipIndex(index);
-      handleUltimaCompraCliente(
+      setSelectedUser(result); // Establece el usuario seleccionado como el resultado actual
+      setSelectedChipIndex(index); // Establece el índice del chip seleccionado
+      handleUltimaCompraCliente( // Realiza acciones relacionadas con la última compra del cliente
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      handleOpenPreciosClientesDialog(
+      handleOpenPreciosClientesDialog( // Abre el diálogo de precios para el cliente seleccionado
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      handleOpenDeudasClientesDialog(
+      handleOpenDeudasClientesDialog( // Abre el diálogo de deudas para el cliente seleccionado
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      clearSalesData();
+      clearSalesData(); // Limpia los datos de ventas
     }
   };
+  
+
   // const handleChipClick = (index, result) => {
-  //   // Verificar si el usuario seleccionado es el mismo que el usuario actualmente seleccionado
   //   if (
-  //     selectedUser !== null &&
+  //     selectedUser &&
   //     selectedUser.codigoCliente === result.codigoCliente &&
   //     selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
   //   ) {
-  //     // Si es el mismo usuario, limpiar los datos de la venta
   //     clearSalesData();
-  //     // Desseleccionar el usuario estableciendo selectedUser a null
-  //     setSelectedUser([]);
-  //     // Establecer el índice del chip seleccionado a null
+  //     setSelectedUser(null);
   //     setSelectedChipIndex([]);
-  //     updateSearchResults([]);
-      
+  //     setSearchResults([]);
+  //     setSelectedCodigoCliente(0);
   //   } else {
-  //     // Si es un usuario diferente, realizar las acciones normales de selección
-  //     setSelectedUser(result); // Establecer el usuario seleccionado
-  //     setSelectedChipIndex(index); // Establecer el índice del chip seleccionado directamente
-  //     // Llamar a las funciones asociadas al clic en el chip seleccionado
+  //     setSelectedUser(result);
+  //     setSelectedChipIndex(index);
   //     handleUltimaCompraCliente(
   //       result.codigoCliente,
   //       result.codigoClienteSucursal
@@ -133,7 +131,6 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   //       result.codigoCliente,
   //       result.codigoClienteSucursal
   //     );
-    
   //     handleOpenDeudasClientesDialog(
   //       result.codigoCliente,
   //       result.codigoClienteSucursal

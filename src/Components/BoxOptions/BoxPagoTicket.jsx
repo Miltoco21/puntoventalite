@@ -356,10 +356,11 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             Cuenta Corriente
           </Button>
           <Button
-            sx={{ height: "100%" }}
-            variant={metodoPago === "Transferencia" ? "contained" : "outlined"}
+          id={`${selectedMethod}-btn`}
+       
+            variant={selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"}
             onClick={() => {
-              setMetodoPago("Transferencia");
+              handleMetodoPagoClick("TRANSFERENCIA");
               handleTransferenciaModalOpen(selectedDebts);
             }} // Ambas funciones separadas por punto y coma
             fullWidth
