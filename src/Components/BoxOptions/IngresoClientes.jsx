@@ -48,6 +48,22 @@ function Alert(props) {
 
 const IngresoClientes = ({ onClose }) => {
   const [rutError, setRutError] = useState("");
+  const [correoError, setCorreoError] = useState("");
+
+  const validateEmail = (email) => {
+    // Expresión regular para validar el formato de un correo electrónico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    // Verificar si el correo electrónico cumple con el formato esperado
+    if (!emailRegex.test(email)) {
+      setCorreoError('El correo electrónico ingresado no es válido.');
+      return false;
+    }
+  
+    // El correo electrónico tiene un formato válido
+    return true;
+  };
+  
 
   const validarRutChileno = (rut) => {
     // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
@@ -88,13 +104,10 @@ const IngresoClientes = ({ onClose }) => {
     if (dv === rutDV) {
       console.log("El RUT ingresado  es válido.");
     
-      setRutError('');
-      return false;
+      
+      return true;
     }
-    // if (!rutRegex.test(rut)) {
-    //   console.log('El RUT ingresado no tiene el formato correcto.');
-    //   return false;
-    // }
+   
   
     return true;
   };
@@ -363,6 +376,13 @@ const IngresoClientes = ({ onClose }) => {
   };
   const handleSubmit = async () => {
     try {
+      if (!validateEmail(formData.correo)) {
+        return; // No continuar si el correo electrónico no es válido
+      }
+      if (!validarRutChileno(formData.rut)) {
+        setRutError("el RUT no es válido");
+        return; // No continuar si el RUT no es válido
+      }
       
 
       const emptyFields = Object.entries(formData)
@@ -379,13 +399,11 @@ const IngresoClientes = ({ onClose }) => {
         setRutError("");
       }
       setRutError("");
-      if(validarRutChileno(formData.rut)==false){
-        console.log(" validarRutChileno no valido")
-        return;
-      }
-      if(validateEmail()==false){
-        console.log(" Email no valido")
-      }
+      
+  
+      // if(validateEmail()==false){
+      //   console.log(" Email no valido")
+      // }
 
       const formDataToSend = {
         ...formData,
@@ -410,18 +428,12 @@ const IngresoClientes = ({ onClose }) => {
           setTimeout(() => {
             onClose(); ////Cierre Modal al finalizar
           }, 3000);
-        } else {
-          setSnackbarMessage("Error en la operación");
-          setOpenSnackbar(true);
         }
-      } else {
-        setSnackbarMessage("Error en la operación");
-        setOpenSnackbar(true);
-      }
+      } 
     } catch (error) {
       console.error("Error en la solicitud:", error);
-      setSnackbarMessage("Error en la operación");
-      setOpenSnackbar(true);
+      // setSnackbarMessage("Error en la operación");
+      // setOpenSnackbar(true);
     }
   };
 
@@ -498,6 +510,7 @@ const IngresoClientes = ({ onClose }) => {
             lg={8}
             spacing={2}
           >
+              {correoError && <p style={{ color: "red" }}> {correoError}</p>}
             {rutError&& <p style={{ color: "red" }}> {rutError}</p>}
             <Grid item xs={12} sm={6} md={6}>
               <TextField

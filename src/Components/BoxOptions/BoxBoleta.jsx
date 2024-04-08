@@ -317,7 +317,7 @@ const BoxBoleta = ({ onClose }) => {
         <TextField
           margin="dense"
           fullWidth
-          type="number"
+       
           label="Cantidad pagada"
           value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
           onChange={(e) => {
@@ -328,6 +328,10 @@ const BoxBoleta = ({ onClose }) => {
             } else {
               setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
             }
+          }}
+          inputProps={{
+            inputMode: "numeric",
+            pattern: "[0-9]*",
           }}
         />
         <TextField

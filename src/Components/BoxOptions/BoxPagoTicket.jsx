@@ -317,7 +317,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         <TextField
           margin="dense"
           fullWidth
-          type="number"
+         
           label="Cantidad pagada"
           value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
           onChange={(e) => {
