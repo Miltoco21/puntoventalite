@@ -46,7 +46,7 @@ const BoxBoleta = ({ onClose }) => {
 
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
-
+  const [cantidadPagada, setCantidadPagada] = useState(0);
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
@@ -293,6 +293,14 @@ const BoxBoleta = ({ onClose }) => {
             inputMode: "numeric",
             pattern: "[0-9]*",
           }}
+        />
+         <TextField
+          margin="dense"
+          fullWidth
+          InputProps={{ readOnly: true }}
+          label="Cantidad pagada"
+          value={cantidadPagada}
+          onChange={(e) => setCantidadPagada(parseFloat(e.target.value))}
         />
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid>
