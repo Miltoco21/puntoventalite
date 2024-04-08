@@ -46,6 +46,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
 
+  const [transferenciaExitosa,setTransferenciaExitosa]= useState(false);
 
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
 
@@ -141,69 +142,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     setSelectedMethod(metodo);
   };
 
-  const handleGenerarTicket = async () => {
-    if (grandTotal === 0) {
-      setError(
-        "No se puede generar el ticket de pago porque el total a pagar es cero."
-      );
-      return;
-    }
-    if (isNaN(cantidadPagada) || cantidadPagada < 0) {
-      setError("Por favor, ingresa una cantidad pagada válida.");
-      return;
-    }
-    const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
-    const codigoCliente = searchResults[0].codigoCliente;
-    try {
-      const ticket = {
-        idUsuario: userData.codigoUsuario,
-        codigoClienteSucursal: codigoClienteSucursal,
-        codigoCliente: codigoCliente,
-        total: grandTotal,
-        products: salesData.map((sale) => ({
-          codProducto: sale.idProducto,
-          cantidad: sale.quantity,
-          precioUnidad: sale.precio,
-          descripcion: sale.descripcion,
-        })),
-        metodoPago: selectedMethod,
-        transferencias: {
-          nombre: nombre,
-          rut: rut,
-          banco: selectedBanco,
-          tipoCuenta: tipoCuenta,
-          nroCuenta: nroCuenta,
-          fecha: fecha,
-          nroOperacion: nroOperacion,
-        }, 
-      };
-
-      console.log("Datos enviados por Axios:", ticket);
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
-        ticket
-      );
-
-      console.log("Respuesta del servidor:", response.data);
-      if (response.status === 200) {
-        setSnackbarMessage(response.data.descripcion);
-        setSnackbarOpen(true);
-        setSearchResults([]);
-        clearSalesData();
-
-        // Esperar 4 segundos antes de cerrar el modal
-        setTimeout(() => {
-          onCloseTicket();
-        }, 3000);
-        
-      }
-      console.log("Información TICKET al servidor en:", new Date().toLocaleString());
-
-    } catch (error) {
-      console.error("Error al generar la boleta electrónica:", error);
-      setError("Error al generar la boleta electrónica.");
-    }
-  };
 
   const handleTransferData = async () => {
     try {
@@ -258,6 +196,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         setSearchResults([]);
         setSelectedUser([]);
         clearSalesData();
+        setTransferenciaExitosa(true)
 
         setTimeout(() => {
           handleClosePaymentDialog(true);
@@ -273,11 +212,93 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     }
   };
 
+  const handleGenerarTicket = async () => {
+    try {
+      if (selectedMethod === "TRANSFERENCIA" && !transferenciaExitosa) {
+        // Si el método de pago es transferencia y la transferencia no ha sido exitosa,
+        // entonces no procesar el pago y mostrar un mensaje de error
+        setError("Por favor, complete la transferencia correctamente antes de generar el ticket.");
+        return;
+      }
+  
+      if (grandTotal === 0) {
+        setError("No se puede generar el ticket de pago porque el total a pagar es cero.");
+        return;
+      }
+     
+      if (isNaN(cantidadPagada) || cantidadPagada < 0) {
+        setError("Por favor, ingresa una cantidad pagada válida.");
+        return;
+      }
+  
+      const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
+      const codigoCliente = searchResults[0].codigoCliente;
+  
+      const ticket = {
+        idUsuario: userData.codigoUsuario,
+        codigoClienteSucursal: codigoClienteSucursal,
+        codigoCliente: codigoCliente,
+        total: grandTotal,
+        products: salesData.map((sale) => ({
+          codProducto: sale.idProducto,
+          cantidad: sale.quantity,
+          precioUnidad: sale.precio,
+          descripcion: sale.descripcion,
+        })),
+        metodoPago: selectedMethod,
+        transferencias: {
+          nombre: nombre,
+          rut: rut,
+          banco: selectedBanco,
+          tipoCuenta: tipoCuenta,
+          nroCuenta: nroCuenta,
+          fecha: fecha,
+          nroOperacion: nroOperacion,
+        }, 
+      };
+  
+      console.log("Datos enviados por Axios:", ticket);
+      const response = await axios.post(
+        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
+        ticket
+      );
+  
+      console.log("Respuesta del servidor:", response.data);
+      if (response.status === 200) {
+        setSnackbarMessage(response.data.descripcion);
+        setSnackbarOpen(true);
+        setSearchResults([]);
+        clearSalesData();
+        setTransferenciaExitosa(true)
+  
+        // Esperar 4 segundos antes de cerrar el modal
+        setTimeout(() => {
+          onCloseTicket();
+        }, 3000);
+        
+      }
+      console.log("Información TICKET al servidor en:", new Date().toLocaleString());
+  
+    } catch (error) {
+      console.error("Error al generar la boleta electrónica:", error);
+      setError("Error al generar la boleta electrónica.");
+    }
+  };
+
+  
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography variant="h4">Pago de Ticket</Typography>
       </Grid>
+      {error && (
+        <Grid item xs={12}>
+          <Typography variant="body1" color="error">
+            {error}
+          </Typography>
+        </Grid>
+      )}
 
       <Grid item xs={12} sm={6} md={6} lg={6}>
         <TextField
@@ -388,13 +409,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         </Grid>
       )} */}
 
-      {error && (
-        <Grid item xs={12}>
-          <Typography variant="body1" color="error">
-            {error}
-          </Typography>
-        </Grid>
-      )}
+    
 
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -409,26 +424,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
-          {/* <Grid container spacing={2}>
-            {selectedDebts.map((deuda, index) => (
-              <Grid item xs={12} key={index}>
-                <Typography>ID: {deuda.id}</Typography>
-                <Typography>ID de Cabeceraaa: {deuda.idCabecera}</Typography>
-                <Typography>
-                  Descripción: {deuda.descripcionComprobante}
-                </Typography>
-                <Typography>
-                  Número de Comprobante: {deuda.nroComprobante}
-                </Typography>
-                <Typography>
-                  Total Pagado Parcial: ${deuda.totalPagadoParcial}
-                </Typography>
-                <Typography>Total: ${deuda.total}</Typography>
-                
-              </Grid>
-            ))}
-          </Grid> */}
-
+        
           <Grid container spacing={2}>
             {errorTransferenciaError && (
               <p style={{ color: "red" }}> {errorTransferenciaError}</p>
@@ -527,23 +523,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
             onClick={handleTransferData}
-            // Convertir el objeto selectedDebts en un array de valores
-            // const selectedDebtsArray = Object.values(selectedDebts);
-
-            // // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
-
-            // // Validar campos y RUT
-
-            // // Iterar sobre el array selectedDebtsArray
-            // selectedDebtsArray.forEach((deuda) => {
-            //   // Realizar las operaciones necesarias con cada deuda
-            //   console.log("ID de la deuda:", deuda.id);
-            //   console.log("ID de la cabecera:", deuda.idCabecera);
-            //   console.log("Total de la deuda:", deuda.total);
-            //   // Agregar aquí el resto de la lógica necesaria
-            // });
-
-            // Puedes mostrar un mensaje de error aquí si lo deseas
+         
 
             variant="contained"
             color="secondary"

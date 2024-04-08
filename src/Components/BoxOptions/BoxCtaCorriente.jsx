@@ -71,7 +71,7 @@ const BoxCtaCorriente = ({ onClose }) => {
   // };
   //////////////////
   const [rutError, setRutError] = useState(""); // Estado para manejar errores de validación del RUT
-
+  const [transferenciaExitosa,setTransferenciaExitosa]= useState(false);
   const [selectedDeuda, setSelectedDeuda] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
@@ -257,6 +257,7 @@ const BoxCtaCorriente = ({ onClose }) => {
           setSnackbarOpen(true);
           setSearchResults([]);
           clearSalesData();
+          setTransferenciaExitosa(true)///guardo datos de transferencia
           setTimeout(() => {
             handleClosePaymentDialog();
             handleTransferenciaModalClose();
@@ -271,58 +272,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     }
   };
 
-  // const handleTransferData = async () => {
-  //   try {
-  //     const montoPagado = getTotalSelected();
-  //     const requestBody = {
-  //       deudaIds: selectedDebts.map((deuda) => ({
-  //         idCuentaCorriente: selectedCodigoCliente,
-  //         idCabecera: deuda.idCabecera,
-  //         total: montoPagado,
-  //       })),
-  //       montoPagado: montoPagado,
-  //       metodoPago: metodoPago,
-  //       idUsuario: userData.codigoUsuario,
-  //       transferencias: {
-  //         nombre: nombre,
-  //         rut: rut,
-  //         banco: selectedBanco,
-  //         tipoCuenta: tipoCuenta,
-  //         nroCuenta: nroCuenta,
-  //         fecha: fecha,
-  //         nroOperacion: nroOperacion,
-  //       },
-  //     };
 
-  //     console.log("Request Body:", requestBody); // Verifica el cuerpo de la solicitud
-
-  //     for (const deuda of selectedDebts) {
-  //       const response = await axios.post(
-  //         "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
-  //         requestBody
-  //       );
-
-  //       console.log("Response:", response); // Verifica la respuesta de la solicitud
-
-  //       if (response.status === 200) {
-  //         console.log("Transferencia exitosa:", response.data.descripcion);
-  //         setSnackbarMessage(response.data.descripcion);
-  //         setSnackbarOpen(true);
-  //         setSearchResults([]);
-  //         clearSalesData();
-  //         setTimeout(() => {
-  //           handleClosePaymentDialog();
-  //           handleTransferenciaModalClose();
-  //           onClose();
-  //         }, 3000);
-  //       } else {
-  //         console.error("Error al realizar la transferencia");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al realizar la transferencia:", error);
-  //   }
-  // };
 
   const handlePayment = async () => {
     try {
@@ -373,59 +323,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     setSnackbarOpen(false);
   };
 
-  // const validarRutChileno = (rut) => {
-  //   // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
-  //   const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
 
-  //   console.log("Input RUT:", rut);
-
-  //   if (!rutRegex.test(rut)) {
-  //     setRutError("El RUT ingresado no tiene el formato correcto.");
-  //     return false;
-  //   }
-
-  //   // Eliminar puntos del RUT
-  //   const rutWithoutDots = rut.replace(/\./g, "");
-
-  //   // Dividir el RUT en número y dígito verificador
-  //   const rutParts = rutWithoutDots.split("-");
-  //   const rutNumber = rutParts[0];
-  //   const rutDV = rutParts[1].toUpperCase();
-
-  //   console.log("RUT Number:", rutNumber);
-  //   console.log("RUT DV:", rutDV);
-
-  //   // Calcular el dígito verificador esperado
-  //   let suma = 0;
-  //   let multiplo = 2;
-  //   for (let i = rutNumber.length - 1; i >= 0; i--) {
-  //     suma += rutNumber.charAt(i) * multiplo;
-  //     multiplo = multiplo === 7 ? 2 : multiplo + 1;
-  //   }
-
-  //   const dvEsperado = 11 - (suma % 11);
-  //   const dv =
-  //     dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
-  //   console.log("Expected DV:", dv);
-
-  //   // Comparar el dígito verificador ingresado con el esperado
-  //   if (dv !== rutDV) {
-  //     setRutError("El RUT ingresado no es válido.");
-  //     return false;
-  //   }
-  //   if (dv === rutDV) {
-  //     console.log("rut coincide");
-
-  //     setRutError("");
-  //     return false;
-  //   }
-  //   // if (!rutRegex.test(rut)) {
-  //   //   console.log('El RUT ingresado no tiene el formato correcto.');
-  //   //   return false;
-  //   // }
-
-  //   return true;
-  // };
 
   return (
     <Grid container spacing={2}>
@@ -508,13 +406,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                     </TableCell>
 
                     <TableCell>
-                      {/* <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={() => handleOpenPaymentDialog(deuda)}
-                      >
-                        Pagar
-                      </Button> */}
+                   
                     </TableCell>
                   </TableRow>
                 ))}
@@ -628,6 +520,7 @@ const BoxCtaCorriente = ({ onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePaymentDialog}>Cerrar</Button>
+          
           <Button onClick={handlePayment} variant="contained" color="secondary">
             Pagar
           </Button>
