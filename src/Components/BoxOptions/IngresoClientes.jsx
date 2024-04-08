@@ -50,12 +50,14 @@ const IngresoClientes = ({ onClose }) => {
   const [rutError, setRutError] = useState("");
   const [correoError, setCorreoError] = useState("");
 
-  const validateEmail = (email) => {
+  const validateEmail = (correo) => {
+
+    console.log("Input correo:", correo);
     // Expresión regular para validar el formato de un correo electrónico
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   
     // Verificar si el correo electrónico cumple con el formato esperado
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(correo)) {
       setCorreoError('El correo electrónico ingresado no es válido.');
       return false;
     }
@@ -63,10 +65,13 @@ const IngresoClientes = ({ onClose }) => {
     // El correo electrónico tiene un formato válido
     return true;
   };
+
   
 
   const validarRutChileno = (rut) => {
     // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
+ 
+  
     const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
   
     console.log("Input RUT:", rut);
@@ -95,6 +100,8 @@ const IngresoClientes = ({ onClose }) => {
     const dvEsperado = 11 - (suma % 11);
     const dv = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
     console.log("Expected DV:", dv);
+
+    
   
     // Comparar el dígito verificador ingresado con el esperado
     if (dv !== rutDV) {
@@ -207,6 +214,7 @@ const IngresoClientes = ({ onClose }) => {
       }
     };
 
+    
     fetchData();
   }, []);
 
@@ -377,12 +385,22 @@ const IngresoClientes = ({ onClose }) => {
   const handleSubmit = async () => {
     try {
       if (!validateEmail(formData.correo)) {
-        return; // No continuar si el correo electrónico no es válido
+        setCorreoError("El correo electrónico ingresado no es válido.");
+        return;
+      } else {
+        setCorreoError(""); // Clear any previous error message
       }
-      if (!validarRutChileno(formData.rut)) {
-        setRutError("el RUT no es válido");
-        return; // No continuar si el RUT no es válido
+  
+      if (!formData.rut) {
+        setRutError("Por favor ingresa un RUT.");
+        return;
+      } else if (!validarRutChileno(formData.rut)) {
+        setRutError("El RUT ingresado NO es válido.");
+        return;
+      } else {
+        setRutError(""); // Clear any previous error message
       }
+      
       
 
       const emptyFields = Object.entries(formData)
