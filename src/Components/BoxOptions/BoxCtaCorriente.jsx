@@ -34,6 +34,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     setPrecioData,
     clearSalesData,
     selectedUser,
+    setSelectedUser,
     ventaData,
     setVentaData,
     selectedCodigoCliente,
@@ -59,8 +60,6 @@ const BoxCtaCorriente = ({ onClose }) => {
   useEffect(() => {
     fetchDeudaData();
   }, [searchResults]);
-
-
 
   ////////////
   // const countSelectedCheckboxes = () => {
@@ -156,7 +155,6 @@ const BoxCtaCorriente = ({ onClose }) => {
     setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
     setMontoPagado(getTotalSelected());
-
   };
 
   const handleTransferenciaModalClose = () => {
@@ -191,9 +189,8 @@ const BoxCtaCorriente = ({ onClose }) => {
   const handleOpenPaymentDialog = (selectedDebts) => {
     setOpenDialog(true);
     setSelectedDebts(ventaData.filter((deuda) => deuda.selected));
-    
+
     setMontoPagado(getTotalSelected());
-   
   };
   const handleCheckboxChange = (index) => {
     const updatedVentaData = [...ventaData];
@@ -209,7 +206,7 @@ const BoxCtaCorriente = ({ onClose }) => {
 
   const handleClosePaymentDialog = () => {
     setOpenDialog(false);
-   
+
     setMontoPagado(0); // Reiniciar el valor del monto a pagar al cerrar el diálogo
     setMetodoPago("");
   };
@@ -217,8 +214,11 @@ const BoxCtaCorriente = ({ onClose }) => {
   const handleTransferData = async () => {
     try {
       // Calcular el monto total pagado sumando los totales de las deudas seleccionadas
-      const montoPagado = selectedDebts.reduce((total, deuda) => total + deuda.total, 0);
-  
+      const montoPagado = selectedDebts.reduce(
+        (total, deuda) => total + deuda.total,
+        0
+      );
+
       const requestBody = {
         deudaIds: selectedDebts.map((deuda) => ({
           idCuentaCorriente: deuda.id,
@@ -238,18 +238,18 @@ const BoxCtaCorriente = ({ onClose }) => {
           nroOperacion: nroOperacion,
         },
       };
-  
+
       console.log("Request Body:", requestBody); // Verifica el cuerpo de la solicitud
-  
+
       // Realizar la solicitud de transferencia para cada deuda seleccionada
       for (const deuda of selectedDebts) {
         const response = await axios.post(
           "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
           requestBody
         );
-  
+
         console.log("Response:", response); // Verifica la respuesta de la solicitud
-  
+
         if (response.status === 200) {
           console.log("Transferencia exitosa:", response.data.descripcion);
           setSnackbarOpen(true);
@@ -270,8 +270,7 @@ const BoxCtaCorriente = ({ onClose }) => {
       console.error("Error al realizar la transferencia:", error);
     }
   };
-  
-  
+
   // const handleTransferData = async () => {
   //   try {
   //     const montoPagado = getTotalSelected();
@@ -294,17 +293,17 @@ const BoxCtaCorriente = ({ onClose }) => {
   //         nroOperacion: nroOperacion,
   //       },
   //     };
-  
+
   //     console.log("Request Body:", requestBody); // Verifica el cuerpo de la solicitud
-  
+
   //     for (const deuda of selectedDebts) {
   //       const response = await axios.post(
   //         "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
   //         requestBody
   //       );
-  
+
   //       console.log("Response:", response); // Verifica la respuesta de la solicitud
-  
+
   //       if (response.status === 200) {
   //         console.log("Transferencia exitosa:", response.data.descripcion);
   //         setSnackbarMessage(response.data.descripcion);
@@ -324,8 +323,6 @@ const BoxCtaCorriente = ({ onClose }) => {
   //     console.error("Error al realizar la transferencia:", error);
   //   }
   // };
-
-
 
   const handlePayment = async () => {
     try {
@@ -437,43 +434,41 @@ const BoxCtaCorriente = ({ onClose }) => {
           Cuenta Corriente
         </Typography>
       </Grid>
-      {searchResults &&
-        searchResults.length > 0 &&
-        selectedUser &&
-        precioData &&
-        precioData.clientesProductoPrecioMostrar && (
-          <Grid container spacing={2} justifyContent="center">
-            <Grid item xs={12} md={12} lg={12}>
-              <Paper>
-                <Box
-                  display="flex"
-                  p={1.5}
-                  gap={2}
-                  bgcolor={"#f5f5f5"}
-                  borderRadius={4}
-                  sx={{ alignItems: "center" }}
-                >
-                  <Box>
-                    <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
-                  </Box>
-                  <Box sx={{ flex: 1 }}>
-                    <Typography variant="body2" sx={{ color: "#696c6f" }}>
-                      ID:
-                      {selectedUser.rutResponsable}
-                      {/* {precioData.clientesProductoPrecioMostrar[0] &&
+      {/* precioData &&
+         precioData.clientesProductoPrecioMostrar &&  */}
+      {searchResults && searchResults.length > 0 && selectedUser && (
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper>
+              <Box
+                display="flex"
+                p={1.5}
+                gap={2}
+                bgcolor={"#f5f5f5"}
+                borderRadius={4}
+                sx={{ alignItems: "center" }}
+              >
+                <Box>
+                  <Avatar sx={{ borderRadius: 3, width: 48, height: 48 }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" sx={{ color: "#696c6f" }}>
+                    ID:
+                    {selectedUser.rutResponsable}
+                    {/* {precioData.clientesProductoPrecioMostrar[0] &&
                         precioData.clientesProductoPrecioMostrar[0]
                           .codigoCliente}{" "}
                       {" " + " "} */}
-                      <br />
-                      {selectedUser.nombreResponsable}
-                      {""} {selectedUser.apellidoResponsable}
-                    </Typography>
-                  </Box>
+                    <br />
+                    {selectedUser.nombreResponsable}
+                    {""} {selectedUser.apellidoResponsable}
+                  </Typography>
                 </Box>
-              </Paper>
-            </Grid>
+              </Box>
+            </Paper>
           </Grid>
-        )}
+        </Grid>
+      )}
       <Grid item xs={12}>
         {ventaData && ventaData.length > 0 && (
           <TableContainer>
@@ -639,11 +634,11 @@ const BoxCtaCorriente = ({ onClose }) => {
         </DialogActions>
       </Dialog>
       <Snackbar
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-              open={snackbarOpen}
-              onClose={handleSnackbarClose}
-              message={snackbarMessage}
-            />
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={snackbarOpen}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
 
       <Dialog
         open={openTransferenciaModal}
@@ -742,9 +737,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                 onChange={(e) => setNroOperacion(e.target.value)}
               />
             </Grid>
-           
           </Grid>
-
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
@@ -757,7 +750,6 @@ const BoxCtaCorriente = ({ onClose }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      
     </Grid>
   );
 };

@@ -141,6 +141,13 @@ const BoxBuscador = (handleClosePreciosClientes) => {
 
   const handleSearch = async () => {
     try {
+      clearSalesData(); // Limpia los datos de ventas
+      setSelectedUser(null); // Desmarca el usuario seleccionado
+      setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
+      setSearchResults([]); // Limpia los resultados de búsqueda
+      setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
+      handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
+      handleOpenDeudasClientesDialog(0, 0);
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );

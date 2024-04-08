@@ -82,11 +82,11 @@ const IngresoClientes = ({ onClose }) => {
   
     // Comparar el dígito verificador ingresado con el esperado
     if (dv !== rutDV) {
-      setRutError('El RUT ingresado no es válido.');
+      setRutError('El RUT ingresado NO es válido.');
       return false;
     }
     if (dv === rutDV) {
-      console.log("rut coincide");
+      console.log("El RUT ingresado  es válido.");
     
       setRutError('');
       return false;
@@ -363,7 +363,7 @@ const IngresoClientes = ({ onClose }) => {
   };
   const handleSubmit = async () => {
     try {
-      (validarRutChileno(formData.rut))
+      
 
       const emptyFields = Object.entries(formData)
         .filter(([key, value]) => value === "")
@@ -371,12 +371,20 @@ const IngresoClientes = ({ onClose }) => {
 
       if (emptyFields.length > 0) {
         const emptyField = emptyFields[0];
-        setErrorMessage(
+        setRutError(
           `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
         );
         return;
       } else {
-        setErrorMessage("");
+        setRutError("");
+      }
+      setRutError("");
+      if(validarRutChileno(formData.rut)==false){
+        console.log(" validarRutChileno no valido")
+        return;
+      }
+      if(validateEmail()==false){
+        console.log(" Email no valido")
       }
 
       const formDataToSend = {
@@ -503,6 +511,7 @@ const IngresoClientes = ({ onClose }) => {
                   inputMode: "numeric", // textEstablece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
                 }}
+                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -512,6 +521,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.nombre}
                 onChange={handleInputChange}
+                
               />
             </Grid>
             <Grid item xs={12} sm={6}>
