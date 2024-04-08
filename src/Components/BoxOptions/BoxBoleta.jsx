@@ -46,7 +46,7 @@ const BoxBoleta = ({ onClose }) => {
 
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
-  const [cantidadPagada, setCantidadPagada] = useState(0);
+  const [cantidadPagada, setCantidadPagada] = useState(grandTotal);
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
@@ -140,6 +140,10 @@ const BoxBoleta = ({ onClose }) => {
   }, [salesData]);
 
   const handlePagoBoleta = async () => {
+    if (!userData.codigoUsuario) {
+      setError(" Ingresa Código de Vendedor para continuar.");
+      return;
+    }
     if (grandTotal === 0) {
       setError(
         "No se puede generar el boleta de pago porque el total a pagar es cero."
@@ -147,6 +151,11 @@ const BoxBoleta = ({ onClose }) => {
       return;
     }
     try {
+      const cambio = cantidadPagada - grandTotal;
+      if (cambio < 0) {
+        setError("La cantidad pagada es insuficiente.");
+        return;
+      }
       const pagoData = {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: selectedCodigoClienteSucursal,
@@ -160,6 +169,7 @@ const BoxBoleta = ({ onClose }) => {
         })),
         metodoPago: metodoPago,
         transferencias: {
+          idCuentaCorrientePago: 0,
           nombre: nombre,
           rut: rut,
           banco: selectedBanco,
@@ -167,8 +177,7 @@ const BoxBoleta = ({ onClose }) => {
           nroCuenta: nroCuenta,
           fecha: fecha,
           nroOperacion: nroOperacion,
-        }, 
-
+        },
       };
 
       console.log("Datos Boleta antes de enviar la solicitud:", pagoData);
@@ -190,7 +199,10 @@ const BoxBoleta = ({ onClose }) => {
         }, 2000);
         clearSalesData();
       }
-      console.log("Información BOLETA enviada al servidor en:", new Date().toLocaleString());
+      console.log(
+        "Información BOLETA enviada al servidor en:",
+        new Date().toLocaleString()
+      );
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
     }
@@ -215,17 +227,18 @@ const BoxBoleta = ({ onClose }) => {
         );
         return;
       }
-  
+
       const requestBody = {
-        deudaIds: selectedDebts.map(deuda => ({
+        deudaIds: selectedDebts.map((deuda) => ({
           idCuentaCorriente: selectedCodigoCliente,
           idCabecera: deuda.idCabecera,
-          total:  grandTotal,
+          total: grandTotal,
         })),
         montoPagado: grandTotal,
         metodoPago: metodoPago,
         idUsuario: userData.codigoUsuario,
         transferencias: {
+
           nombre: nombre,
           rut: rut,
           banco: selectedBanco,
@@ -235,30 +248,33 @@ const BoxBoleta = ({ onClose }) => {
           nroOperacion: nroOperacion,
         },
       };
-  
+
       console.log("Datos de la solicitud antes de enviarla:", requestBody);
-  
+
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
         requestBody
       );
-  
+
       console.log("Datos de la respuesta después de enviarla:", response);
-  
+
       if (response.status === 200) {
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
-  
+
         setSearchResults([]);
         setSelectedUser([]);
         clearSalesData();
-  
+
         setTimeout(() => {
           handleClosePaymentDialog(true);
           handleTransferenciaModalClose(true);
           onClose(); ////Cierre Modal al finalizar
         }, 3000);
-        console.log("Información TransferenciaBOLETA al servidor en:", new Date().toLocaleString());
+        console.log(
+          "Información TransferenciaBOLETA al servidor en:",
+          new Date().toLocaleString()
+        );
       } else {
         console.error("Error al realizar la transferencia");
       }
@@ -266,11 +282,15 @@ const BoxBoleta = ({ onClose }) => {
       console.error("Error al realizar la transferencia:", error);
     }
   };
-  
+
+  const calcularVuelto = () => {
+    const cambio = cantidadPagada - grandTotal;
+    return cambio > 0 ? cambio : 0;
+  };
 
   return (
     <Grid item xs={12} sm={12} md={12} lg={12}>
-      <Typography sx={{ marginBottom: "2%" }} variant="h5">
+      <Typography variant="h4" sx={{ marginBottom: "2%" }}>
         Pagar Boleta
       </Typography>
       <Grid spacing={2}>
@@ -294,14 +314,40 @@ const BoxBoleta = ({ onClose }) => {
             pattern: "[0-9]*",
           }}
         />
-         <TextField
+        <TextField
           margin="dense"
           fullWidth
-          InputProps={{ readOnly: true }}
+          type="number"
           label="Cantidad pagada"
-          value={cantidadPagada}
-          onChange={(e) => setCantidadPagada(parseFloat(e.target.value))}
+          value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
+          onChange={(e) => {
+            const value = e.target.value; // Valor ingresado en el campo
+            if (!value.trim()) {
+              // Verifica si el valor ingresado está vacío o solo contiene espacios
+              setCantidadPagada(0); // Si está vacío, establece la cantidad pagada como 0
+            } else {
+              setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
+            }
+          }}
         />
+        <TextField
+          margin="dense"
+          fullWidth
+          type="number"
+          label="Por pagar"
+          value={Math.max(0, grandTotal - cantidadPagada)}
+          InputProps={{ readOnly: true }}
+        />
+        {calcularVuelto() > 0 && (
+          <TextField
+            margin="dense"
+            fullWidth
+            type="number"
+            label="Vuelto"
+            value={calcularVuelto()}
+            InputProps={{ readOnly: true }}
+          />
+        )}
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid>
             <Typography variant="h6">Selecciona Método de Pago:</Typography>
@@ -310,48 +356,47 @@ const BoxBoleta = ({ onClose }) => {
           <Grid item xs={12} sm={12} md={12}>
             <Grid item xs={12} sm={2} md={12}>
               <Button
+               id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 fullWidth
-                variant={metodoPago === "Efectivo" ? "contained" : "outlined"}
-                onClick={() => setMetodoPago("Efectivo")}
+                variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
+                onClick={() => setMetodoPago("EFECTIVO")}
               >
                 Efectivo
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Button
+               id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
-                variant={
-                  metodoPago === "Tarjeta Débito" ? "contained" : "outlined"
-                }
-                onClick={() => setMetodoPago("Tarjeta Débito")}
+                variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
+                onClick={() => setMetodoPago("DEBITO")}
                 fullWidth
               >
-                Tarjeta Débito
+                Débito
               </Button>
             </Grid>
             <Grid item xs={12} sm={6} md={12}>
               <Button
+               id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
-                variant={
-                  metodoPago === "Tarjeta Crédito" ? "contained" : "outlined"
-                }
-                onClick={() => setMetodoPago("Tarjeta Crédito")}
+                variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
+                onClick={() => setMetodoPago("CREDITO")}
                 fullWidth
               >
-                Tarjeta Crédito
+                Crédito
               </Button>
             </Grid>
             <Grid item xs={12} sm={6} md={12}>
               <Button
+               id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={
-                  metodoPago === "Transferencia" ? "contained" : "outlined"
+                  metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
                 }
                 onClick={() => {
-                  setMetodoPago("Transferencia");
+                  setMetodoPago("TRANSFERENCIA");
                   handleTransferenciaModalOpen(selectedDebts);
-
                 }} // Ambas funciones separadas por punto y coma
                 fullWidth
               >
@@ -505,25 +550,24 @@ const BoxBoleta = ({ onClose }) => {
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
             onClick={handleTransferData}
-              // Convertir el objeto selectedDebts en un array de valores
-              // const selectedDebtsArray = Object.values(selectedDebts);
+            // Convertir el objeto selectedDebts en un array de valores
+            // const selectedDebtsArray = Object.values(selectedDebts);
 
-              // // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
+            // // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
 
-              // // Validar campos y RUT
+            // // Validar campos y RUT
 
-              // // Iterar sobre el array selectedDebtsArray
-              // selectedDebtsArray.forEach((deuda) => {
-              //   // Realizar las operaciones necesarias con cada deuda
-              //   console.log("ID de la deuda:", deuda.id);
-              //   console.log("ID de la cabecera:", deuda.idCabecera);
-              //   console.log("Total de la deuda:", deuda.total);
-              //   // Agregar aquí el resto de la lógica necesaria
-              // });
-              
+            // // Iterar sobre el array selectedDebtsArray
+            // selectedDebtsArray.forEach((deuda) => {
+            //   // Realizar las operaciones necesarias con cada deuda
+            //   console.log("ID de la deuda:", deuda.id);
+            //   console.log("ID de la cabecera:", deuda.idCabecera);
+            //   console.log("Total de la deuda:", deuda.total);
+            //   // Agregar aquí el resto de la lógica necesaria
+            // });
 
-              // Puedes mostrar un mensaje de error aquí si lo deseas
-           
+            // Puedes mostrar un mensaje de error aquí si lo deseas
+
             variant="contained"
             color="secondary"
           >

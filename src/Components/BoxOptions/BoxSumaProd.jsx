@@ -121,7 +121,8 @@ const BoxSumaProd = ({ venta }) => {
         }
       } catch (error) {
         console.error("Error al buscar el producto:", error);
-        setErrorMessage("Error al buscar el producto por PLU");
+
+        setErrorMessage("");
 
       }
     }
@@ -396,7 +397,7 @@ const BoxSumaProd = ({ venta }) => {
             </Table>
             <Paper
               sx={{
-               
+               width:"100%",
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",

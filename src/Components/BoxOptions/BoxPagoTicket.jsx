@@ -46,7 +46,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
 
-  const [transferenciaExitosa,setTransferenciaExitosa]= useState(false);
+  const [transferenciaExitosa, setTransferenciaExitosa] = useState(false);
 
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
 
@@ -142,7 +142,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     setSelectedMethod(metodo);
   };
 
-
   const handleTransferData = async () => {
     try {
       if (
@@ -167,7 +166,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           total: grandTotal,
         })),
         montoPagado: grandTotal,
-        metodoPago:selectedMethod,
+        metodoPago: selectedMethod,
         idUsuario: userData.codigoUsuario,
         transferencias: {
           nombre: nombre,
@@ -183,7 +182,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       console.log("Datos de la solicitud antes de enviarla:", requestBody);
 
       const response = await axios.post(
-         "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
+        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
         requestBody
       );
 
@@ -196,14 +195,17 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         setSearchResults([]);
         setSelectedUser([]);
         clearSalesData();
-        setTransferenciaExitosa(true)
+        setTransferenciaExitosa(true);
 
         setTimeout(() => {
           handleClosePaymentDialog(true);
           handleTransferenciaModalClose(true);
           onClose(); ////Cierre Modal al finalizar
         }, 3000);
-        console.log("Información TransferenciaTICKET al servidor en:", new Date().toLocaleString());
+        console.log(
+          "Información TransferenciaTICKET al servidor en:",
+          new Date().toLocaleString()
+        );
       } else {
         console.error("Error al realizar la transferencia");
       }
@@ -217,23 +219,27 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       if (selectedMethod === "TRANSFERENCIA" && !transferenciaExitosa) {
         // Si el método de pago es transferencia y la transferencia no ha sido exitosa,
         // entonces no procesar el pago y mostrar un mensaje de error
-        setError("Por favor, complete la transferencia correctamente antes de generar el ticket.");
+        setError(
+          "Por favor, complete la transferencia correctamente antes de generar el ticket."
+        );
         return;
       }
-  
+
       if (grandTotal === 0) {
-        setError("No se puede generar el ticket de pago porque el total a pagar es cero.");
+        setError(
+          "No se puede generar el ticket de pago porque el total a pagar es cero."
+        );
         return;
       }
-     
+
       if (isNaN(cantidadPagada) || cantidadPagada < 0) {
         setError("Por favor, ingresa una cantidad pagada válida.");
         return;
       }
-  
+
       const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
       const codigoCliente = searchResults[0].codigoCliente;
-  
+
       const ticket = {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: codigoClienteSucursal,
@@ -254,38 +260,37 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           nroCuenta: nroCuenta,
           fecha: fecha,
           nroOperacion: nroOperacion,
-        }, 
+        },
       };
-  
+
       console.log("Datos enviados por Axios:", ticket);
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
         ticket
       );
-  
+
       console.log("Respuesta del servidor:", response.data);
       if (response.status === 200) {
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
         setSearchResults([]);
         clearSalesData();
-        setTransferenciaExitosa(true)
-  
+        setTransferenciaExitosa(true);
+
         // Esperar 4 segundos antes de cerrar el modal
         setTimeout(() => {
           onCloseTicket();
         }, 3000);
-        
       }
-      console.log("Información TICKET al servidor en:", new Date().toLocaleString());
-  
+      console.log(
+        "Información TICKET al servidor en:",
+        new Date().toLocaleString()
+      );
     } catch (error) {
       console.error("Error al generar la boleta electrónica:", error);
       setError("Error al generar la boleta electrónica.");
     }
   };
-
-  
 
   return (
     <Grid container spacing={2}>
@@ -312,10 +317,18 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         <TextField
           margin="dense"
           fullWidth
-          InputProps={{ readOnly: true }}
+          type="number"
           label="Cantidad pagada"
-          value={cantidadPagada}
-          onChange={(e) => setCantidadPagada(parseFloat(e.target.value))}
+          value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
+          onChange={(e) => {
+            const value = e.target.value; // Valor ingresado en el campo
+            if (!value.trim()) {
+              // Verifica si el valor ingresado está vacío o solo contiene espacios
+              setCantidadPagada(0); // Si está vacío, establece la cantidad pagada como 0
+            } else {
+              setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
+            }
+          }}
         />
         <TextField
           margin="dense"
@@ -377,9 +390,10 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             Cuenta Corriente
           </Button>
           <Button
-          id={`${selectedMethod}-btn`}
-       
-            variant={selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"}
+            id={`${selectedMethod}-btn`}
+            variant={
+              selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"
+            }
             onClick={() => {
               handleMetodoPagoClick("TRANSFERENCIA");
               handleTransferenciaModalOpen(selectedDebts);
@@ -409,8 +423,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         </Grid>
       )} */}
 
-    
-
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         open={snackbarOpen}
@@ -424,7 +436,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
-        
           <Grid container spacing={2}>
             {errorTransferenciaError && (
               <p style={{ color: "red" }}> {errorTransferenciaError}</p>
@@ -523,8 +534,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
             onClick={handleTransferData}
-         
-
             variant="contained"
             color="secondary"
           >
