@@ -210,6 +210,9 @@ const BoxBoleta = ({ onClose }) => {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
+  const handleMetodoPagoClick = (metodo) => {
+    setSelectedMethod(metodo);
+  };
 
   const handleTransferData = async () => {
     try {
@@ -238,7 +241,6 @@ const BoxBoleta = ({ onClose }) => {
         metodoPago: metodoPago,
         idUsuario: userData.codigoUsuario,
         transferencias: {
-
           nombre: nombre,
           rut: rut,
           banco: selectedBanco,
@@ -289,78 +291,84 @@ const BoxBoleta = ({ onClose }) => {
   };
 
   return (
-    <Grid item xs={12} sm={12} md={12} lg={12}>
-      <Typography variant="h4" sx={{ marginBottom: "2%" }}>
-        Pagar Boleta
-      </Typography>
-      <Grid spacing={2}>
-        {error && (
-          <Grid item xs={12}>
-            <Typography variant="body1" color="error">
-              {error}
-            </Typography>
-          </Grid>
-        )}
-        <TextField
-          sx={{ marginBottom: "5%" }}
-          margin="dense"
-          label="Monto a Pagar"
-          variant="outlined"
-          value={grandTotal}
-          onChange={(e) => setMontoPagado(e.target.value)}
-          fullWidth
-          inputProps={{
-            inputMode: "numeric",
-            pattern: "[0-9]*",
-          }}
-        />
-        <TextField
-          margin="dense"
-          fullWidth
-       
-          label="Cantidad pagada"
-          value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
-          onChange={(e) => {
-            const value = e.target.value; // Valor ingresado en el campo
-            if (!value.trim()) {
-              // Verifica si el valor ingresado está vacío o solo contiene espacios
-              setCantidadPagada(0); // Si está vacío, establece la cantidad pagada como 0
-            } else {
-              setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
-            }
-          }}
-          inputProps={{
-            inputMode: "numeric",
-            pattern: "[0-9]*",
-          }}
-        />
-        <TextField
-          margin="dense"
-          fullWidth
-          type="number"
-          label="Por pagar"
-          value={Math.max(0, grandTotal - cantidadPagada)}
-          InputProps={{ readOnly: true }}
-        />
-        {calcularVuelto() > 0 && (
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <Typography variant="h4" sx={{ marginBottom: "2%" }}>
+            Pagar Boleta
+          </Typography>
+          {error && (
+            <Grid item xs={12}>
+              <Typography variant="body1" color="error">
+                {error}
+              </Typography>
+            </Grid>
+          )}
+          <TextField
+            sx={{ marginBottom: "5%" }}
+            margin="dense"
+            label="Monto a Pagar"
+            variant="outlined"
+            value={grandTotal}
+            onChange={(e) => setMontoPagado(e.target.value)}
+            fullWidth
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
+          />
+          <TextField
+            margin="dense"
+            fullWidth
+            label="Cantidad pagada"
+            value={cantidadPagada || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!value.trim()) {
+                setCantidadPagada(0);
+              } else {
+                setCantidadPagada(parseFloat(value));
+              }
+            }}
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
+          />
           <TextField
             margin="dense"
             fullWidth
             type="number"
-            label="Vuelto"
-            value={calcularVuelto()}
+            label="Por pagar"
+            value={Math.max(0, grandTotal - cantidadPagada)}
             InputProps={{ readOnly: true }}
           />
-        )}
-        <Grid container spacing={2} alignItems="center" justifyContent="center">
-          <Grid>
-            <Typography variant="h6">Selecciona Método de Pago:</Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={12} md={12}>
-            <Grid item xs={12} sm={2} md={12}>
+          {calcularVuelto() > 0 && (
+            <TextField
+              margin="dense"
+              fullWidth
+              type="number"
+              label="Vuelto"
+              value={calcularVuelto()}
+              InputProps={{ readOnly: true }}
+            />
+          )}
+        </Grid>
+        <Grid item xs={12} md={6} lg={6}>
+          <Grid
+            container
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid item xs={12}>
+              <Typography sx={{ marginTop: "7%" }} variant="h6">
+                Selecciona Método de Pago:
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
               <Button
-               id={`${metodoPago}-btn`}
+                id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 fullWidth
                 variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
@@ -371,7 +379,7 @@ const BoxBoleta = ({ onClose }) => {
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Button
-               id={`${metodoPago}-btn`}
+                id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
                 onClick={() => setMetodoPago("DEBITO")}
@@ -382,7 +390,7 @@ const BoxBoleta = ({ onClose }) => {
             </Grid>
             <Grid item xs={12} sm={6} md={12}>
               <Button
-               id={`${metodoPago}-btn`}
+                id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
                 onClick={() => setMetodoPago("CREDITO")}
@@ -391,9 +399,24 @@ const BoxBoleta = ({ onClose }) => {
                 Crédito
               </Button>
             </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${metodoPago}-btn`}
+                fullWidth
+                variant={
+                  metodoPago === "CUENTACORRIENTE"
+                    ? "contained"
+                    : "outlined"
+                }
+                onClick={() => setMetodoPago("CUENTACORRIENTE")}
+              >
+                Cuenta Corriente
+              </Button>
+            </Grid>
             <Grid item xs={12} sm={6} md={12}>
               <Button
-               id={`${metodoPago}-btn`}
+                id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={
                   metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
@@ -401,7 +424,7 @@ const BoxBoleta = ({ onClose }) => {
                 onClick={() => {
                   setMetodoPago("TRANSFERENCIA");
                   handleTransferenciaModalOpen(selectedDebts);
-                }} // Ambas funciones separadas por punto y coma
+                }}
                 fullWidth
               >
                 Transferencia
@@ -421,14 +444,14 @@ const BoxBoleta = ({ onClose }) => {
             </Grid>
           </Grid>
         </Grid>
-
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          open={snackbarOpen}
-          onClose={onClose}
-          message={snackbarMessage}
-        />
       </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={snackbarOpen}
+        onClose={onClose}
+        message={snackbarMessage}
+      />
 
       <Dialog
         open={openTransferenciaModal}
@@ -436,26 +459,6 @@ const BoxBoleta = ({ onClose }) => {
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
-          {/* <Grid container spacing={2}>
-            {selectedDebts.map((deuda, index) => (
-              <Grid item xs={12} key={index}>
-                <Typography>ID: {deuda.id}</Typography>
-                <Typography>ID de Cabeceraaa: {deuda.idCabecera}</Typography>
-                <Typography>
-                  Descripción: {deuda.descripcionComprobante}
-                </Typography>
-                <Typography>
-                  Número de Comprobante: {deuda.nroComprobante}
-                </Typography>
-                <Typography>
-                  Total Pagado Parcial: ${deuda.totalPagadoParcial}
-                </Typography>
-                <Typography>Total: ${deuda.total}</Typography>
-                
-              </Grid>
-            ))}
-          </Grid> */}
-
           <Grid container spacing={2}>
             {errorTransferenciaError && (
               <p style={{ color: "red" }}> {errorTransferenciaError}</p>
@@ -471,11 +474,11 @@ const BoxBoleta = ({ onClose }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Ingrese rut con puntos y guión "
+                label="Ingrese rut con puntos y guión"
                 placeholder=" ej : 13.344.434-6"
                 variant="outlined"
                 fullWidth
-                value={rut} // Asigna el estado `rut` como valor
+                value={rut}
                 onChange={(e) => setRut(e.target.value)}
               />
             </Grid>
@@ -502,7 +505,6 @@ const BoxBoleta = ({ onClose }) => {
                 onChange={handleChangeTipoCuenta}
                 fullWidth
               >
-                {/* Mapeo del objeto tiposDeCuenta para generar los elementos MenuItem */}
                 {Object.entries(tiposDeCuenta).map(([key, value]) => (
                   <MenuItem key={key} value={value}>
                     {key}
@@ -510,13 +512,12 @@ const BoxBoleta = ({ onClose }) => {
                 ))}
               </TextField>
             </Grid>
-
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
-                value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
+                value={nroCuenta}
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
@@ -525,11 +526,11 @@ const BoxBoleta = ({ onClose }) => {
                 label="Fecha"
                 variant="outlined"
                 fullWidth
-                type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
+                type="date"
                 value={fecha}
                 onChange={handleFechaChange}
                 InputLabelProps={{
-                  shrink: true, // Encoger la etiqueta para evitar solapamientos
+                  shrink: true,
                 }}
               />
             </Grid>
@@ -538,40 +539,16 @@ const BoxBoleta = ({ onClose }) => {
                 label="Numero Operación"
                 variant="outlined"
                 fullWidth
-                value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
+                value={nroOperacion}
                 onChange={(e) => setNroOperacion(e.target.value)}
               />
             </Grid>
-            <Snackbar
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-              open={snackbarOpen}
-              onClose={handleSnackbarClose}
-              message={snackbarMessage}
-            />
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
           <Button
             onClick={handleTransferData}
-            // Convertir el objeto selectedDebts en un array de valores
-            // const selectedDebtsArray = Object.values(selectedDebts);
-
-            // // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
-
-            // // Validar campos y RUT
-
-            // // Iterar sobre el array selectedDebtsArray
-            // selectedDebtsArray.forEach((deuda) => {
-            //   // Realizar las operaciones necesarias con cada deuda
-            //   console.log("ID de la deuda:", deuda.id);
-            //   console.log("ID de la cabecera:", deuda.idCabecera);
-            //   console.log("Total de la deuda:", deuda.total);
-            //   // Agregar aquí el resto de la lógica necesaria
-            // });
-
-            // Puedes mostrar un mensaje de error aquí si lo deseas
-
             variant="contained"
             color="secondary"
           >
@@ -579,7 +556,7 @@ const BoxBoleta = ({ onClose }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Grid>
+    </>
   );
 };
 

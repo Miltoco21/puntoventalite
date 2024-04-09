@@ -37,8 +37,9 @@ const Boxfactura = ({ onClose }) => {
     selectedCodigoCliente,
     selectedCodigoClienteSucursal,
   } = useContext(SelectedOptionsContext);
+  const [cantidadPagada, setCantidadPagada] = useState(0);
 
-  const [montoPagado, setMontoPagado] = useState(0);
+
   const [metodoPago, setMetodoPago] = useState("");
   const [error, setError] = useState(null);
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
@@ -136,7 +137,7 @@ const Boxfactura = ({ onClose }) => {
       0
     );
     // Establecer el total como el monto pagado
-    setMontoPagado(totalVenta);
+    setCantidadPagada(totalVenta);
   }, [salesData]);
 
   const handleCloseSnackbar = () => {
@@ -150,6 +151,84 @@ const Boxfactura = ({ onClose }) => {
   const handleTransferenciaModalClose = () => {
     setOpenTransferenciaModal(false);
   };
+
+  // const handleGenerarTicket = async () => {
+  //   try {
+  //     if (metodoPago === "TRANSFERENCIA" && !transferenciaExitosa) {
+  //       // Si el método de pago es transferencia y la transferencia no ha sido exitosa,
+  //       // entonces no procesar el pago y mostrar un mensaje de error
+  //       setError(
+  //         "Por favor, complete la transferencia correctamente antes de generar el ticket."
+  //       );
+  //       return;
+  //     }
+
+  //     if (grandTotal === 0) {
+  //       setError(
+  //         "No se puede generar el ticket de pago porque el total a pagar es cero."
+  //       );
+  //       return;
+  //     }
+
+  //     if (isNaN(cantidadPagada) || cantidadPagada < 0) {
+  //       setError("Por favor, ingresa una cantidad pagada válida.");
+  //       return;
+  //     }
+
+  //     const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
+  //     const codigoCliente = searchResults[0].codigoCliente;
+
+  //     const ticket = {
+  //       idUsuario: userData.codigoUsuario,
+  //       codigoClienteSucursal: codigoClienteSucursal,
+  //       codigoCliente: codigoCliente,
+  //       total: grandTotal,
+  //       products: salesData.map((sale) => ({
+  //         codProducto: sale.idProducto,
+  //         cantidad: sale.quantity,
+  //         precioUnidad: sale.precio,
+  //         descripcion: sale.descripcion,
+  //       })),
+  //       metodoPago: metodoPago,
+  //       transferencias: {
+  //         nombre: nombre,
+  //         rut: rut,
+  //         banco: selectedBanco,
+  //         tipoCuenta: tipoCuenta,
+  //         nroCuenta: nroCuenta,
+  //         fecha: fecha,
+  //         nroOperacion: nroOperacion,
+  //       },
+  //     };
+
+  //     console.log("Datos enviados por Axios:", ticket);
+  //     const response = await axios.post(
+  //       "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
+  //       ticket
+  //     );
+
+  //     console.log("Respuesta del servidor:", response.data);
+  //     if (response.status === 200) {
+  //       setSnackbarMessage(response.data.descripcion);
+  //       setSnackbarOpen(true);
+  //       setSearchResults([]);
+  //       clearSalesData();
+  //       setTransferenciaExitosa(true);
+
+  //       // Esperar 4 segundos antes de cerrar el modal
+  //       setTimeout(() => {
+  //         onCloseTicket();
+  //       }, 3000);
+  //     }
+  //     console.log(
+  //       "Información TICKET al servidor en:",
+  //       new Date().toLocaleString()
+  //     );
+  //   } catch (error) {
+  //     console.error("Error al generar la boleta electrónica:", error);
+  //     setError("Error al generar la boleta electrónica.");
+  //   }
+  // };
 
   const handlePagoFactura = async () => {
     try {
@@ -198,6 +277,9 @@ const Boxfactura = ({ onClose }) => {
       setSnackbarMessage("Error en el proceso");
     }
   };
+  const handleMetodoPagoClick = (metodo) => {
+    setSelectedMethod(metodo);
+  };
  
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -233,7 +315,7 @@ const Boxfactura = ({ onClose }) => {
               total:  grandTotal,
             },
           ],
-          montoPagado: grandTotal,
+          cantidadPagada: grandTotal,
           metodoPago: metodoPago,
           idUsuario: userData.codigoUsuario,
           transferencias: {
@@ -279,284 +361,288 @@ const Boxfactura = ({ onClose }) => {
       console.error("Error al realizar la transferencia:", error);
     }
   };
+  const calcularVuelto = () => {
+    const cambio = cantidadPagada - grandTotal;
+    return cambio > 0 ? cambio : 0;
+  };
   return (
-    <Grid item xs={12} sm={12} md={12} lg={12}>
-      <Typography sx={{ marginBottom: "2%" }} variant="h5">
-        Pagar Factura
-      </Typography>
-      <Stack spacing={2}>
-        {error && (
-          <Grid item xs={12}>
-            <Typography variant="body1" color="error">
-              {error}
-            </Typography>
-          </Grid>
-        )}
-        <TextField
-          sx={{ marginBottom: "5%" }}
-          margin="dense"
-          label="Monto a Pagar"
-          variant="outlined"
-          value={grandTotal}
-          onChange={(e) => setMontoPagado(e.target.value)}
-          fullWidth
-          inputProps={{
-            inputMode: "numeric",
-            pattern: "[0-9]*",
-          }}
-        />
-        <Grid container spacing={2} alignItems="center" justifyContent="center">
-          <Grid>
-            <Typography variant="h6">Selecciona Método de Pago:</Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={2} md={12}>
-            <Grid item xs={12} sm={12} md={12}>
-              <Button
-                sx={{ height: "100%" }}
-                fullWidth
-                variant={metodoPago === "Efectivo" ? "contained" : "outlined"}
-                onClick={() => setMetodoPago("Efectivo")}
-              >
-                Efectivo
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Button
-                sx={{ height: "100%" }}
-                variant={
-                  metodoPago === "Tarjeta Débito" ? "contained" : "outlined"
-                }
-                onClick={() => setMetodoPago("Tarjeta Débito")}
-                fullWidth
-              >
-                Tarjeta Débito
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={12} md={12}>
-              <Button
-                sx={{ height: "100%" }}
-                variant={
-                  metodoPago === "Tarjeta Crédito" ? "contained" : "outlined"
-                }
-                onClick={() => setMetodoPago("Tarjeta Crédito")}
-                fullWidth
-              >
-                Tarjeta Crédito
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={6} md={12}>
-              <Button
-                sx={{ height: "100%" }}
-                variant={
-                  metodoPago === "Transferencia" ? "contained" : "outlined"
-                }
-                onClick={() => handleTransferenciaModalOpen(selectedDebts)}
-                fullWidth
-              >
-                Transferencia
-              </Button>
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={12}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="secondary"
-                disabled={!metodoPago || montoPagado <= 0}
-                onClick={handlePagoFactura}
-              >
-                Pagar
-              </Button>
-            </Grid>
-          </Grid>
+    <Grid container spacing={2}>
+    <Grid item xs={12} md={6} lg={6}>
+      <Typography variant="h4">Pagar Factura</Typography>
+  
+      {error && (
+        <Grid item xs={12}>
+          <Typography variant="body1" color="error">
+            {error}
+          </Typography>
         </Grid>
-      </Stack>
-      <Snackbar
-        open={snackbarOpen}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
+      )}
+      <TextField
+        margin="dense"
+        fullWidth
+        label="Monto a Pagar"
+        variant="outlined"
+        value={grandTotal}
+        InputProps={{ readOnly: true }}
+        onChange={(e) => setCantidadPagada(e.target.value)}
       />
-      <Dialog
-        open={openTransferenciaModal}
-        onClose={handleTransferenciaModalClose}
+      <TextField
+        margin="dense"
+        fullWidth
+        type="number"
+        label="Cantidad pagada"
+        value={cantidadPagada || ""}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (!value.trim()) {
+            setCantidadPagada(0);
+          } else {
+            setCantidadPagada(parseFloat(value));
+          }
+        }}
+      />
+      <TextField
+        margin="dense"
+        fullWidth
+        type="number"
+        label="Por pagar"
+        value={Math.max(0, grandTotal - cantidadPagada)}
+        InputProps={{ readOnly: true }}
+      />
+       {calcularVuelto() > 0 && (
+            <TextField
+              margin="dense"
+              fullWidth
+              type="number"
+              label="Vuelto"
+              value={calcularVuelto()}
+              InputProps={{ readOnly: true }}
+            />
+          )}
+    </Grid>
+  
+    <Grid item xs={12} sm={12} md={6}>
+      <Grid container spacing={1} alignItems="center" justifyContent="center">
+        <Grid item xs={12}>
+          <Typography sx={{ marginTop: "7%" }} variant="h6">
+            Selecciona Método de Pago:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
+          <Button
+            sx={{ height: "100%" }}
+            fullWidth
+            variant={metodoPago === "Efectivo" ? "contained" : "outlined"}
+            onClick={() => setMetodoPago("Efectivo")}
+          >
+            Efectivo
+          </Button>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
+          <Button
+            sx={{ height: "100%" }}
+            variant={
+              metodoPago === "Tarjeta Débito" ? "contained" : "outlined"
+            }
+            onClick={() => setMetodoPago("Tarjeta Débito")}
+            fullWidth
+          >
+            Débito
+          </Button>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
+          <Button
+            sx={{ height: "100%" }}
+            variant={
+              metodoPago === "Tarjeta Crédito" ? "contained" : "outlined"
+            }
+            onClick={() => setMetodoPago("Tarjeta Crédito")}
+            fullWidth
+          >
+            Crédito
+          </Button>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
+          <Button
+            sx={{ height: "100%" }}
+            variant={
+              metodoPago === "Transferencia" ? "contained" : "outlined"
+            }
+            onClick={() => handleTransferenciaModalOpen(selectedDebts)}
+            fullWidth
+          >
+            Transferencia
+          </Button>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${metodoPago}-btn`}
+                fullWidth
+                variant={
+                  metodoPago === "CUENTACORRIENTE"
+                    ? "contained"
+                    : "outlined"
+                }
+                onClick={() => setMetodoPago("CUENTACORRIENTE")}
+              >
+                Cuenta Corriente
+              </Button>
+            </Grid>
+      </Grid>
+      <Button
+        fullWidth
+        variant="contained"
+        color="secondary"
+        disabled={!metodoPago || cantidadPagada <= 0}
+        onClick={handlePagoFactura}
       >
-        <DialogTitle>Transferencia</DialogTitle>
-        <DialogContent>
-          {/* <Grid container spacing={2}>
-            {selectedDebts.map((deuda, index) => (
-              <Grid item xs={12} key={index}>
-                <Typography>ID: {deuda.id}</Typography>
-                <Typography>ID de Cabeceraaa: {deuda.idCabecera}</Typography>
-                <Typography>
-                  Descripción: {deuda.descripcionComprobante}
-                </Typography>
-                <Typography>
-                  Número de Comprobante: {deuda.nroComprobante}
-                </Typography>
-                <Typography>
-                  Total Pagado Parcial: ${deuda.totalPagadoParcial}
-                </Typography>
-                <Typography>Total: ${deuda.total}</Typography>
-                
-              </Grid>
-            ))}
-          </Grid> */}
-
-          <Grid container spacing={2}>
-          {errorTransferenciaError&& <p style={{ color: "red" }}> {errorTransferenciaError}</p>}
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                variant="outlined"
-                fullWidth
-              />
+        Pagar
+      </Button>
+    </Grid>
+  
+    <Snackbar
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      open={snackbarOpen}
+      autoHideDuration={6000}
+      onClose={handleCloseSnackbar}
+      message={snackbarMessage}
+    />
+  
+    <Dialog
+      open={openTransferenciaModal}
+      onClose={handleTransferenciaModalClose}
+    >
+      <DialogTitle>Transferencia</DialogTitle>
+      <DialogContent>
+        <Grid container spacing={2}>
+          {errorTransferenciaError && (
+            <Grid item xs={12}>
+              <Typography style={{ color: "red" }}>
+                {errorTransferenciaError}
+              </Typography>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Ingrese rut con puntos y guión "
-                placeholder=" ej : 13.344.434-6"
-                variant="outlined"
-                fullWidth
-                value={rut} // Asigna el estado `rut` como valor
-                onChange={(e) => setRut(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                label="Banco"
-                value={selectedBanco}
-                onChange={handleBancoChange}
-                fullWidth
-              >
-                {bancosChile.map((banco) => (
-                  <MenuItem key={banco.id} value={banco.nombre}>
-                    {banco.nombre}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                select
-                label="Tipo de Cuenta"
-                value={tipoCuenta}
-                onChange={handleChangeTipoCuenta}
-                fullWidth
-              >
-                {/* Mapeo del objeto tiposDeCuenta para generar los elementos MenuItem */}
-                {Object.entries(tiposDeCuenta).map(([key, value]) => (
-                  <MenuItem key={key} value={value}>
-                    {key}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Número de cuenta"
-                variant="outlined"
-                fullWidth
-                value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
-                onChange={(e) => setNroCuenta(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Fecha"
-                variant="outlined"
-                fullWidth
-                type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
-                value={fecha}
-                onChange={handleFechaChange}
-                InputLabelProps={{
-                  shrink: true, // Encoger la etiqueta para evitar solapamientos
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Numero Operación"
-                variant="outlined"
-                fullWidth
-                value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
-                onChange={(e) => setNroOperacion(e.target.value)}
-              />
-            </Grid>
-            <Snackbar
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-              open={snackbarOpen}
-              onClose={handleSnackbarClose}
-              message={snackbarMessage}
+          )}
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Nombre"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              variant="outlined"
+              fullWidth
             />
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-          <Button
-            onClick={() => {
-              if (
-                !nombre ||
-                !rut ||
-                !selectedBanco ||
-                !tipoCuenta ||
-                !nroCuenta ||
-                !fecha ||
-                !nroOperacion
-              ) {
-                setTransferenciaError("Por favor complete todos los campos obligatorios.");
-                return;
-              }
-              // Convertir el objeto selectedDebts en un array de valores
-              const selectedDebtsArray = Object.values(selectedDebts);
-
-              // Verificar que selectedDebtsArray sea un array y contenga los datos esperados
-              console.log(
-                "Tipo de selectedDebtsArray:",
-                Array.isArray(selectedDebtsArray)
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Ingrese rut con puntos y guión "
+              placeholder=" ej : 13.344.434-6"
+              variant="outlined"
+              fullWidth
+              value={rut}
+              onChange={(e) => setRut(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              label="Banco"
+              value={selectedBanco}
+              onChange={handleBancoChange}
+              fullWidth
+            >
+              {bancosChile.map((banco) => (
+                <MenuItem key={banco.id} value={banco.nombre}>
+                  {banco.nombre}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              select
+              label="Tipo de Cuenta"
+              value={tipoCuenta}
+              onChange={handleChangeTipoCuenta}
+              fullWidth
+            >
+              {Object.entries(tiposDeCuenta).map(([key, value]) => (
+                <MenuItem key={key} value={value}>
+                  {key}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+  
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Número de cuenta"
+              variant="outlined"
+              fullWidth
+              value={nroCuenta}
+              onChange={(e) => setNroCuenta(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Fecha"
+              variant="outlined"
+              fullWidth
+              type="date"
+              value={fecha}
+              onChange={handleFechaChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Numero Operación"
+              variant="outlined"
+              fullWidth
+              value={nroOperacion}
+              onChange={(e) => setNroOperacion(e.target.value)}
+            />
+          </Grid>
+        </Grid>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
+        <Button
+          onClick={() => {
+            if (
+              !nombre ||
+              !rut ||
+              !selectedBanco ||
+              !tipoCuenta ||
+              !nroCuenta ||
+              !fecha ||
+              !nroOperacion
+            ) {
+              setTransferenciaError(
+                "Por favor complete todos los campos obligatorios."
               );
-              console.log(
-                "Contenido de selectedDebtsArray:",
-                selectedDebtsArray
-              );
-
-              // Validar campos y RUT
-
-              // Iterar sobre el array selectedDebtsArray
-              selectedDebtsArray.forEach((deuda) => {
-                // Realizar las operaciones necesarias con cada deuda
-                console.log("ID de la deuda:", deuda.id);
-                console.log("ID de la cabecera:", deuda.idCabecera);
-                console.log("Total de la deuda:", deuda.total);
-                // Agregar aquí el resto de la lógica necesaria
-              });
-
-              // Llamar a la función handleTransferData con los datos preparados
-              handleTransferData(selectedDebts, montoPagado, metodoPago, {
-                nombre: nombre,
-                rut: rut,
-                banco: selectedBanco,
-                tipoCuenta: tipoCuenta,
-                nroCuenta: nroCuenta,
-                fecha: fecha,
-                nroOperacion: nroOperacion,
-              });
-
-              
-              // Puedes mostrar un mensaje de error aquí si lo deseas
-            }}
-            variant="contained"
-            color="secondary"
-          >
-            Guardar Datos Transferencia
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Grid>
+              return;
+            }
+            handleTransferData(selectedDebts, cantidadPagada, metodoPago, {
+              nombre: nombre,
+              rut: rut,
+              banco: selectedBanco,
+              tipoCuenta: tipoCuenta,
+              nroCuenta: nroCuenta,
+              fecha: fecha,
+              nroOperacion: nroOperacion,
+            });
+          }}
+          variant="contained"
+          color="secondary"
+        >
+          Guardar Datos Transferencia
+        </Button>
+      </DialogActions>
+    </Dialog>
+  </Grid>
+  
   );
 };
 

@@ -384,12 +384,23 @@ const IngresoClientes = ({ onClose }) => {
   };
   const handleSubmit = async () => {
     try {
-      if (!validateEmail(formData.correo)) {
-        setCorreoError("El correo electrónico ingresado no es válido.");
-        return;
-      } else {
-        setCorreoError(""); // Clear any previous error message
-      }
+       
+
+      const emptyFields = Object.entries(formData)
+      .filter(([key, value]) => value === "")
+      .map(([key]) => key);
+
+    if (emptyFields.length > 0) {
+      const emptyField = emptyFields[0];
+      setRutError(
+        `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+      );
+      return;
+    } else {
+      setRutError("");
+    }
+    setRutError("");
+     
   
       if (!formData.rut) {
         setRutError("Por favor ingresa un RUT.");
@@ -400,23 +411,14 @@ const IngresoClientes = ({ onClose }) => {
       } else {
         setRutError(""); // Clear any previous error message
       }
-      
-      
-
-      const emptyFields = Object.entries(formData)
-        .filter(([key, value]) => value === "")
-        .map(([key]) => key);
-
-      if (emptyFields.length > 0) {
-        const emptyField = emptyFields[0];
-        setRutError(
-          `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
-        );
+      if (!validateEmail(formData.correo)) {
+        setCorreoError("El correo electrónico ingresado no es válido.");
         return;
       } else {
-        setRutError("");
+        setCorreoError(""); // Clear any previous error message
       }
-      setRutError("");
+      
+      
       
   
       // if(validateEmail()==false){

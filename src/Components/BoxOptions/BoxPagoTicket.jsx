@@ -291,145 +291,173 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       setError("Error al generar la boleta electrónica.");
     }
   };
+  const calcularVuelto = () => {
+    const cambio = cantidadPagada - grandTotal;
+    return cambio > 0 ? cambio : 0;
+  };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Typography variant="h4">Pago de Ticket</Typography>
-      </Grid>
-      {error && (
-        <Grid item xs={12}>
-          <Typography variant="body1" color="error">
-            {error}
-          </Typography>
-        </Grid>
-      )}
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <Typography variant="h4">Pagar Ticket</Typography>
 
-      <Grid item xs={12} sm={6} md={6} lg={6}>
-        <TextField
-          margin="dense"
-          fullWidth
-          type="number"
-          label="Total de la compra"
-          value={grandTotal}
-          InputProps={{ readOnly: true }}
-        />
-        <TextField
-          margin="dense"
-          fullWidth
-         
-          label="Cantidad pagada"
-          value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
-          onChange={(e) => {
-            const value = e.target.value; // Valor ingresado en el campo
-            if (!value.trim()) {
-              // Verifica si el valor ingresado está vacío o solo contiene espacios
-              setCantidadPagada(0); // Si está vacío, establece la cantidad pagada como 0
-            } else {
-              setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
-            }
-          }}
-        />
-        <TextField
-          margin="dense"
-          fullWidth
-          type="number"
-          label="Por pagar"
-          value={Math.max(0, grandTotal - cantidadPagada)}
-          InputProps={{ readOnly: true }}
-        />
-        {Math.max(0, grandTotal - cantidadPagada) < grandTotal && (
+          {error && (
+            <Grid item xs={12}>
+              <Typography variant="body1" color="error">
+                {error}
+              </Typography>
+            </Grid>
+          )}
           <TextField
             margin="dense"
             fullWidth
             type="number"
-            label="Vuelto"
-            value={Math.abs(grandTotal - cantidadPagada)}
+            label="Total de la compra"
+            value={grandTotal}
             InputProps={{ readOnly: true }}
           />
-        )}
+          <TextField
+            margin="dense"
+            fullWidth
+            label="Cantidad pagada"
+            value={cantidadPagada || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!value.trim()) {
+                setCantidadPagada(0);
+              } else {
+                setCantidadPagada(parseFloat(value));
+              }
+            }}
+          />
+          <TextField
+            margin="dense"
+            fullWidth
+            type="number"
+            label="Por pagar"
+            value={Math.max(0, grandTotal - cantidadPagada)}
+            InputProps={{ readOnly: true }}
+          />
+            {calcularVuelto() > 0 && (
+            <TextField
+              margin="dense"
+              fullWidth
+              type="number"
+              label="Vuelto"
+              value={calcularVuelto()}
+              InputProps={{ readOnly: true }}
+            />
+          )}
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={6} lg={6}>
+          <Grid
+            container
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid item xs={12}>
+              <Typography sx={{ marginTop: "7%" }} variant="h6">
+                Selecciona Método de Pago:
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${selectedMethod}-btn`}
+                fullWidth
+                variant={
+                  selectedMethod === "EFECTIVO" ? "contained" : "outlined"
+                }
+                onClick={() => handleMetodoPagoClick("EFECTIVO")}
+              >
+                Efectivo
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${selectedMethod}-btn`}
+                fullWidth
+                variant={
+                  selectedMethod === "TARJETA" ? "contained" : "outlined"
+                }
+                onClick={() => handleMetodoPagoClick("TARJETA")}
+              >
+                Débito
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${selectedMethod}-btn`}
+                fullWidth
+                variant={
+                  selectedMethod === "CREDITO" ? "contained" : "outlined"
+                }
+                onClick={() => handleMetodoPagoClick("CREDITO")}
+              >
+                Crédito
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${selectedMethod}-btn`}
+                fullWidth
+                variant={
+                  selectedMethod === "CUENTACORRIENTE"
+                    ? "contained"
+                    : "outlined"
+                }
+                onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
+              >
+                Cuenta Corriente
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${selectedMethod}-btn`}
+                variant={
+                  selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"
+                }
+                onClick={() => {
+                  handleMetodoPagoClick("TRANSFERENCIA");
+                  handleTransferenciaModalOpen(selectedDebts);
+                }}
+                fullWidth
+              >
+                Transferencia
+              </Button>
+            </Grid>
+            <Grid>
+              <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                disabled={!selectedMethod || montoPagado <= 0}
+                onClick={handleGenerarTicket}
+              >
+                Pagar
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={onCloseTicket}
+          message={snackbarMessage}
+        />
       </Grid>
 
-      <Grid item xs={12} md={6} lg={6}>
-        <Grid>
-          <Typography variant="h6">Selecciona Método de Pago:</Typography>
-        </Grid>
-        <Grid>
-          <Button
-            id={`${selectedMethod}-btn`}
-            fullWidth
-            variant={selectedMethod === "EFECTIVO" ? "contained" : "outlined"}
-            onClick={() => handleMetodoPagoClick("EFECTIVO")}
-          >
-            Efectivo
-          </Button>
-          <Button
-            id={`${selectedMethod}-btn`}
-            fullWidth
-            variant={selectedMethod === "TARJETA" ? "contained" : "outlined"}
-            onClick={() => handleMetodoPagoClick("TARJETA")}
-          >
-            Débito
-          </Button>
-          <Button
-            id={`${selectedMethod}-btn`}
-            fullWidth
-            variant={selectedMethod === "CREDITO" ? "contained" : "outlined"}
-            onClick={() => handleMetodoPagoClick("CREDITO")}
-          >
-            Crédito
-          </Button>
-          <Button
-            id={`${selectedMethod}-btn`}
-            fullWidth
-            variant={
-              selectedMethod === "CUENTACORRIENTE" ? "contained" : "outlined"
-            }
-            onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
-          >
-            Cuenta Corriente
-          </Button>
-          <Button
-            id={`${selectedMethod}-btn`}
-            variant={
-              selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"
-            }
-            onClick={() => {
-              handleMetodoPagoClick("TRANSFERENCIA");
-              handleTransferenciaModalOpen(selectedDebts);
-            }} // Ambas funciones separadas por punto y coma
-            fullWidth
-          >
-            Transferencia
-          </Button>
-        </Grid>
-        <Grid>
-          <Button
-            fullWidth
-            variant="contained"
-            color="secondary"
-            onClick={handleGenerarTicket}
-          >
-            Procesar
-          </Button>
-        </Grid>
-      </Grid>
-
-      {/* {selectedMethod && (
-        <Grid item xs={12}>
-          <Typography variant="body1">
-            Método de pago seleccionado: {selectedMethod}
-          </Typography>
-        </Grid>
-      )} */}
-
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={onCloseTicket}
-        message={snackbarMessage}
-      />
       <Dialog
         open={openTransferenciaModal}
         onClose={handleTransferenciaModalClose}
@@ -455,7 +483,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 placeholder=" ej : 13.344.434-6"
                 variant="outlined"
                 fullWidth
-                value={rut} // Asigna el estado `rut` como valor
+                value={rut}
                 onChange={(e) => setRut(e.target.value)}
               />
             </Grid>
@@ -482,7 +510,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 onChange={handleChangeTipoCuenta}
                 fullWidth
               >
-                {/* Mapeo del objeto tiposDeCuenta para generar los elementos MenuItem */}
                 {Object.entries(tiposDeCuenta).map(([key, value]) => (
                   <MenuItem key={key} value={value}>
                     {key}
@@ -496,7 +523,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
-                value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
+                value={nroCuenta}
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
@@ -505,11 +532,11 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 label="Fecha"
                 variant="outlined"
                 fullWidth
-                type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
+                type="date"
                 value={fecha}
                 onChange={handleFechaChange}
                 InputLabelProps={{
-                  shrink: true, // Encoger la etiqueta para evitar solapamientos
+                  shrink: true,
                 }}
               />
             </Grid>
@@ -518,7 +545,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 label="Numero Operación"
                 variant="outlined"
                 fullWidth
-                value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
+                value={nroOperacion}
                 onChange={(e) => setNroOperacion(e.target.value)}
               />
             </Grid>
@@ -541,7 +568,257 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Grid>
+    </>
+
+    // <Grid container spacing={2}>
+    //   <Grid item xs={12}>
+    //     <Typography variant="h4">Pago de Ticket</Typography>
+    //   </Grid>
+    //   {error && (
+    //     <Grid item xs={12}>
+    //       <Typography variant="body1" color="error">
+    //         {error}
+    //       </Typography>
+    //     </Grid>
+    //   )}
+
+    //   <Grid item xs={12} sm={6} md={6} lg={6}>
+    //     <TextField
+    //       margin="dense"
+    //       fullWidth
+    //       type="number"
+    //       label="Total de la compra"
+    //       value={grandTotal}
+    //       InputProps={{ readOnly: true }}
+    //     />
+    //     <TextField
+    //       margin="dense"
+    //       fullWidth
+
+    //       label="Cantidad pagada"
+    //       value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
+    //       onChange={(e) => {
+    //         const value = e.target.value; // Valor ingresado en el campo
+    //         if (!value.trim()) {
+    //           // Verifica si el valor ingresado está vacío o solo contiene espacios
+    //           setCantidadPagada(0); // Si está vacío, establece la cantidad pagada como 0
+    //         } else {
+    //           setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
+    //         }
+    //       }}
+    //     />
+    //     <TextField
+    //       margin="dense"
+    //       fullWidth
+    //       type="number"
+    //       label="Por pagar"
+    //       value={Math.max(0, grandTotal - cantidadPagada)}
+    //       InputProps={{ readOnly: true }}
+    //     />
+    //     {Math.max(0, grandTotal - cantidadPagada) < grandTotal && (
+    //       <TextField
+    //         margin="dense"
+    //         fullWidth
+    //         type="number"
+    //         label="Vuelto"
+    //         value={Math.abs(grandTotal - cantidadPagada)}
+    //         InputProps={{ readOnly: true }}
+    //       />
+    //     )}
+    //   </Grid>
+
+    //   <Grid item xs={12} md={6} lg={6}>
+    //     <Grid>
+    //       <Typography variant="h6">Selecciona Método de Pago:</Typography>
+    //     </Grid>
+    //     <Grid>
+    //       <Button
+    //         id={`${selectedMethod}-btn`}
+    //         fullWidth
+    //         variant={selectedMethod === "EFECTIVO" ? "contained" : "outlined"}
+    //         onClick={() => handleMetodoPagoClick("EFECTIVO")}
+    //       >
+    //         Efectivo
+    //       </Button>
+    //       <Button
+    //         id={`${selectedMethod}-btn`}
+    //         fullWidth
+    //         variant={selectedMethod === "TARJETA" ? "contained" : "outlined"}
+    //         onClick={() => handleMetodoPagoClick("TARJETA")}
+    //       >
+    //         Débito
+    //       </Button>
+    //       <Button
+    //         id={`${selectedMethod}-btn`}
+    //         fullWidth
+    //         variant={selectedMethod === "CREDITO" ? "contained" : "outlined"}
+    //         onClick={() => handleMetodoPagoClick("CREDITO")}
+    //       >
+    //         Crédito
+    //       </Button>
+    //       <Button
+    //         id={`${selectedMethod}-btn`}
+    //         fullWidth
+    //         variant={
+    //           selectedMethod === "CUENTACORRIENTE" ? "contained" : "outlined"
+    //         }
+    //         onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
+    //       >
+    //         Cuenta Corriente
+    //       </Button>
+    //       <Button
+    //         id={`${selectedMethod}-btn`}
+    //         variant={
+    //           selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"
+    //         }
+    //         onClick={() => {
+    //           handleMetodoPagoClick("TRANSFERENCIA");
+    //           handleTransferenciaModalOpen(selectedDebts);
+    //         }} // Ambas funciones separadas por punto y coma
+    //         fullWidth
+    //       >
+    //         Transferencia
+    //       </Button>
+    //     </Grid>
+    //     <Grid>
+    //       <Button
+    //         fullWidth
+    //         variant="contained"
+    //         color="secondary"
+    //         onClick={handleGenerarTicket}
+    //       >
+    //         Procesar
+    //       </Button>
+    //     </Grid>
+    //   </Grid>
+
+    //   {/* {selectedMethod && (
+    //     <Grid item xs={12}>
+    //       <Typography variant="body1">
+    //         Método de pago seleccionado: {selectedMethod}
+    //       </Typography>
+    //     </Grid>
+    //   )} */}
+
+    //   <Snackbar
+    //     anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+    //     open={snackbarOpen}
+    //     autoHideDuration={6000}
+    //     onClose={onCloseTicket}
+    //     message={snackbarMessage}
+    //   />
+    //   <Dialog
+    //     open={openTransferenciaModal}
+    //     onClose={handleTransferenciaModalClose}
+    //   >
+    //     <DialogTitle>Transferencia</DialogTitle>
+    //     <DialogContent>
+    //       <Grid container spacing={2}>
+    //         {errorTransferenciaError && (
+    //           <p style={{ color: "red" }}> {errorTransferenciaError}</p>
+    //         )}
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             label="Nombre"
+    //             value={nombre}
+    //             onChange={(e) => setNombre(e.target.value)}
+    //             variant="outlined"
+    //             fullWidth
+    //           />
+    //         </Grid>
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             label="Ingrese rut con puntos y guión "
+    //             placeholder=" ej : 13.344.434-6"
+    //             variant="outlined"
+    //             fullWidth
+    //             value={rut} // Asigna el estado `rut` como valor
+    //             onChange={(e) => setRut(e.target.value)}
+    //           />
+    //         </Grid>
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             select
+    //             label="Banco"
+    //             value={selectedBanco}
+    //             onChange={handleBancoChange}
+    //             fullWidth
+    //           >
+    //             {bancosChile.map((banco) => (
+    //               <MenuItem key={banco.id} value={banco.nombre}>
+    //                 {banco.nombre}
+    //               </MenuItem>
+    //             ))}
+    //           </TextField>
+    //         </Grid>
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             select
+    //             label="Tipo de Cuenta"
+    //             value={tipoCuenta}
+    //             onChange={handleChangeTipoCuenta}
+    //             fullWidth
+    //           >
+    //             {/* Mapeo del objeto tiposDeCuenta para generar los elementos MenuItem */}
+    //             {Object.entries(tiposDeCuenta).map(([key, value]) => (
+    //               <MenuItem key={key} value={value}>
+    //                 {key}
+    //               </MenuItem>
+    //             ))}
+    //           </TextField>
+    //         </Grid>
+
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             label="Número de cuenta"
+    //             variant="outlined"
+    //             fullWidth
+    //             value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
+    //             onChange={(e) => setNroCuenta(e.target.value)}
+    //           />
+    //         </Grid>
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             label="Fecha"
+    //             variant="outlined"
+    //             fullWidth
+    //             type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
+    //             value={fecha}
+    //             onChange={handleFechaChange}
+    //             InputLabelProps={{
+    //               shrink: true, // Encoger la etiqueta para evitar solapamientos
+    //             }}
+    //           />
+    //         </Grid>
+    //         <Grid item xs={12} sm={6}>
+    //           <TextField
+    //             label="Numero Operación"
+    //             variant="outlined"
+    //             fullWidth
+    //             value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
+    //             onChange={(e) => setNroOperacion(e.target.value)}
+    //           />
+    //         </Grid>
+    //         <Snackbar
+    //           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+    //           open={snackbarOpen}
+    //           onClose={handleSnackbarClose}
+    //           message={snackbarMessage}
+    //         />
+    //       </Grid>
+    //     </DialogContent>
+    //     <DialogActions>
+    //       <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
+    //       <Button
+    //         onClick={handleTransferData}
+    //         variant="contained"
+    //         color="secondary"
+    //       >
+    //         Guardar Datos Transferencia
+    //       </Button>
+    //     </DialogActions>
+    //   </Dialog>
+    // </Grid>
   );
 };
 
