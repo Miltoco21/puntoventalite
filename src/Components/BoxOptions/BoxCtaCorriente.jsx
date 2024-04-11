@@ -323,7 +323,10 @@ const BoxCtaCorriente = ({ onClose }) => {
     setSnackbarOpen(false);
   };
 
-
+  const formatFecha = (fechaString) => {
+    const fecha = new Date(fechaString);
+    return fecha.toLocaleDateString("es-CL");
+  };
 
   return (
     <Grid container spacing={2}>
@@ -383,6 +386,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                   <TableCell>Descripción</TableCell>
                   <TableCell>Folio</TableCell>
                   <TableCell>Pago Parcial</TableCell>
+                  <TableCell>Fecha</TableCell>
                   <TableCell>Total</TableCell>
                   {/* <TableCell>Acciones</TableCell> */}
                 </TableRow>
@@ -400,6 +404,8 @@ const BoxCtaCorriente = ({ onClose }) => {
                     <TableCell>{deuda.descripcionComprobante}</TableCell>
                     <TableCell>{deuda.nroComprobante}</TableCell>
                     <TableCell>${deuda.totalPagadoParcial}</TableCell>
+                    <TableCell sx={{width:1}}>{formatFecha(deuda.fecha)}</TableCell>
+
                     <TableCell>${deuda.total}</TableCell>
                     <TableCell sx={{ display: "none" }}>
                       ${deuda.idCabecera}
