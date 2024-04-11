@@ -1,3 +1,4 @@
+
 /* eslint-disable react/prop-types */
 /* eslint-disable no-undef */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -11,8 +12,6 @@ import {
   TextField,
   Typography,
   Button,
-  CircularProgress,
-  IconButton,
   DialogContent,
   Dialog,
   Tab,
@@ -37,56 +36,54 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import BuscadorClientes from "./BuscadorClientes";
-import IngresoClienteSucursal from "./IngresoClienteSucursal";
 
 import MuiAlert from "@mui/material/Alert";
 
 import axios from "axios";
 
-const apiUrl = "https://www.easyposdev.somee.com/api/Clientes/AddCliente";
-
-function Alert(props) {
-  return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
-
-const IngresoClientes = ({ onClose }) => {
+const IngresoClienteSucursal = () => {
   const [rutError, setRutError] = useState("");
   const [correoError, setCorreoError] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const validateEmail = (correo) => {
+
     console.log("Input correo:", correo);
     // Expresión regular para validar el formato de un correo electrónico
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+  
     // Verificar si el correo electrónico cumple con el formato esperado
     if (!emailRegex.test(correo)) {
-      setCorreoError("El correo electrónico ingresado no es válido.");
+      setCorreoError('El correo electrónico ingresado no es válido.');
       return false;
     }
-
+  
     // El correo electrónico tiene un formato válido
     return true;
   };
 
+  
+
   const validarRutChileno = (rut) => {
     // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
-
+ 
+  
     const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
-
+  
     console.log("Input RUT:", rut);
-
+  
+    
+  
     // Eliminar puntos del RUT
-    const rutWithoutDots = rut.replace(/\./g, "");
-
+    const rutWithoutDots = rut.replace(/\./g, '');
+  
     // Dividir el RUT en número y dígito verificador
-    const rutParts = rutWithoutDots.split("-");
+    const rutParts = rutWithoutDots.split('-');
     const rutNumber = rutParts[0];
     const rutDV = rutParts[1].toUpperCase();
-
+  
     console.log("RUT Number:", rutNumber);
     console.log("RUT DV:", rutDV);
-
+  
     // Calcular el dígito verificador esperado
     let suma = 0;
     let multiplo = 2;
@@ -94,23 +91,26 @@ const IngresoClientes = ({ onClose }) => {
       suma += rutNumber.charAt(i) * multiplo;
       multiplo = multiplo === 7 ? 2 : multiplo + 1;
     }
-
+  
     const dvEsperado = 11 - (suma % 11);
-    const dv =
-      dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+    const dv = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
     console.log("Expected DV:", dv);
 
+    
+  
     // Comparar el dígito verificador ingresado con el esperado
     if (dv !== rutDV) {
-      setRutError("El RUT ingresado NO es válido.");
+      setRutError('El RUT ingresado NO es válido.');
       return false;
     }
     if (dv === rutDV) {
       console.log("El RUT ingresado  es válido.");
-
+    
+      
       return true;
     }
-
+   
+  
     return true;
   };
   const [formData, setFormData] = useState({
@@ -209,6 +209,7 @@ const IngresoClientes = ({ onClose }) => {
       }
     };
 
+    
     fetchData();
   }, []);
 
@@ -373,26 +374,29 @@ const IngresoClientes = ({ onClose }) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value,
+      [name]: value
     }));
   };
   const handleSubmit = async () => {
     try {
+       
+
       const emptyFields = Object.entries(formData)
-        .filter(([key, value]) => value === "")
-        .map(([key]) => key);
+      .filter(([key, value]) => value === "")
+      .map(([key]) => key);
 
-      if (emptyFields.length > 0) {
-        const emptyField = emptyFields[0];
-        setRutError(
-          `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
-        );
-        return;
-      } else {
-        setRutError("");
-      }
+    if (emptyFields.length > 0) {
+      const emptyField = emptyFields[0];
+      setRutError(
+        `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+      );
+      return;
+    } else {
       setRutError("");
-
+    }
+    setRutError("");
+     
+  
       if (!formData.rut) {
         setRutError("Por favor ingresa un RUT.");
         return;
@@ -408,9 +412,10 @@ const IngresoClientes = ({ onClose }) => {
       } else {
         setCorreoError(""); // Clear any previous error message
       }
-
-      setLoading(true);
-
+      
+      
+      
+  
       // if(validateEmail()==false){
       //   console.log(" Email no valido")
       // }
@@ -431,37 +436,19 @@ const IngresoClientes = ({ onClose }) => {
       if (response.status === 200) {
         const responseData = response.data;
         console.log("Form Data after submission:", responseData);
-        setFormData({
-          rut: "",
-          nombre: "",
-          apellido: "",
-          direccion: "",
-          telefono: "",
-          region: setSelectedRegion(""),
-          comuna: setSelectedComuna(""),
-          correo: "",
-          giro: "",
-          urlPagina: "",
-          formaPago: "",
-          razonSocial: "",
-          usaCuentaCorriente: 0,
-        });
 
         if (responseData) {
           setSnackbarMessage("Cliente generado exitosamente");
           setOpenSnackbar(true);
-
           setTimeout(() => {
             onClose(); ////Cierre Modal al finalizar
-          }, 2000);
+          }, 3000);
         }
-      }
+      } 
     } catch (error) {
       console.error("Error en la solicitud:", error);
       // setSnackbarMessage("Error en la operación");
       // setOpenSnackbar(true);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -513,89 +500,227 @@ const IngresoClientes = ({ onClose }) => {
     }));
   };
   return (
-    <Paper>
-      <Grid container item xs={12} sm={11} md={12} lg={12} spacing={2}>
-        {selectedTab === 0 && (
-          <Grid
-            container
-            sx={{ margin: "auto", display: "flex", justifyContent: "center" }}
-            item
-            xs={12}
-            sm={11}
-            md={12}
-            lg={12}
-            spacing={2}
-          >
-            {correoError && <p style={{ color: "red" }}> {correoError}</p>}
-            {rutError && <p style={{ color: "red" }}> {rutError}</p>}
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                label="Ingrese RUT "
-                name="rut"
-                placeholder="Ingrese rut con puntos y con guión"
-                fullWidth
-                value={formData.rut}
-                onChange={handleInputChange}
-                inputProps={{
-                  inputMode: "numeric", // textEstablece el modo de entrada como numérico
-                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
-                }}
-                required
-              />
+    <> 
+      <Grid
+      
+      >
+        <Grid item xs={12} sm={6} md={12} lg={12}>
+          <Paper>
+            <Grid
+              container
+              spacing={2}
+              itemlg={12}
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
+              <div>
+                <Grid item lg={8}>
+                  <TextField
+                    label="Buscar cliente..."
+                    variant="outlined"
+                    fullWidth
+                    value={searchTerm}
+                    margin="dense"
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid container spacing={2}>
+                  {filteredCustomers.map((customer) => (
+                    <Grid
+                      item
+                      sx={{ display: "flex", justifyContent: "center" }}
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      lg={6}
+                      key={customer.codigoCliente}
+                    >
+                      <Card
+                        sx={{
+                          margin: "5px",
+                          background: "rgb(174,238,229)",
+                          backgroundImage:
+                            "radial-gradient(linear, rgba(174,238,229,1) 33%, rgba(238, 174, 202, 1) 100%)",
+                        }}
+                      >
+                        <CardContent>
+                          <Typography variant="h7" component="h4">
+                            ID Cliente: {customer.codigoCliente}
+                          </Typography>
+                          <Typography variant="body1" component="p">
+                            Nombre: {customer.nombre} {customer.apellido}
+                            <br /> <hr />
+                            Rut: {customer.rut}
+                            <br />
+                            <hr />
+                            Dirección:{customer.direccion},<br />
+                            {customer.comuna}
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button
+                            size="small"
+                            color="primary"
+                            variant="contained"
+                            onClick={() =>
+                              handleOpenModal(customer.codigoCliente)
+                            }
+                          >
+                            Agregar Sucursal
+                          </Button>
+                          <Button
+                            size="small"
+                            color="primary"
+                            variant="contained"
+                            onClick={() =>
+                              handleShowBranch(customer.codigoCliente)
+                            }
+                          >
+                            {/* Cambiar el texto del botón según si se están mostrando o no los detalles */}
+                            {showBranchDetails[customer.codigoCliente]
+                              ? "Ocultar Sucursal"
+                              : "Mostrar Sucursal"}
+                          </Button>
+                        </CardActions>
+                        {selectedBranchData[customer.codigoCliente] &&
+                          selectedBranchData[customer.codigoCliente].map(
+                            (sucursal, index) => (
+                              <Card
+                                key={index}
+                                sx={{ margin: "10px", padding: "10px" }}
+                              >
+                                <CardContent>
+                                  <Typography variant="h6" component="h2">
+                                    Sucursal : {index + 1}
+                                  </Typography>
+
+                                  {/* Agregar otros campos según sea necesario */}
+                                </CardContent>
+                                <CardActions>
+                                  <Button
+                                    size="small"
+                                    color="primary"
+                                    onClick={() =>
+                                      setShowDetails(!showDetails)
+                                    }
+                                  >
+                                    {showDetails
+                                      ? "Ocultar Detalles"
+                                      : "Mostrar Detalles"}
+                                  </Button>
+                                </CardActions>
+                                {showDetails && (
+                                  <CardContent>
+                                    <Typography
+                                      variant="body1"
+                                      component="p"
+                                    >
+                                      Responsable:{" "}
+                                      {sucursal.nombreResponsable}
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      component="p"
+                                    >
+                                      Apellido Responsable:{" "}
+                                      {sucursal.apellidoResponsable}
+                                    </Typography>
+                                    <Typography
+                                      variant="body1"
+                                      component="p"
+                                    >
+                                      Dirección: {sucursal.direccion}
+                                    </Typography>
+                                    {/* Otros detalles específicos de la sucursal */}
+                                  </CardContent>
+                                )}
+                              </Card>
+                            )
+                          )}
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </div>
             </Grid>
-            <Grid item xs={12} sm={12} md={6}>
+          </Paper>
+
+          {/* Add Branch Modal */}
+          <Dialog open={openModal} onClose={handleCloseModal}>
+            <DialogTitle>
+              Ingresa Sucursal {selectedCustomerId}{" "}
+            </DialogTitle>
+            <DialogContent>
+              {/* Add form fields for branch data */}
               <TextField
-                label="Nombre"
-                name="nombre"
-                type="text"
-                fullWidth
-                value={formData.nombre}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                type="text"
-                label="Apellido"
-                name="apellido"
-                fullWidth
-                value={formData.apellido}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                label="Dirección"
-                name="direccion"
-                fullWidth
-                value={formData.direccion}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                label="Teléfono"
-                type="number"
-                name="telefono"
-                fullWidth
-                value={formData.telefono}
-                onChange={handleInputChange}
+                label="RUT Responsable"
+                name="rutResponsable"
+                margin="dense"
+                value={branchData.rutResponsable}
+                onChange={handleBranchDataChange}
                 inputProps={{
                   inputMode: "numeric", // Establece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
                 }}
               />
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={6}>
               <TextField
-                fullWidth
+                label="Nombre Responsable"
+                name="nombreResponsable"
+                margin="dense"
+                value={branchData.nombreResponsable}
+                onChange={handleBranchDataChange}
+              />
+              <TextField
+                label="Apellido Responsable"
+                name="apellidoResponsable"
+                margin="dense"
+                value={branchData.apellidoResponsable}
+                onChange={handleBranchDataChange}
+              />
+              <TextField
+                label="Dirección"
+                name="direccion"
+                margin="dense"
+                value={branchData.direccion}
+                onChange={handleBranchDataChange}
+              />
+              <TextField
+                margin="dense"
+                label="Teléfono"
+                name="telefono"
+                value={branchData.telefono}
+                onChange={handleBranchDataChange}
+                inputProps={{
+                  inputMode: "numeric", // Establece el modo de entrada como numérico
+                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                }}
+              />
+              <TextField
+                margin="dense"
+                label="Giro"
+                name="giro"
+                value={branchData.giro}
+                onChange={handleBranchDataChange}
+              />
+              <TextField
+                margin="dense"
+                label="urlPagina"
+                name="urlPagina"
+                value={branchData.urlPagina}
+                onChange={handleBranchDataChange}
+              />
+              <TextField
+                margin="dense"
                 id="region"
+                fullWidth
                 select
                 label="Región"
-                value={selectedRegion}
+                name="region"
+                value={branchData.region}
                 onChange={(e) => {
                   const regionID = e.target.value;
+                  handleBranchDataChange(e); // Usamos el mismo controlador de cambio
+                  console.log("Región seleccionada:", regionID); // Imprimir en consola
                   setSelectedRegion(regionID);
                   // Actualizar el valor en formData
                   setFormData((prevFormData) => ({
@@ -610,17 +735,18 @@ const IngresoClientes = ({ onClose }) => {
                   </MenuItem>
                 ))}
               </TextField>
-            </Grid>
-
-            <Grid item xs={12} ssm={12} md={6}>
               <TextField
+                sx={{ marginTop: 2 }}
                 id="comuna"
                 select
                 fullWidth
                 label="Comuna"
-                value={selectedComuna}
+                name="comuna"
+                value={branchData.comuna}
                 onChange={(e) => {
                   const comunaValue = e.target.value;
+                  handleBranchDataChange(e); // Usamos el mismo controlador de cambio
+                  console.log("Comuna seleccionada:", comunaValue); // Imprimir en consola
                   setSelectedComuna(comunaValue);
                   // Actualizar el valor en formData.comuna (sin sucursal)
                   setFormData((prevFormData) => ({
@@ -635,104 +761,37 @@ const IngresoClientes = ({ onClose }) => {
                   </MenuItem>
                 ))}
               </TextField>
-            </Grid>
-
-            <Grid item xs={12} sm={12} md={6}>
               <TextField
-                label="Correo"
-                name="correo"
-                type="email"
-                fullWidth
-                value={formData.correo}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                label="Giro"
-                name="giro"
-                fullWidth
-                value={formData.giro}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                label="URL Página"
-                name="urlPagina"
-                fullWidth
-                value={formData.urlPagina}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
+                margin="dense"
                 label="Forma de Pago"
                 name="formaPago"
-                fullWidth
-                value={formData.formaPago}
-                onChange={handleInputChange}
+                value={branchData.formaPago}
+                onChange={handleBranchDataChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={12} md={6}>
-              <TextField
-                fullWidth
-                label="Razón Social"
-                name="razonSocial"
-                value={formData.razonSocial}
-                onChange={handleInputChange}
-              />
-            </Grid>
 
-            <Grid item sx={{ marginBottom: "10px" }} xs={12} sm={12}>
-              <Button
-                sx={{ height: "100%" }}
-                variant="contained"
-                fullWidth
-                color="secondary"
-                disabled={loading} // Deshabilita el botón si loading es true
-                onClick={handleSubmit} // Asegúrate de que esta sea la función correcta para manejar el envío de datos
-              >
-                {loading ? (
-                  <>
-                    <CircularProgress size={20} /> Procesando...
-                  </>
-                ) : (
-                  "Guardar"
-                )}
+              {/* Add other form fields based on your branch data */}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal} color="primary">
+                Cerrar
               </Button>
-            </Grid>
-          </Grid>
-        )}
+              <Button
+                onClick={handleAddBranch}
+                variant="contained"
+                color="primary"
+              >
+                Agregar Sucursal
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Grid>
 
-        {/* 
-        {selectedTab === 1 && (
-          <Grid
-            container
-            sx={{ margin: "auto" }}
-            item
-            xs={12}
-            sm={11}
-            md={12}
-            lg={12}
-            xl={12}
-            spacing={2}
-          >
-           <IngresoClienteSucursal/>
-
-            
-          </Grid>
-        )} */}
-
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          // onClose={handleCloseSnackbar}
-          message={snackbarMessage}
-        />
+        {/* Aquí mostrar sucursales seleccionadas */}
       </Grid>
-    </Paper>
-  );
-};
+   
+    </>
+   
+  )
+}
 
-export default IngresoClientes;
+export default IngresoClienteSucursal

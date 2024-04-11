@@ -1,5 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 import {
   Paper,
   Avatar,
@@ -7,6 +9,7 @@ import {
   Grid,
   Stack,
   Typography,
+  CircularProgress,
   Snackbar,
   Button,
   Table,
@@ -30,6 +33,7 @@ const BoxBoleta = ({ onClose }) => {
     userData,
     ventaData,
     grandTotal,
+    setGrandTotal,
     salesData,
     setSearchResults,
     setSelectedUser,
@@ -40,10 +44,11 @@ const BoxBoleta = ({ onClose }) => {
   } = useContext(SelectedOptionsContext);
   const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para controlar la apertura del Snackbar
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   console.log("salesData:", salesData);
 
+  const navigate = useNavigate();
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
   const [cantidadPagada, setCantidadPagada] = useState(grandTotal);
@@ -122,7 +127,7 @@ const BoxBoleta = ({ onClose }) => {
   }, [selectedDebts]);
 
   const handleTransferenciaModalOpen = () => {
-    setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
+    setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
   };
   const handleTransferenciaModalClose = () => {
@@ -140,6 +145,27 @@ const BoxBoleta = ({ onClose }) => {
   }, [salesData]);
 
   const handlePagoBoleta = async () => {
+    if (
+      metodoPago === "TRANSFERENCIA" &&
+      (!nombre ||
+        !rut ||
+        !selectedBanco ||
+        !tipoCuenta ||
+        !nroCuenta ||
+        !fecha ||
+        !nroOperacion)
+    ) {
+      setTransferenciaError(
+        "Todos los campos de transferencia son obligatorios."
+      );
+      return;
+    } else setTransferenciaError("");
+
+    if (!validarRutChileno(rut)) {
+      setTransferenciaError("El RUT ingresado NO es válido.");
+      return;
+    }
+
     if (!userData.codigoUsuario) {
       setError(" Ingresa Código de Vendedor para continuar.");
       return;
@@ -156,6 +182,7 @@ const BoxBoleta = ({ onClose }) => {
         setError("La cantidad pagada es insuficiente.");
         return;
       }
+      setLoading(true);
       const pagoData = {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: selectedCodigoClienteSucursal,
@@ -189,15 +216,15 @@ const BoxBoleta = ({ onClose }) => {
 
       console.log("Datos después de enviar la solicitud:", response.data);
       if (response.status === 200) {
-        setSnackbarOpen(true);
         setSnackbarMessage("Boleta guardada exitosamente");
-
+        setSnackbarOpen(true);
         setSearchResults([]);
         setSelectedUser([]);
+        clearSalesData();
+
         setTimeout(() => {
           onClose(); ////Cierre Modal al finalizar
-        }, 2000);
-        clearSalesData();
+        }, 3000);
       }
       console.log(
         "Información BOLETA enviada al servidor en:",
@@ -205,6 +232,8 @@ const BoxBoleta = ({ onClose }) => {
       );
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const handleSnackbarClose = () => {
@@ -214,80 +243,90 @@ const BoxBoleta = ({ onClose }) => {
     setSelectedMethod(metodo);
   };
 
-  const handleTransferData = async () => {
-    try {
-      if (
-        !nombre ||
-        !rut ||
-        !selectedBanco ||
-        !tipoCuenta ||
-        !nroCuenta ||
-        !fecha ||
-        !nroOperacion
-      ) {
-        setTransferenciaError(
-          "Por favor complete todos los campos obligatorios."
-        );
-        return;
-      }
+  const validarRutChileno = (rut) => {
+    // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
 
-      const requestBody = {
-        deudaIds: selectedDebts.map((deuda) => ({
-          idCuentaCorriente: selectedCodigoCliente,
-          idCabecera: deuda.idCabecera,
-          total: grandTotal,
-        })),
-        montoPagado: grandTotal,
-        metodoPago: metodoPago,
-        idUsuario: userData.codigoUsuario,
-        transferencias: {
-          nombre: nombre,
-          rut: rut,
-          banco: selectedBanco,
-          tipoCuenta: tipoCuenta,
-          nroCuenta: nroCuenta,
-          fecha: fecha,
-          nroOperacion: nroOperacion,
-        },
-      };
+    const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
 
-      console.log("Datos de la solicitud antes de enviarla:", requestBody);
+    console.log("Input RUT:", rut);
 
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
-        requestBody
-      );
+    // Eliminar puntos del RUT
+    const rutWithoutDots = rut.replace(/\./g, "");
 
-      console.log("Datos de la respuesta después de enviarla:", response);
+    // Dividir el RUT en número y dígito verificador
+    const rutParts = rutWithoutDots.split("-");
+    const rutNumber = rutParts[0];
+    const rutDV = rutParts[1].toUpperCase();
 
-      if (response.status === 200) {
-        setSnackbarMessage(response.data.descripcion);
-        setSnackbarOpen(true);
+    console.log("RUT Number:", rutNumber);
+    console.log("RUT DV:", rutDV);
 
-        setSearchResults([]);
-        setSelectedUser([]);
-        clearSalesData();
-
-        setTimeout(() => {
-          handleClosePaymentDialog(true);
-          handleTransferenciaModalClose(true);
-          onClose(); ////Cierre Modal al finalizar
-        }, 3000);
-        console.log(
-          "Información TransferenciaBOLETA al servidor en:",
-          new Date().toLocaleString()
-        );
-      } else {
-        console.error("Error al realizar la transferencia");
-      }
-    } catch (error) {
-      console.error("Error al realizar la transferencia:", error);
+    // Calcular el dígito verificador esperado
+    let suma = 0;
+    let multiplo = 2;
+    for (let i = rutNumber.length - 1; i >= 0; i--) {
+      suma += rutNumber.charAt(i) * multiplo;
+      multiplo = multiplo === 7 ? 2 : multiplo + 1;
     }
+
+    const dvEsperado = 11 - (suma % 11);
+    const dv =
+      dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+    console.log("Expected DV:", dv);
+
+    // Comparar el dígito verificador ingresado con el esperado
+    if (dv !== rutDV) {
+      setTransferenciaError("El RUT ingresado NO es válido.");
+      return false;
+    }
+    if (dv === rutDV) {
+      console.log("El RUT ingresado  es válido.");
+
+      return true;
+    }
+
+    return true;
   };
 
   const calcularVuelto = () => {
     const cambio = cantidadPagada - grandTotal;
     return cambio > 0 ? cambio : 0;
+  };
+
+  const validateFields = () => {
+    const requiredFields = [
+      "nombre",
+      "rut",
+      "selectedBanco",
+      "tipoCuenta",
+      "nroCuenta",
+      "fecha",
+      "nroOperacion",
+    ];
+    let isValid = true;
+    const newErrors = {};
+
+    requiredFields.forEach((field) => {
+      if (!fields[field]) {
+        newErrors[field] = `El campo ${field} es requerido.`;
+        isValid = false;
+      }
+    });
+
+    // Validación específica para RUT
+    if (!validarRutChileno(rut)) {
+      newErrors.rut = "El RUT ingresado NO es válido.";
+      isValid = false;
+    }
+
+    // Validación de cantidad pagada
+    if (cantidadPagada < grandTotal) {
+      newErrors.cantidadPagada = "La cantidad pagada es insuficiente.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   return (
@@ -399,7 +438,7 @@ const BoxBoleta = ({ onClose }) => {
                 Crédito
               </Button>
             </Grid>
-            <Grid item xs={12} sm={12} md={12}>
+            {/* <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
@@ -413,7 +452,7 @@ const BoxBoleta = ({ onClose }) => {
               >
                 Cuenta Corriente
               </Button>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} sm={6} md={12}>
               <Button
                 id={`${metodoPago}-btn`}
@@ -436,10 +475,16 @@ const BoxBoleta = ({ onClose }) => {
                 variant="contained"
                 fullWidth
                 color="secondary"
-                disabled={!metodoPago || montoPagado <= 0}
+                disabled={!metodoPago || montoPagado <= 0 || loading}
                 onClick={handlePagoBoleta}
               >
-                Pagar
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
               </Button>
             </Grid>
           </Grid>
@@ -460,9 +505,12 @@ const BoxBoleta = ({ onClose }) => {
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            {errorTransferenciaError && (
-              <p style={{ color: "red" }}> {errorTransferenciaError}</p>
-            )}
+            <Grid item xs={12} sm={12}>
+              {errorTransferenciaError && (
+                <p style={{ color: "red" }}> {errorTransferenciaError}</p>
+              )}
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Nombre"
@@ -517,6 +565,11 @@ const BoxBoleta = ({ onClose }) => {
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
+                type="number"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
                 value={nroCuenta}
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
@@ -532,28 +585,63 @@ const BoxBoleta = ({ onClose }) => {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                inputProps={{
+                  readOnly: true, // Deshabilita la entrada manual
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Numero Operación"
                 variant="outlined"
+                type="number"
                 fullWidth
                 value={nroOperacion}
                 onChange={(e) => setNroOperacion(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
               />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+            <Button
+            sx={{ height: "100%" }}
+            variant="contained"
+            fullWidth
+            color="secondary"
+            disabled={!metodoPago || montoPagado <= 0 || loading}
+            onClick={handlePagoBoleta}
+          >
+            {loading ? (
+              <>
+                <CircularProgress size={20} /> Procesando...
+              </>
+            ) : (
+              "Pagar"
+            )}
+          </Button>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-          <Button
-            onClick={handleTransferData}
+          {/* <Button
+            sx={{ height: "100%" }}
             variant="contained"
+            fullWidth
             color="secondary"
+            disabled={!metodoPago || montoPagado <= 0 || loading}
+            onClick={handlePagoBoleta}
           >
-            Guardar Datos Transferencia
-          </Button>
+            {loading ? (
+              <>
+                <CircularProgress size={20} /> Procesando...
+              </>
+            ) : (
+              "Pagar"
+            )}
+          </Button> */}
         </DialogActions>
       </Dialog>
     </>

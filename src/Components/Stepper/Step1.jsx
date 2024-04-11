@@ -64,10 +64,7 @@ const Step1Component = ({ data, onNext,setStepData }) => {
   };
   const validateFields = () => {
     if (
-      !selectedCategoryId ||
-      !selectedSubCategoryId ||
-      !selectedFamilyId ||
-      !selectedSubFamilyId ||
+      
       !nombre ||
       !marca
     ) {
@@ -78,18 +75,10 @@ const Step1Component = ({ data, onNext,setStepData }) => {
   };
   
   // Llamamos a la función validateFields cada vez que cambie uno de los estados relevantes
-  useEffect(() => {
-    validateFields();
-  }, [
-    selectedCategoryId,
-    selectedSubCategoryId,
-    selectedFamilyId,
-    selectedSubFamilyId,
-    nombre,
-    marca,
-  ]);
+  
 
   const handleNext = () => {
+    validateFields();
     const step1Data = {
       selectedCategoryId,
       selectedSubCategoryId,
@@ -382,7 +371,7 @@ const Step1Component = ({ data, onNext,setStepData }) => {
         {/* Mensaje de validación */}
         <Grid item xs={12} md={8}>
         <Box mt={2}>
-          {( !selectedCategoryId || !selectedSubCategoryId || !selectedFamilyId || !selectedSubFamilyId || !nombre || !marca) && (
+          {(  !nombre || !marca) && (
             <Typography variant="body2" color="error">
               {emptyFieldsMessage}
             </Typography>
