@@ -112,7 +112,7 @@ const NavBar = () => {
               {/* <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>
                 Configuración
               </MenuItem> */}
-              <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>Más</MenuItem>
+              {/* <MenuItem onClick={() => setIsLogoutDialogOpen(true)}>Más</MenuItem> */}
             </Menu>
           </Grid>
         </Grid>

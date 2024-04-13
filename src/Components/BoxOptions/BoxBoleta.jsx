@@ -30,8 +30,9 @@ import {
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const BoxBoleta = ({ onClose }) => {
-  const {userData,
-   salesData,
+  const {
+    userData,
+    salesData,
     addToSalesData,
     setPrecioData,
     grandTotal,
@@ -155,89 +156,91 @@ const BoxBoleta = ({ onClose }) => {
   }, [salesData]);
   const handlePagoBoleta = async () => {
     try {
-       // Validar si el usuario ha ingresado el código de vendedor
-       if (!userData.codigoUsuario) {
-         setError("Por favor, ingresa el código de vendedor para continuar.");
-         return;
-       }
- 
-       // Validar si el total a pagar es cero
-       if (grandTotal === 0) {
-         setError(
-           "No se puede generar la boleta de pago porque el total a pagar es cero."
-         );
-         return;
-       }
- 
-       // Validar que se haya seleccionado al menos una deuda
-     
- 
-       setLoading(true);
- 
-       let endpoint =
-         'https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE';
- 
-       // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
-       if (metodoPago === "TRANSFERENCIA") {
-         endpoint =
-           'https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE';
- 
-         // Validar datos de transferencia
-         if (
-           !nombre ||
-           !rut ||
-           !selectedBanco ||
-           !tipoCuenta ||
-           !nroCuenta ||
-           !fecha ||
-           !nroOperacion
-         ) {
-           setError(
-             "Por favor, completa todos los campos necesarios para la transferencia."
-           );
-           setLoading(false);
-           return;
-         }
-         if (!validarRutChileno(rut)) {
-           setError("El RUT ingresado NO es válido.");
-           setLoading(false);
-           return;
-         }
-       }
- 
-       // Validar el monto pagado
-       if (!montoPagado || montoPagado <= 0) {
-         setError("Por favor, ingresa un monto válido para el pago.");
-         setLoading(false);
-         return;
-       }
- 
-       // Validar el método de pago
-       if (!metodoPago) {
-         setError("Por favor, selecciona un método de pago.");
-         setLoading(false);
-         return;
-       }
- 
-       // Validar el código de usuario
-       if (
-         typeof userData.codigoUsuario !== "number" ||
-         userData.codigoUsuario <= 0
-       ) {
-         setError("El código de usuario no es válido.");
-         setLoading(false);
-         return;
-       }
- 
-       // Otras validaciones que consideres necesarias...
- 
-       // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
- 
-       const products = salesData.map(producto => ({
+      // Validar si el usuario ha ingresado el código de vendedor
+      if (!userData.codigoUsuario) {
+        setError("Por favor, ingresa el código de vendedor para continuar.");
+        return;
+      }
+
+      // Validar si el total a pagar es cero
+      if (grandTotal === 0) {
+        setError(
+          "No se puede generar la boleta de pago porque el total a pagar es cero."
+        );
+        return;
+      }
+
+      // Validar que se haya seleccionado al menos una deuda
+
+      setLoading(true);
+
+      let endpoint =
+        "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+
+      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
+      if (metodoPago === "TRANSFERENCIA") {
+        endpoint =
+          "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+
+        // Validar datos de transferencia
+        if (
+          !nombre ||
+          !rut ||
+          !selectedBanco ||
+          !tipoCuenta ||
+          !nroCuenta ||
+          !fecha ||
+          !nroOperacion
+        ) {
+          setError(
+            "Por favor, completa todos los campos necesarios para la transferencia."
+          );
+          setLoading(false);
+          return;
+        }
+        if (!validarRutChileno(rut)) {
+          setError("El RUT ingresado NO es válido.");
+          setLoading(false);
+          return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setError("");
+        }
+      }
+
+      // Validar el monto pagado
+      if (!metodoPago || cantidadPagada <= 0) {
+        setError("Por favor, ingresa un monto válido para el pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el método de pago
+      if (!metodoPago) {
+        setError("Por favor, selecciona un método de pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el código de usuario
+      if (
+        typeof userData.codigoUsuario !== "number" ||
+        userData.codigoUsuario <= 0
+      ) {
+        setError("El código de usuario no es válido.");
+        setLoading(false);
+        return;
+      }
+
+      // Otras validaciones que consideres necesarias...
+
+      // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
+
+      const products = salesData.map((producto) => ({
         codProducto: producto.id, // Ajustar la propiedad según el nombre real en tus datos
         cantidad: producto.cantidad, // Ajustar la propiedad según el nombre real en tus datos
         precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
-        descripcion: producto.descripcion // Ajustar la propiedad según el nombre real en tus datos
+        descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
       }));
 
       const requestBody = {
@@ -255,44 +258,40 @@ const BoxBoleta = ({ onClose }) => {
           tipoCuenta: tipoCuenta,
           nroCuenta: nroCuenta,
           fecha: fecha,
-          nroOperacion: nroOperacion
-        }
+          nroOperacion: nroOperacion,
+        },
       };
 
- 
-       console.log("Request Body:", requestBody);
- 
-       const response = await axios.post(endpoint, requestBody);
- 
-       console.log("Response:", response.data);
- 
-       if (response.status === 200) {
-         // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
-         setSnackbarOpen(true);
-         setSnackbarMessage(response.data.descripcion);
-         clearSalesData();
-         setSelectedUser(null);
-         setSelectedChipIndex([]);
-         setSearchResults([]);
-         setSelectedCodigoCliente(0);
-          setSearchText(""), 
-         
-          handleTransferenciaModalClose();
-          
- 
-         setTimeout(() => {
-           
-           onClose();
-         }, 1000);
-       } else {
-         console.error("Error al realizar el pago");
-       }
-     } catch (error) {
-       console.error("Error al realizar el pago:", error);
-     } finally {
-       setLoading(false);
-     }
-   };
+      console.log("Request Body:", requestBody);
+
+      const response = await axios.post(endpoint, requestBody);
+
+      console.log("Response:", response.data);
+
+      if (response.status === 200) {
+        // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
+        setSnackbarOpen(true);
+        setSnackbarMessage(response.data.descripcion);
+        clearSalesData();
+        setSelectedUser(null);
+        setSelectedChipIndex([]);
+        setSearchResults([]);
+        setSelectedCodigoCliente(0);
+        setSearchText(""), 
+        handleTransferenciaModalClose();
+
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } else {
+        console.error("Error al realizar el pago");
+      }
+    } catch (error) {
+      console.error("Error al realizar el pago:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   // const handlePagoBoleta = async () => {
   //  try {
   //     // Validar si el usuario ha ingresado el código de vendedor
@@ -310,7 +309,6 @@ const BoxBoleta = ({ onClose }) => {
   //     }
 
   //     // Validar que se haya seleccionado al menos una deuda
-      
 
   //     setLoading(true);
 
@@ -409,13 +407,13 @@ const BoxBoleta = ({ onClose }) => {
   //       setSelectedChipIndex([]);
   //       setSearchResults([]);
   //       setSelectedCodigoCliente(0);
-  //        setSearchText(""), 
+  //        setSearchText(""),
   //        handleClosePaymentDialog();
   //        handleTransferenciaModalClose();
   //        onClose();
 
   //       // setTimeout(() => {
-          
+
   //       //   onClose();
   //       // }, 1000);
   //     } else {
@@ -427,7 +425,7 @@ const BoxBoleta = ({ onClose }) => {
   //     setLoading(false);
   //   }
   // };
-  
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -435,7 +433,7 @@ const BoxBoleta = ({ onClose }) => {
     setSelectedMethod(metodo);
   };
 
-   const validarRutChileno = (rut) => {
+  const validarRutChileno = (rut) => {
     if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
       // Si el formato del RUT no es válido, retorna false
       return false;
@@ -486,7 +484,6 @@ const BoxBoleta = ({ onClose }) => {
     });
 
     // Validación específica para RUT
-   
 
     // Validación de cantidad pagada
     if (cantidadPagada < grandTotal) {
@@ -819,7 +816,6 @@ const BoxBoleta = ({ onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-          
         </DialogActions>
       </Dialog>
     </>

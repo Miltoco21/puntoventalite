@@ -165,7 +165,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     }));
     setVentaData(updatedVentaData);
   };
-
+  /////revisar si este codigo  
   const getTotalSelected = () => {
     let totalSelected = 0;
     ventaData.forEach((deuda) => {
@@ -282,6 +282,9 @@ const BoxCtaCorriente = ({ onClose }) => {
           setError("El RUT ingresado NO es válido.");
           setLoading(false);
           return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setError("");
         }
       }
 
@@ -319,7 +322,7 @@ const BoxCtaCorriente = ({ onClose }) => {
           idCabecera: deuda.idCabecera,
           total: deuda.total,
         })),
-        montoPagado: cantidad,
+        montoPagado: grandTotal,
         metodoPago: metodoPago,
         idUsuario: userData.codigoUsuario,
         transferencias: {

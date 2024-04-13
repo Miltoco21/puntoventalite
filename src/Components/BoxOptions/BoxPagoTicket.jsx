@@ -1,11 +1,13 @@
 import React, { useState, useContext, useEffect } from "react";
 import {
   Grid,
+  Avatar,
   Paper,
   Button,
   Typography,
   MenuItem,
   CircularProgress,
+  InputLabel,
   Table,
   TableBody,
   TableCell,
@@ -43,12 +45,14 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     selectedCodigoClienteSucursal,
     setSelectedCodigoClienteSucursal,
     clearSalesData,
-    selectedChipIndex, setSelectedChipIndex,
-    searchText, setSearchText
+    selectedChipIndex,
+    setSelectedChipIndex,
+    searchText,
+    setSearchText,
   } = useContext(SelectedOptionsContext);
 
   const [totalCompra, setTotalCompra] = useState(grandTotal);
-  const [cantidadPagada, setCantidadPagada] = useState(0);
+  const [cantidadPagada, setCantidadPagada] = useState(grandTotal);
 
   const [error, setError] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -125,7 +129,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   };
 
   // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
- 
 
   const handleTransferenciaModalOpen = () => {
     setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
@@ -135,65 +138,109 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     setOpenTransferenciaModal(false);
   };
 
-  useEffect(() => {
-    // Actualizar la cantidad pagada cuando cambia el total de la compra (grandTotal)
-    setCantidadPagada(grandTotal);
-  }, [grandTotal]);
-
   const handleMetodoPagoClick = (metodo) => {
     setMetodoPago(metodo);
     setLoading(false); // Establecer el estado de loading en false cuando se selecciona un método de pago
   };
 
- 
-
   const handleGenerarTicket = async () => {
     try {
-      if (
-        metodoPago === "TRANSFERENCIA" &&
-        (!nombre ||
+      if (!userData.codigoUsuario) {
+        setError("Por favor, ingresa el código de vendedor para continuar.");
+        return;
+      }
+
+      // Validar si el total a pagar es cero
+      if (grandTotal === 0) {
+        setError(
+          "No se puede generar la boleta de pago porque el total a pagar es cero."
+        );
+        return;
+      }
+
+      // Validar que se haya seleccionado al menos una deuda
+
+      setLoading(true);
+
+   
+      let endpoint =
+        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket";
+
+      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
+      if (metodoPago === "TRANSFERENCIA") {
+        endpoint =
+          "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket";
+
+        // Validar datos de transferencia
+        if (
+          !nombre ||
           !rut ||
           !selectedBanco ||
           !tipoCuenta ||
           !nroCuenta ||
           !fecha ||
-          !nroOperacion)
+          !nroOperacion
+        ) {
+          setError(
+            "Por favor, completa todos los campos necesarios para la transferencia."
+          );
+          setLoading(false);
+          return;
+        }
+        if (!validarRutChileno(rut)) {
+          setError("El RUT ingresado NO es válido.");
+          setLoading(false);
+          return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setError("");
+        }
+      }
+
+      if (!metodoPago || cantidadPagada <= 0) {
+        setError("Por favor, ingresa un monto válido para el pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el método de pago
+      if (!metodoPago) {
+        setError("Por favor, selecciona un método de pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el código de usuario
+      if (
+        typeof userData.codigoUsuario !== "number" ||
+        userData.codigoUsuario <= 0
       ) {
-        setTransferenciaError(
-          "Todos los campos de transferencia son obligatorios."
-        );
-        return;
-      } else setTransferenciaError("");
-
-      if (grandTotal === 0) {
-        setError(
-          "No se puede generar el ticket de pago porque el total a pagar es cero."
-        );
+        setError("El código de usuario no es válido.");
+        setLoading(false);
         return;
       }
 
-      if (isNaN(cantidadPagada) || cantidadPagada < 0) {
-        setError("Por favor, ingresa una cantidad pagada válida.");
-        return;
-      }
 
-      const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
-      const codigoCliente = searchResults[0].codigoCliente;
+      // Otras validaciones que consideres necesarias...
 
-      const ticket = {
+      // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
+
+      const products = salesData.map((producto) => ({
+        codProducto: producto.id, // Ajustar la propiedad según el nombre real en tus datos
+        cantidad: producto.cantidad, // Ajustar la propiedad según el nombre real en tus datos
+        precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
+        descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
+      }));
+
+      const requestBody = {
         idUsuario: userData.codigoUsuario,
-        codigoClienteSucursal: codigoClienteSucursal,
-        codigoCliente: codigoCliente,
+        codigoClienteSucursal: selectedCodigoClienteSucursal, // Ajustar según la lógica de tu aplicación
+        codigoCliente: selectedCodigoCliente, // Ajustar según la lógica de tu aplicación
         total: grandTotal,
-        products: salesData.map((sale) => ({
-          codProducto: sale.idProducto,
-          cantidad: sale.quantity,
-          precioUnidad: sale.precio,
-          descripcion: sale.descripcion,
-        })),
+        products: products,
         metodoPago: metodoPago,
-        idCuentaCorrientePago: 0,
         transferencias: {
+          idCuentaCorrientePago: 0,
           nombre: nombre,
           rut: rut,
           banco: selectedBanco,
@@ -204,40 +251,60 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         },
       };
 
-      console.log("Datos enviados por Axios:", ticket);
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
-        ticket
-      );
+      console.log("Request Body:", requestBody);
 
-      console.log("Respuesta del servidor:", response.data);
+      const response = await axios.post(endpoint, requestBody);
+
+      console.log("Response:", response.data);
+
       if (response.status === 200) {
-        setSnackbarMessage(response.data.descripcion);
+        // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
         setSnackbarOpen(true);
+        setSnackbarMessage(response.data.descripcion);
+        clearSalesData();
+        setSelectedUser(null);
+        setSelectedChipIndex([]);
+        setSearchResults([]);
+        setSelectedCodigoCliente(0);
+        setSearchText(""), 
 
-        clearSalesData(); // Limpia los datos de ventas
-        setSelectedUser(null); // Desmarca el usuario seleccionado
-        setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
-        setSearchResults([]); // Limpia los resultados de búsqueda
-        setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
-       
-        setSearchText("")
-       
-
-        // Esperar 4 segundos antes de cerrar el modal
         setTimeout(() => {
           onCloseTicket();
-        }, 2000);
+        }, 1000);
+      } else {
+        console.error("Error al realizar el pago");
       }
-      console.log(
-        "Información TICKET al servidor en:",
-        new Date().toLocaleString()
-      );
     } catch (error) {
       console.error("Error al generar la boleta electrónica:", error);
-      setError("Error al generar la boleta electrónica.");
+    } finally {
+      setLoading(false);
     }
   };
+  const validarRutChileno = (rut) => {
+    if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
+      // Si el formato del RUT no es válido, retorna false
+      return false;
+    }
+
+    // Separar el número del RUT y el dígito verificador
+    const partesRut = rut.split("-");
+    const digitoVerificador = partesRut[1].toUpperCase();
+    const numeroRut = partesRut[0];
+
+    // Función para calcular el dígito verificador
+    const calcularDigitoVerificador = (T) => {
+      let M = 0;
+      let S = 1;
+      for (; T; T = Math.floor(T / 10)) {
+        S = (S + (T % 10) * (9 - (M++ % 6))) % 11;
+      }
+      return S ? String(S - 1) : "K";
+    };
+
+    // Validar el dígito verificador
+    return calcularDigitoVerificador(numeroRut) === digitoVerificador;
+  };
+
   const calcularVuelto = () => {
     const cambio = cantidadPagada - grandTotal;
     return cambio > 0 ? cambio : 0;
@@ -416,8 +483,18 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
+            {error && (
+              <Grid item xs={12}>
+                <Typography variant="body1" color="error">
+                  {error}
+                </Typography>
+              </Grid>
+            )}
 
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Nombre
+              </InputLabel>
               <TextField
                 label="Nombre"
                 value={nombre}
@@ -426,10 +503,13 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 fullWidth
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa rut sin puntos y con guión
+              </InputLabel>
               <TextField
-                label="Ingrese rut con puntos y guión"
-                placeholder=" ej : 13.344.434-6"
+                label="ej: 11111111-1"
                 variant="outlined"
                 fullWidth
                 value={rut}
@@ -437,6 +517,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Banco</InputLabel>
               <TextField
                 select
                 label="Banco"
@@ -452,6 +533,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Tipo de Cuenta{" "}
+              </InputLabel>
               <TextField
                 select
                 label="Tipo de Cuenta"
@@ -467,6 +551,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Número de Cuenta{" "}
+              </InputLabel>
               <TextField
                 label="Número de cuenta"
                 variant="outlined"
@@ -481,6 +568,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
               <TextField
                 label="Fecha"
                 variant="outlined"
@@ -497,6 +585,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Numero Operación
+              </InputLabel>
               <TextField
                 label="Numero Operación"
                 variant="outlined"
