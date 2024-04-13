@@ -10,6 +10,7 @@ import {
   Grid,
   TextField,
   Typography,
+  InputLabel,
   Button,
   CircularProgress,
   IconButton,
@@ -70,48 +71,28 @@ const IngresoClientes = ({ onClose }) => {
   };
 
   const validarRutChileno = (rut) => {
-    // Expresión regular para validar RUT chileno permitiendo puntos como separadores de miles
-
-    const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
-
-    console.log("Input RUT:", rut);
-
-    // Eliminar puntos del RUT
-    const rutWithoutDots = rut.replace(/\./g, "");
-
-    // Dividir el RUT en número y dígito verificador
-    const rutParts = rutWithoutDots.split("-");
-    const rutNumber = rutParts[0];
-    const rutDV = rutParts[1].toUpperCase();
-
-    console.log("RUT Number:", rutNumber);
-    console.log("RUT DV:", rutDV);
-
-    // Calcular el dígito verificador esperado
-    let suma = 0;
-    let multiplo = 2;
-    for (let i = rutNumber.length - 1; i >= 0; i--) {
-      suma += rutNumber.charAt(i) * multiplo;
-      multiplo = multiplo === 7 ? 2 : multiplo + 1;
-    }
-
-    const dvEsperado = 11 - (suma % 11);
-    const dv =
-      dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
-    console.log("Expected DV:", dv);
-
-    // Comparar el dígito verificador ingresado con el esperado
-    if (dv !== rutDV) {
-      setRutError("El RUT ingresado NO es válido.");
+    if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
+      // Si el formato del RUT no es válido, retorna false
       return false;
     }
-    if (dv === rutDV) {
-      console.log("El RUT ingresado  es válido.");
 
-      return true;
-    }
+    // Separar el número del RUT y el dígito verificador
+    const partesRut = rut.split("-");
+    const digitoVerificador = partesRut[1].toUpperCase();
+    const numeroRut = partesRut[0];
 
-    return true;
+    // Función para calcular el dígito verificador
+    const calcularDigitoVerificador = (T) => {
+      let M = 0;
+      let S = 1;
+      for (; T; T = Math.floor(T / 10)) {
+        S = (S + (T % 10) * (9 - (M++ % 6))) % 11;
+      }
+      return S ? String(S - 1) : "K";
+    };
+
+    // Validar el dígito verificador
+    return calcularDigitoVerificador(numeroRut) === digitoVerificador;
   };
   const [formData, setFormData] = useState({
     rut: "",
@@ -526,11 +507,18 @@ const IngresoClientes = ({ onClose }) => {
             lg={12}
             spacing={2}
           >
-            {correoError && <p style={{ color: "red" }}> {correoError}</p>}
-            {rutError && <p style={{ color: "red" }}> {rutError}</p>}
+            {" "}
+            <Grid item xs={12} sm={12} md={12}>
+              {" "}
+              {correoError && <p style={{ color: "red" }}> {correoError}</p>}
+              {rutError && <p style={{ color: "red" }}> {rutError}</p>}
+            </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa rut sin puntos y con guión
+              </InputLabel>
               <TextField
-                label="Ingrese RUT "
+                label="ej: 11111111-1"
                 name="rut"
                 placeholder="Ingrese rut con puntos y con guión"
                 fullWidth
@@ -544,6 +532,9 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Nombre
+              </InputLabel>
               <TextField
                 label="Nombre"
                 name="nombre"
@@ -554,6 +545,9 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Apellido
+              </InputLabel>
               <TextField
                 type="text"
                 label="Apellido"
@@ -564,6 +558,9 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Dirección
+              </InputLabel>
               <TextField
                 label="Dirección"
                 name="direccion"
@@ -573,6 +570,9 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Teléfono
+              </InputLabel>
               <TextField
                 label="Teléfono"
                 type="number"
@@ -586,8 +586,10 @@ const IngresoClientes = ({ onClose }) => {
                 }}
               />
             </Grid>
-
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Selecciona región
+              </InputLabel>
               <TextField
                 fullWidth
                 id="region"
@@ -611,8 +613,10 @@ const IngresoClientes = ({ onClose }) => {
                 ))}
               </TextField>
             </Grid>
-
             <Grid item xs={12} ssm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Selecciona comuna
+              </InputLabel>
               <TextField
                 id="comuna"
                 select
@@ -636,9 +640,12 @@ const IngresoClientes = ({ onClose }) => {
                 ))}
               </TextField>
             </Grid>
-
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa correo electrónico
+              </InputLabel>
               <TextField
+              required
                 label="Correo"
                 name="correo"
                 type="email"
@@ -648,6 +655,7 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Giro</InputLabel>
               <TextField
                 label="Giro"
                 name="giro"
@@ -657,6 +665,7 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Giro</InputLabel>
               <TextField
                 label="URL Página"
                 name="urlPagina"
@@ -666,6 +675,9 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Forma de Pago
+              </InputLabel>
               <TextField
                 label="Forma de Pago"
                 name="formaPago"
@@ -675,6 +687,9 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Razón social
+              </InputLabel>
               <TextField
                 fullWidth
                 label="Razón Social"
@@ -683,7 +698,6 @@ const IngresoClientes = ({ onClose }) => {
                 onChange={handleInputChange}
               />
             </Grid>
-
             <Grid item sx={{ marginBottom: "10px" }} xs={12} sm={12}>
               <Button
                 sx={{ height: "100%" }}

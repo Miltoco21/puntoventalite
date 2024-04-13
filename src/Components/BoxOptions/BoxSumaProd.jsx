@@ -3,12 +3,13 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 
-import React, { useState, useEffect, useContext,useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import {
   Paper,
   Grid,
   Button,
   TextField,
+  Snackbar,
   IconButton,
   Table,
   Autocomplete,
@@ -30,7 +31,7 @@ import {
 import { useTheme } from "@mui/material/styles";
 import { useMediaQuery } from "@mui/material";
 import axios from "axios";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
@@ -56,10 +57,9 @@ const BoxSumaProd = ({ venta }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-
   const [searchTerm, setSearchTerm] = useState("");
 
-  const inputRef = useRef(null)
+  const inputRef = useRef(null);
   const [productInfo, setProductInfo] = useState(null);
   const [plu, setPlu] = useState("");
   const [peso, setPeso] = useState("");
@@ -67,6 +67,9 @@ const BoxSumaProd = ({ venta }) => {
   const [openPeso, setOpenPeso] = useState(false);
   const [sliderValue, setSliderValue] = useState(1);
   const [productByCodigo, setProductByCodigo] = useState([]);
+
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -100,36 +103,35 @@ const BoxSumaProd = ({ venta }) => {
           const productoEncontrado = response.data.productos[0];
           addToSalesData(productoEncontrado, quantity);
           setProductByCodigo(productoEncontrado);
-          
+          setSearchTerm("");
+          setOpenSnackbar(true);
+          setSnackbarMessage("Producto agregado");
 
+          setTimeout(() => {
+            setOpenSnackbar(false); ////Cierre Modal al finalizar
+          }, 1000);
         }
         if (response.data.cantidadRegistros === 0) {
-         
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'El PLU no se encontró!',
-            confirmButtonText: 'Entendido'
-          });
-        
-        }
-        
-        else {
+          setOpenSnackbar(true);
+          setSnackbarMessage("Producto No encontrado");
+          
+
+          setTimeout(() => {
+            setOpenSnackbar(false); ////Cierre Modal al finalizar
+          }, 1000);
+        } else {
           console.log("Producto no encontrado.");
           setProductByCodigo(null);
-          
         }
       } catch (error) {
         console.error("Error al buscar el producto:", error);
 
         setErrorMessage("");
-
       }
     }
   };
 
   const handleDescripcionSearchButtonClick = async () => {
-
     if (searchTerm.trim() !== "") {
       try {
         const response = await axios.get(
@@ -147,7 +149,6 @@ const BoxSumaProd = ({ venta }) => {
       } catch (error) {
         console.error("Error al buscar el producto por descripción:", error);
         setErrorMessage("Error al buscar el producto por descripción");
-
       }
     }
   };
@@ -158,7 +159,6 @@ const BoxSumaProd = ({ venta }) => {
           `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
         );
         setProducts(response.data.productos);
-
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -171,16 +171,12 @@ const BoxSumaProd = ({ venta }) => {
     }
   }, [searchTerm]);
 
- 
-
   const handleAddProductToSales = (product) => {
     if (product) {
       addToSalesData(product, quantity); // Agregar el producto seleccionado a salesData con la cantidad actual
       setQuantity(1); // Restablecer la cantidad a 1 después de agregar el producto
     }
   };
-
- 
 
   const handlePesoSubmit = (pesoValue) => {
     setPeso(pesoValue);
@@ -224,7 +220,7 @@ const BoxSumaProd = ({ venta }) => {
         >
           <Grid item xs={12} lg={14} sx={{ minWidth: 200, width: "80%" }}>
             <div style={{ display: "flex" }}>
-               <Grid item xs={12} md={6} lg={14} sx={{ margin: "1px" }}>
+              <Grid item xs={12} md={6} lg={14} sx={{ margin: "1px" }}>
                 <TextField
                   sx={{
                     backgroundColor: "white",
@@ -237,7 +233,6 @@ const BoxSumaProd = ({ venta }) => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                
               </Grid>
               <Button
                 sx={{
@@ -273,67 +268,80 @@ const BoxSumaProd = ({ venta }) => {
                 Peso
               </Button> */}
             </div>
-            {searchTerm.trim() !== ""  && searchTerm.length > 2 &&errorMessage && (
-    <Typography variant="body4" color="error">
-      {errorMessage}
-    </Typography>
-  )}
+            <Snackbar
+              open={openSnackbar}
+              // onClose={handleCloseSnackbar}
+              message={snackbarMessage}
+              autoHideDuration={1000}
+            />
+            {searchTerm.trim() !== "" &&
+              searchTerm.length > 4 &&
+              errorMessage && (
+                <Typography variant="body4" color="error">
+                  {errorMessage}
+                </Typography>
+              )}
           </Grid>
         </Paper>
       </Grid>
 
       <Grid item xs={12}>
-  <Paper
-    elevation={1}
-    sx={{
-      background: "#859398",
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      margin: "5px",
-    }}
-  >
-    <TableContainer component={Paper} style={{ overflowX: "auto",maxHeight: "200px"  }}>
-      <Table>
-        <TableHead sx={{ background: "white", height: "30%" }}>
-        <TableBody style={{ maxHeight: "100px", overflowY: "auto" }}>
-  {searchTerm.trim() !== "" && products.length > 0 ? (
-    products.map((product) => (
-      <TableRow key={product.id} sx={{ height: "15%" }}>
-        <TableCell>{product.nombre}</TableCell>
-        <TableCell sx={{ width: "21%" }}>Plu:{""}{product.idProducto}</TableCell>
-        <TableCell sx={{ width: "21%" }}>
-          <Button
-            onClick={() => {
-              addToSalesData(product);
-              setProducts([]); // Cerrar la búsqueda después de agregar el producto
-            }}
-            variant="contained"
-            color="secondary"
+        <Paper
+          elevation={1}
+          sx={{
+            background: "#859398",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            margin: "5px",
+          }}
+        >
+          <TableContainer
+            component={Paper}
+            style={{ overflowX: "auto", maxHeight: "200px" }}
           >
-            Agregar
-          </Button>
-        </TableCell>
-      </TableRow>
-    ))
-  ) : searchTerm.trim() !== "" && searchTerm.length < 2 && !isNaN(searchTerm) ? (
-    <TableRow>
-      <TableCell colSpan={1}>
-        <Typography variant="body4" color="error">
-        {errorMessage}
-        </Typography>
-      </TableCell>
-    </TableRow>
-  ) : null}
-</TableBody>
-        </TableHead>
-      
-
-      </Table>
-    </TableContainer>
-  </Paper>
-</Grid>
-
+            <Table>
+              <TableHead sx={{ background: "white", height: "30%" }}>
+                <TableBody style={{ maxHeight: "100px", overflowY: "auto" }}>
+                  {searchTerm.trim() !== "" && products.length > 0 ? (
+                    products.map((product) => (
+                      <TableRow key={product.id} sx={{ height: "15%" }}>
+                        <TableCell>{product.nombre}</TableCell>
+                        <TableCell sx={{ width: "21%" }}>
+                          Plu:{""}
+                          {product.idProducto}
+                        </TableCell>
+                        <TableCell sx={{ width: "21%" }}>
+                          <Button
+                            onClick={() => {
+                              addToSalesData(product);
+                              setProducts([]); // Cerrar la búsqueda después de agregar el producto
+                            }}
+                            variant="contained"
+                            color="secondary"
+                          >
+                            Agregar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : searchTerm.trim() !== "" &&
+                    searchTerm.length < 2 &&
+                    !isNaN(searchTerm) ? (
+                    <TableRow>
+                      <TableCell colSpan={1}>
+                        <Typography variant="body4" color="error">
+                          {errorMessage}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : null}
+                </TableBody>
+              </TableHead>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Grid>
 
       <Grid item xs={12}>
         <Paper
@@ -397,7 +405,7 @@ const BoxSumaProd = ({ venta }) => {
             </Table>
             <Paper
               sx={{
-               width:"100%",
+                width: "100%",
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
@@ -406,12 +414,11 @@ const BoxSumaProd = ({ venta }) => {
               }}
               elevation={18}
             >
-              <Typography >Total: {grandTotal}</Typography>
+              <Typography>Total: {grandTotal}</Typography>
             </Paper>
           </TableContainer>
         </Paper>
       </Grid>
-    
     </Paper>
   );
 };
