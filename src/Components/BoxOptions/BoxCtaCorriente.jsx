@@ -26,6 +26,8 @@ import {
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const BoxCtaCorriente = ({ onClose }) => {
   const {
@@ -129,10 +131,10 @@ const BoxCtaCorriente = ({ onClose }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const [fecha, setFecha] = useState(obtenerFechaActual()); // Estado para almacenar la fecha actual
-
-  const handleFechaChange = (event) => {
-    setFecha(event.target.value); // Actualizar el estado de la fecha cuando cambie
+  const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
+  // const fechaDayjs = dayjs(fecha);
+  const handleDateChange = (newDate) => {
+    setFecha(newDate);
   };
 
   // Estado para el valor seleccionado del banco
@@ -502,8 +504,8 @@ const BoxCtaCorriente = ({ onClose }) => {
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda </DialogTitle>
         <DialogContent>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid>
+          <Grid container spacing={2} item xs={12} md={12} lg={6}>
+            <Grid item xs={12} md={6} lg={6}>
               {error && (
                 <Grid item xs={12}>
                   <Typography variant="body1" color="error">
@@ -569,7 +571,7 @@ const BoxCtaCorriente = ({ onClose }) => {
               spacing={2}
               item
               sm={12}
-              md={12}
+              md={6}
               lg={12}
               sx={{ width: "100%", display: "flex", justifyContent: "center" }}
             >
@@ -577,7 +579,7 @@ const BoxCtaCorriente = ({ onClose }) => {
               <Typography sx={{ marginTop: "7%" }} variant="h6">
                 Selecciona Método de Pago:
               </Typography>
-              <Grid item xs={12} sm={12} md={12}>
+              <Grid item  xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
                   id="efectivo-btn"
@@ -761,19 +763,11 @@ const BoxCtaCorriente = ({ onClose }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
-              <TextField
-                label="Fecha"
-                variant="outlined"
-                fullWidth
-                type="date"
-                value={fecha}
-                onChange={handleFechaChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  readOnly: true, // Deshabilita la entrada manual
-                }}
+              <DatePicker
+                label="Selecciona una fecha"
+                value={fecha} // Pasa el estado 'fecha' como valor del DatePicker
+                onChange={handleDateChange} // Proporciona la función para manejar los cambios de fecha
+                renderInput={(params) => <TextField {...params} fullWidth />} // Esto es solo un ejemplo, asegúrate de proporcionar el componente de entrada correcto para renderizar el DatePicker
               />
             </Grid>
             <Grid item xs={12} sm={6}>

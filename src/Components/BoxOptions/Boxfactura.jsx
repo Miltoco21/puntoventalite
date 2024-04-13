@@ -6,6 +6,7 @@ import {
   Box,
   Grid,
   Stack,
+  InputLabel,
   Typography,
   Snackbar,
   Button,
@@ -24,7 +25,8 @@ import {
   TextField,
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
-
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 const Boxfactura = ({ onClose }) => {
   const {
     userData,
@@ -39,6 +41,7 @@ const Boxfactura = ({ onClose }) => {
   } = useContext(SelectedOptionsContext);
   const [cantidadPagada, setCantidadPagada] = useState(0);
 
+  const [loading, setLoading] = useState(false);
 
   const [metodoPago, setMetodoPago] = useState("");
   const [error, setError] = useState(null);
@@ -95,10 +98,10 @@ const Boxfactura = ({ onClose }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const [fecha, setFecha] = useState(obtenerFechaActual()); // Estado para almacenar la fecha actual
-
-  const handleFechaChange = (event) => {
-    setFecha(event.target.value); // Actualizar el estado de la fecha cuando cambie
+  const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
+  // const fechaDayjs = dayjs(fecha);
+  const handleDateChange = (newDate) => {
+    setFecha(newDate);
   };
 
   // Estado para el valor seleccionado del banco
@@ -515,97 +518,144 @@ const Boxfactura = ({ onClose }) => {
     >
       <DialogTitle>Transferencia</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2}>
-          {errorTransferenciaError && (
-            <Grid item xs={12}>
-              <Typography style={{ color: "red" }}>
-                {errorTransferenciaError}
-              </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={12}>
+              {errorTransferenciaError && (
+                <p style={{ color: "red" }}> {errorTransferenciaError}</p>
+              )}
             </Grid>
-          )}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Nombre"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              variant="outlined"
-              fullWidth
-            />
+            {error && (
+              <Grid item xs={12}>
+                <Typography variant="body1" color="error">
+                  {error}
+                </Typography>
+              </Grid>
+            )}
+
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Nombre
+              </InputLabel>
+              <TextField
+                label="Nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                variant="outlined"
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa rut sin puntos y con guión
+              </InputLabel>
+              <TextField
+                label="ej: 11111111-1"
+                variant="outlined"
+                fullWidth
+                value={rut}
+                onChange={(e) => setRut(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Banco</InputLabel>
+              <TextField
+                select
+                label="Banco"
+                value={selectedBanco}
+                onChange={handleBancoChange}
+                fullWidth
+              >
+                {bancosChile.map((banco) => (
+                  <MenuItem key={banco.id} value={banco.nombre}>
+                    {banco.nombre}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Tipo de Cuenta{" "}
+              </InputLabel>
+              <TextField
+                select
+                label="Tipo de Cuenta"
+                value={tipoCuenta}
+                onChange={handleChangeTipoCuenta}
+                fullWidth
+              >
+                {Object.entries(tiposDeCuenta).map(([key, value]) => (
+                  <MenuItem key={key} value={value}>
+                    {key}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Número de Cuenta{" "}
+              </InputLabel>
+              <TextField
+                label="Número de cuenta"
+                variant="outlined"
+                fullWidth
+                type="number"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
+                value={nroCuenta}
+                onChange={(e) => setNroCuenta(e.target.value)}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
+
+              <DatePicker
+                label="Selecciona una fecha"
+                value={fecha} // Pasa el estado 'fecha' como valor del DatePicker
+                onChange={handleDateChange} // Proporciona la función para manejar los cambios de fecha
+                renderInput={(params) => <TextField {...params} fullWidth />} // Esto es solo un ejemplo, asegúrate de proporcionar el componente de entrada correcto para renderizar el DatePicker
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Numero Operación
+              </InputLabel>
+              <TextField
+                label="Numero Operación"
+                variant="outlined"
+                type="number"
+                fullWidth
+                value={nroOperacion}
+                onChange={(e) => setNroOperacion(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <Button
+                sx={{ height: "100%" }}
+                variant="contained"
+                fullWidth
+                color="secondary"
+                disabled={!metodoPago || cantidadPagada <= 0 || loading}
+                onClick={handlePagoFactura }
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Ingrese rut con puntos y guión "
-              placeholder=" ej : 13.344.434-6"
-              variant="outlined"
-              fullWidth
-              value={rut}
-              onChange={(e) => setRut(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              label="Banco"
-              value={selectedBanco}
-              onChange={handleBancoChange}
-              fullWidth
-            >
-              {bancosChile.map((banco) => (
-                <MenuItem key={banco.id} value={banco.nombre}>
-                  {banco.nombre}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              select
-              label="Tipo de Cuenta"
-              value={tipoCuenta}
-              onChange={handleChangeTipoCuenta}
-              fullWidth
-            >
-              {Object.entries(tiposDeCuenta).map(([key, value]) => (
-                <MenuItem key={key} value={value}>
-                  {key}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-  
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Número de cuenta"
-              variant="outlined"
-              fullWidth
-              value={nroCuenta}
-              onChange={(e) => setNroCuenta(e.target.value)}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Fecha"
-              variant="outlined"
-              fullWidth
-              type="date"
-              value={fecha}
-              onChange={handleFechaChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Numero Operación"
-              variant="outlined"
-              fullWidth
-              value={nroOperacion}
-              onChange={(e) => setNroOperacion(e.target.value)}
-            />
-          </Grid>
-        </Grid>
-      </DialogContent>
+        </DialogContent>
       <DialogActions>
         <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
         <Button

@@ -23,6 +23,9 @@ import {
   DialogActions,
   Snackbar,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
@@ -111,10 +114,10 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const [fecha, setFecha] = useState(obtenerFechaActual()); // Estado para almacenar la fecha actual
-
-  const handleFechaChange = (event) => {
-    setFecha(event.target.value); // Actualizar el estado de la fecha cuando cambie
+  const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
+  // const fechaDayjs = dayjs(fecha);
+  const handleDateChange = (newDate) => {
+    setFecha(newDate);
   };
 
   // Estado para el valor seleccionado del banco
@@ -124,6 +127,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   const handleBancoChange = (event) => {
     setSelectedBanco(event.target.value);
   };
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -162,7 +166,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
 
       setLoading(true);
 
-   
       let endpoint =
         "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket";
 
@@ -220,7 +223,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         return;
       }
 
-
       // Otras validaciones que consideres necesarias...
 
       // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
@@ -266,11 +268,10 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         setSelectedChipIndex([]);
         setSearchResults([]);
         setSelectedCodigoCliente(0);
-        setSearchText(""), 
-
-        setTimeout(() => {
-          onCloseTicket();
-        }, 1000);
+        setSearchText(""),
+          setTimeout(() => {
+            onCloseTicket();
+          }, 1000);
       } else {
         console.error("Error al realizar el pago");
       }
@@ -567,21 +568,15 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
-              <TextField
-                label="Fecha"
-                variant="outlined"
-                fullWidth
-                type="date"
-                value={fecha}
-                onChange={handleFechaChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  readOnly: true, // Deshabilita la entrada manual
-                }}
+
+              <DatePicker
+                label="Selecciona una fecha"
+                value={fecha} // Pasa el estado 'fecha' como valor del DatePicker
+                onChange={handleDateChange} // Proporciona la función para manejar los cambios de fecha
+                renderInput={(params) => <TextField {...params} fullWidth />} // Esto es solo un ejemplo, asegúrate de proporcionar el componente de entrada correcto para renderizar el DatePicker
               />
             </Grid>
             <Grid item xs={12} sm={6}>

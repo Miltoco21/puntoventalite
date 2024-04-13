@@ -1,7 +1,8 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 import {
   Paper,
   Avatar,
@@ -114,10 +115,10 @@ const BoxBoleta = ({ onClose }) => {
     return `${year}-${month}-${day}`;
   };
 
-  const [fecha, setFecha] = useState(obtenerFechaActual()); // Estado para almacenar la fecha actual
-
-  const handleFechaChange = (event) => {
-    setFecha(event.target.value); // Actualizar el estado de la fecha cuando cambie
+  const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
+  // const fechaDayjs = dayjs(fecha);
+  const handleDateChange = (newDate) => {
+    setFecha(newDate);
   };
 
   // Estado para el valor seleccionado del banco
@@ -762,19 +763,11 @@ const BoxBoleta = ({ onClose }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
-              <TextField
-                label="Fecha"
-                variant="outlined"
-                fullWidth
-                type="date"
-                value={fecha}
-                onChange={handleFechaChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  readOnly: true, // Deshabilita la entrada manual
-                }}
+              <DatePicker
+                label="Selecciona una fecha"
+                value={fecha} // Pasa el estado 'fecha' como valor del DatePicker
+                onChange={handleDateChange} // Proporciona la función para manejar los cambios de fecha
+                renderInput={(params) => <TextField {...params} fullWidth />} // Esto es solo un ejemplo, asegúrate de proporcionar el componente de entrada correcto para renderizar el DatePicker
               />
             </Grid>
             <Grid item xs={12} sm={6}>
