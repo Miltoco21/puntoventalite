@@ -19,7 +19,7 @@ const BoxVendedor = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { userData } = useContext(SelectedOptionsContext);
 
-  console.log("userData context", userData);
+  
 
   const vendedores = [
     {

@@ -5,6 +5,7 @@ import {
   Button,
   Typography,
   MenuItem,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -25,31 +26,38 @@ import axios from "axios";
 
 const BoxPagoTicket = ({ onCloseTicket }) => {
   const {
-    grandTotal,
     userData,
-    setSearchResults,
-    setSalesData,
     salesData,
     addToSalesData,
-    clearSalesData,
+    setPrecioData,
+    grandTotal,
     ventaData,
-    searchResults,
     setVentaData,
+    searchResults,
+    setSearchResults,
+    updateSearchResults,
+    selectedUser,
+    setSelectedUser,
+    selectedCodigoCliente,
+    setSelectedCodigoCliente,
+    selectedCodigoClienteSucursal,
+    setSelectedCodigoClienteSucursal,
+    clearSalesData,
+    selectedChipIndex, setSelectedChipIndex,
+    searchText, setSearchText
   } = useContext(SelectedOptionsContext);
 
   const [totalCompra, setTotalCompra] = useState(grandTotal);
   const [cantidadPagada, setCantidadPagada] = useState(0);
-  const [selectedMethod, setSelectedMethod] = useState("");
+
   const [error, setError] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
 
-  const [transferenciaExitosa, setTransferenciaExitosa] = useState(false);
-
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
   const [rut, setRut] = useState(""); // Estado para almacenar el rut
   const [nroCuenta, setNroCuenta] = useState(""); // Estado para almacenar el número de cuenta
@@ -117,16 +125,10 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   };
 
   // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
-  console.log(
-    "selectedDebts justo antes de abrir el diálogo de transferencia:",
-    selectedDebts
-  );
-  useEffect(() => {
-    console.log("selectedDebts cambió:", selectedDebts);
-  }, [selectedDebts]);
+ 
 
   const handleTransferenciaModalOpen = () => {
-    setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
+    setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
   };
   const handleTransferenciaModalClose = () => {
@@ -139,91 +141,29 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   }, [grandTotal]);
 
   const handleMetodoPagoClick = (metodo) => {
-    setSelectedMethod(metodo);
+    setMetodoPago(metodo);
+    setLoading(false); // Establecer el estado de loading en false cuando se selecciona un método de pago
   };
 
-  const handleTransferData = async () => {
-    try {
-      if (
-        !nombre ||
-        !rut ||
-        !selectedBanco ||
-        !tipoCuenta ||
-        !nroCuenta ||
-        !fecha ||
-        !nroOperacion
-      ) {
-        setTransferenciaError(
-          "Por favor complete todos los campos obligatorios."
-        );
-        return;
-      }
-
-      const requestBody = {
-        deudaIds: selectedDebts.map((deuda) => ({
-          idCuentaCorriente: selectedCodigoCliente,
-          idCabecera: deuda.idCabecera,
-          total: grandTotal,
-        })),
-        montoPagado: grandTotal,
-        metodoPago: selectedMethod,
-        idUsuario: userData.codigoUsuario,
-        transferencias: {
-          nombre: nombre,
-          rut: rut,
-          banco: selectedBanco,
-          tipoCuenta: tipoCuenta,
-          nroCuenta: nroCuenta,
-          fecha: fecha,
-          nroOperacion: nroOperacion,
-        },
-      };
-
-      console.log("Datos de la solicitud antes de enviarla:", requestBody);
-
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
-        requestBody
-      );
-
-      console.log("Datos de la respuesta después de enviarla:", response);
-
-      if (response.status === 200) {
-        setSnackbarMessage(response.data.descripcion);
-        setSnackbarOpen(true);
-
-        setSearchResults([]);
-        setSelectedUser([]);
-        clearSalesData();
-        setTransferenciaExitosa(true);
-
-        setTimeout(() => {
-          handleClosePaymentDialog(true);
-          handleTransferenciaModalClose(true);
-          onClose(); ////Cierre Modal al finalizar
-        }, 3000);
-        console.log(
-          "Información TransferenciaTICKET al servidor en:",
-          new Date().toLocaleString()
-        );
-      } else {
-        console.error("Error al realizar la transferencia");
-      }
-    } catch (error) {
-      console.error("Error al realizar la transferencia:", error);
-    }
-  };
+ 
 
   const handleGenerarTicket = async () => {
     try {
-      if (selectedMethod === "TRANSFERENCIA" && !transferenciaExitosa) {
-        // Si el método de pago es transferencia y la transferencia no ha sido exitosa,
-        // entonces no procesar el pago y mostrar un mensaje de error
-        setError(
-          "Por favor, complete la transferencia correctamente antes de generar el ticket."
+      if (
+        metodoPago === "TRANSFERENCIA" &&
+        (!nombre ||
+          !rut ||
+          !selectedBanco ||
+          !tipoCuenta ||
+          !nroCuenta ||
+          !fecha ||
+          !nroOperacion)
+      ) {
+        setTransferenciaError(
+          "Todos los campos de transferencia son obligatorios."
         );
         return;
-      }
+      } else setTransferenciaError("");
 
       if (grandTotal === 0) {
         setError(
@@ -251,7 +191,8 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           precioUnidad: sale.precio,
           descripcion: sale.descripcion,
         })),
-        metodoPago: selectedMethod,
+        metodoPago: metodoPago,
+        idCuentaCorrientePago: 0,
         transferencias: {
           nombre: nombre,
           rut: rut,
@@ -273,14 +214,20 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       if (response.status === 200) {
         setSnackbarMessage(response.data.descripcion);
         setSnackbarOpen(true);
-        setSearchResults([]);
-        clearSalesData();
-        setTransferenciaExitosa(true);
+
+        clearSalesData(); // Limpia los datos de ventas
+        setSelectedUser(null); // Desmarca el usuario seleccionado
+        setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
+        setSearchResults([]); // Limpia los resultados de búsqueda
+        setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
+       
+        setSearchText("")
+       
 
         // Esperar 4 segundos antes de cerrar el modal
         setTimeout(() => {
           onCloseTicket();
-        }, 3000);
+        }, 2000);
       }
       console.log(
         "Información TICKET al servidor en:",
@@ -339,7 +286,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             value={Math.max(0, grandTotal - cantidadPagada)}
             InputProps={{ readOnly: true }}
           />
-            {calcularVuelto() > 0 && (
+          {calcularVuelto() > 0 && (
             <TextField
               margin="dense"
               fullWidth
@@ -366,11 +313,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
-                id={`${selectedMethod}-btn`}
+                id={`${metodoPago}-btn`}
                 fullWidth
-                variant={
-                  selectedMethod === "EFECTIVO" ? "contained" : "outlined"
-                }
+                variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
                 onClick={() => handleMetodoPagoClick("EFECTIVO")}
               >
                 Efectivo
@@ -380,11 +325,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
-                id={`${selectedMethod}-btn`}
+                id={`${metodoPago}-btn`}
                 fullWidth
-                variant={
-                  selectedMethod === "TARJETA" ? "contained" : "outlined"
-                }
+                variant={metodoPago === "TARJETA" ? "contained" : "outlined"}
                 onClick={() => handleMetodoPagoClick("TARJETA")}
               >
                 Débito
@@ -393,11 +336,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
-                id={`${selectedMethod}-btn`}
+                id={`${metodoPago}-btn`}
                 fullWidth
-                variant={
-                  selectedMethod === "CREDITO" ? "contained" : "outlined"
-                }
+                variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
                 onClick={() => handleMetodoPagoClick("CREDITO")}
               >
                 Crédito
@@ -407,12 +348,10 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
-                id={`${selectedMethod}-btn`}
+                id={`${metodoPago}-btn`}
                 fullWidth
                 variant={
-                  selectedMethod === "CUENTACORRIENTE"
-                    ? "contained"
-                    : "outlined"
+                  metodoPago === "CUENTACORRIENTE" ? "contained" : "outlined"
                 }
                 onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
               >
@@ -422,9 +361,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
-                id={`${selectedMethod}-btn`}
+                id={`${metodoPago}-btn`}
                 variant={
-                  selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"
+                  metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
                 }
                 onClick={() => {
                   handleMetodoPagoClick("TRANSFERENCIA");
@@ -435,15 +374,22 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 Transferencia
               </Button>
             </Grid>
-            <Grid>
+            <Grid item xs={12} sm={12} md={12}>
               <Button
-                fullWidth
+                sx={{ height: "100%" }}
                 variant="contained"
+                fullWidth
                 color="secondary"
-                disabled={!selectedMethod || montoPagado <= 0}
+                disabled={!metodoPago || cantidadPagada <= 0 || loading}
                 onClick={handleGenerarTicket}
               >
-                Pagar
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
               </Button>
             </Grid>
           </Grid>
@@ -465,9 +411,12 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            {errorTransferenciaError && (
-              <p style={{ color: "red" }}> {errorTransferenciaError}</p>
-            )}
+            <Grid item xs={12} sm={12}>
+              {errorTransferenciaError && (
+                <p style={{ color: "red" }}> {errorTransferenciaError}</p>
+              )}
+            </Grid>
+
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Nombre"
@@ -479,7 +428,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Ingrese rut con puntos y guión "
+                label="Ingrese rut con puntos y guión"
                 placeholder=" ej : 13.344.434-6"
                 variant="outlined"
                 fullWidth
@@ -517,12 +466,16 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 ))}
               </TextField>
             </Grid>
-
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
+                type="number"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
                 value={nroCuenta}
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
@@ -538,287 +491,57 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 InputLabelProps={{
                   shrink: true,
                 }}
+                inputProps={{
+                  readOnly: true, // Deshabilita la entrada manual
+                }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 label="Numero Operación"
                 variant="outlined"
+                type="number"
                 fullWidth
                 value={nroOperacion}
                 onChange={(e) => setNroOperacion(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
               />
             </Grid>
-            <Snackbar
-              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-              open={snackbarOpen}
-              onClose={handleSnackbarClose}
-              message={snackbarMessage}
-            />
+            <Grid item xs={12} sm={12}>
+              <Button
+                sx={{ height: "100%" }}
+                variant="contained"
+                fullWidth
+                color="secondary"
+                disabled={!metodoPago || cantidadPagada <= 0 || loading}
+                onClick={handleGenerarTicket}
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
+              </Button>
+            </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-          <Button
+          {/* <Button
             onClick={handleTransferData}
             variant="contained"
             color="secondary"
           >
-            Guardar Datos Transferencia
-          </Button>
+            Pagar
+          </Button> */}
         </DialogActions>
       </Dialog>
     </>
-
-    // <Grid container spacing={2}>
-    //   <Grid item xs={12}>
-    //     <Typography variant="h4">Pago de Ticket</Typography>
-    //   </Grid>
-    //   {error && (
-    //     <Grid item xs={12}>
-    //       <Typography variant="body1" color="error">
-    //         {error}
-    //       </Typography>
-    //     </Grid>
-    //   )}
-
-    //   <Grid item xs={12} sm={6} md={6} lg={6}>
-    //     <TextField
-    //       margin="dense"
-    //       fullWidth
-    //       type="number"
-    //       label="Total de la compra"
-    //       value={grandTotal}
-    //       InputProps={{ readOnly: true }}
-    //     />
-    //     <TextField
-    //       margin="dense"
-    //       fullWidth
-
-    //       label="Cantidad pagada"
-    //       value={cantidadPagada || ""} // Si cantidadPagada es falsy (null, undefined, NaN, 0, ""), se mostrará una cadena vacía en lugar de "NaN"
-    //       onChange={(e) => {
-    //         const value = e.target.value; // Valor ingresado en el campo
-    //         if (!value.trim()) {
-    //           // Verifica si el valor ingresado está vacío o solo contiene espacios
-    //           setCantidadPagada(0); // Si está vacío, establece la cantidad pagada como 0
-    //         } else {
-    //           setCantidadPagada(parseFloat(value)); // De lo contrario, actualiza la cantidad pagada con el valor ingresado
-    //         }
-    //       }}
-    //     />
-    //     <TextField
-    //       margin="dense"
-    //       fullWidth
-    //       type="number"
-    //       label="Por pagar"
-    //       value={Math.max(0, grandTotal - cantidadPagada)}
-    //       InputProps={{ readOnly: true }}
-    //     />
-    //     {Math.max(0, grandTotal - cantidadPagada) < grandTotal && (
-    //       <TextField
-    //         margin="dense"
-    //         fullWidth
-    //         type="number"
-    //         label="Vuelto"
-    //         value={Math.abs(grandTotal - cantidadPagada)}
-    //         InputProps={{ readOnly: true }}
-    //       />
-    //     )}
-    //   </Grid>
-
-    //   <Grid item xs={12} md={6} lg={6}>
-    //     <Grid>
-    //       <Typography variant="h6">Selecciona Método de Pago:</Typography>
-    //     </Grid>
-    //     <Grid>
-    //       <Button
-    //         id={`${selectedMethod}-btn`}
-    //         fullWidth
-    //         variant={selectedMethod === "EFECTIVO" ? "contained" : "outlined"}
-    //         onClick={() => handleMetodoPagoClick("EFECTIVO")}
-    //       >
-    //         Efectivo
-    //       </Button>
-    //       <Button
-    //         id={`${selectedMethod}-btn`}
-    //         fullWidth
-    //         variant={selectedMethod === "TARJETA" ? "contained" : "outlined"}
-    //         onClick={() => handleMetodoPagoClick("TARJETA")}
-    //       >
-    //         Débito
-    //       </Button>
-    //       <Button
-    //         id={`${selectedMethod}-btn`}
-    //         fullWidth
-    //         variant={selectedMethod === "CREDITO" ? "contained" : "outlined"}
-    //         onClick={() => handleMetodoPagoClick("CREDITO")}
-    //       >
-    //         Crédito
-    //       </Button>
-    //       <Button
-    //         id={`${selectedMethod}-btn`}
-    //         fullWidth
-    //         variant={
-    //           selectedMethod === "CUENTACORRIENTE" ? "contained" : "outlined"
-    //         }
-    //         onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
-    //       >
-    //         Cuenta Corriente
-    //       </Button>
-    //       <Button
-    //         id={`${selectedMethod}-btn`}
-    //         variant={
-    //           selectedMethod === "TRANSFERENCIA" ? "contained" : "outlined"
-    //         }
-    //         onClick={() => {
-    //           handleMetodoPagoClick("TRANSFERENCIA");
-    //           handleTransferenciaModalOpen(selectedDebts);
-    //         }} // Ambas funciones separadas por punto y coma
-    //         fullWidth
-    //       >
-    //         Transferencia
-    //       </Button>
-    //     </Grid>
-    //     <Grid>
-    //       <Button
-    //         fullWidth
-    //         variant="contained"
-    //         color="secondary"
-    //         onClick={handleGenerarTicket}
-    //       >
-    //         Procesar
-    //       </Button>
-    //     </Grid>
-    //   </Grid>
-
-    //   {/* {selectedMethod && (
-    //     <Grid item xs={12}>
-    //       <Typography variant="body1">
-    //         Método de pago seleccionado: {selectedMethod}
-    //       </Typography>
-    //     </Grid>
-    //   )} */}
-
-    //   <Snackbar
-    //     anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-    //     open={snackbarOpen}
-    //     autoHideDuration={6000}
-    //     onClose={onCloseTicket}
-    //     message={snackbarMessage}
-    //   />
-    //   <Dialog
-    //     open={openTransferenciaModal}
-    //     onClose={handleTransferenciaModalClose}
-    //   >
-    //     <DialogTitle>Transferencia</DialogTitle>
-    //     <DialogContent>
-    //       <Grid container spacing={2}>
-    //         {errorTransferenciaError && (
-    //           <p style={{ color: "red" }}> {errorTransferenciaError}</p>
-    //         )}
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             label="Nombre"
-    //             value={nombre}
-    //             onChange={(e) => setNombre(e.target.value)}
-    //             variant="outlined"
-    //             fullWidth
-    //           />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             label="Ingrese rut con puntos y guión "
-    //             placeholder=" ej : 13.344.434-6"
-    //             variant="outlined"
-    //             fullWidth
-    //             value={rut} // Asigna el estado `rut` como valor
-    //             onChange={(e) => setRut(e.target.value)}
-    //           />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             select
-    //             label="Banco"
-    //             value={selectedBanco}
-    //             onChange={handleBancoChange}
-    //             fullWidth
-    //           >
-    //             {bancosChile.map((banco) => (
-    //               <MenuItem key={banco.id} value={banco.nombre}>
-    //                 {banco.nombre}
-    //               </MenuItem>
-    //             ))}
-    //           </TextField>
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             select
-    //             label="Tipo de Cuenta"
-    //             value={tipoCuenta}
-    //             onChange={handleChangeTipoCuenta}
-    //             fullWidth
-    //           >
-    //             {/* Mapeo del objeto tiposDeCuenta para generar los elementos MenuItem */}
-    //             {Object.entries(tiposDeCuenta).map(([key, value]) => (
-    //               <MenuItem key={key} value={value}>
-    //                 {key}
-    //               </MenuItem>
-    //             ))}
-    //           </TextField>
-    //         </Grid>
-
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             label="Número de cuenta"
-    //             variant="outlined"
-    //             fullWidth
-    //             value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
-    //             onChange={(e) => setNroCuenta(e.target.value)}
-    //           />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             label="Fecha"
-    //             variant="outlined"
-    //             fullWidth
-    //             type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
-    //             value={fecha}
-    //             onChange={handleFechaChange}
-    //             InputLabelProps={{
-    //               shrink: true, // Encoger la etiqueta para evitar solapamientos
-    //             }}
-    //           />
-    //         </Grid>
-    //         <Grid item xs={12} sm={6}>
-    //           <TextField
-    //             label="Numero Operación"
-    //             variant="outlined"
-    //             fullWidth
-    //             value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
-    //             onChange={(e) => setNroOperacion(e.target.value)}
-    //           />
-    //         </Grid>
-    //         <Snackbar
-    //           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-    //           open={snackbarOpen}
-    //           onClose={handleSnackbarClose}
-    //           message={snackbarMessage}
-    //         />
-    //       </Grid>
-    //     </DialogContent>
-    //     <DialogActions>
-    //       <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-    //       <Button
-    //         onClick={handleTransferData}
-    //         variant="contained"
-    //         color="secondary"
-    //       >
-    //         Guardar Datos Transferencia
-    //       </Button>
-    //     </DialogActions>
-    //   </Dialog>
-    // </Grid>
   );
 };
 

@@ -7,9 +7,11 @@ import {
   Stack,
   Typography,
   Snackbar,
+  InputLabel,
   Button,
   Table,
   TableBody,
+  CircularProgress,
   TableCell,
   TableContainer,
   MenuItem,
@@ -29,21 +31,26 @@ const BoxCtaCorriente = ({ onClose }) => {
   const {
     userData,
     precioData,
+    grandTotal,
     searchResults,
     setSearchResults,
     setPrecioData,
     clearSalesData,
     selectedUser,
     setSelectedUser,
+
     ventaData,
     setVentaData,
     selectedCodigoCliente,
+    setSelectedCodigoCliente,
     selectedCodigoClienteSucursal,
+
+    setSelectedChipIndex,
+    selectedChipIndex,
+    searchText,
+    setSearchText,
   } = useContext(SelectedOptionsContext);
-  console.log("userData:", userData);
-  console.log("ventaData:", ventaData);
-  console.log("selectedCodigoCliente:", selectedCodigoCliente);
-  console.log("selectedCodigoClienteSucursal:", selectedCodigoClienteSucursal);
+
   const fetchDeudaData = async () => {
     try {
       const response = await axios.get(
@@ -61,18 +68,12 @@ const BoxCtaCorriente = ({ onClose }) => {
     fetchDeudaData();
   }, [searchResults]);
 
-  ////////////
-  // const countSelectedCheckboxes = () => {
-  //   // Filtrar el array de ventaData para obtener solo las deudas seleccionadas
-  //   const selectedDeudas = ventaData.filter((deuda) => deuda.selected);
+  const [errorTransferenciaError, setTransferenciaError] = useState("");
+  const [cantidadPagada, setCantidadPagada] = useState(grandTotal);
 
-  //   // Devolver la longitud del array de deudas seleccionadas
-  //   return selectedDeudas.length;
-  // };
-  //////////////////
-  const [rutError, setRutError] = useState(""); // Estado para manejar errores de validación del RUT
-  const [transferenciaExitosa,setTransferenciaExitosa]= useState(false);
-  const [selectedDeuda, setSelectedDeuda] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const [openDialog, setOpenDialog] = useState(false);
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
@@ -143,13 +144,6 @@ const BoxCtaCorriente = ({ onClose }) => {
   };
 
   // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
-  console.log(
-    "selectedDebts justo antes de abrir el diálogo de transferencia:",
-    selectedDebts
-  );
-  useEffect(() => {
-    console.log("selectedDebts cambió:", selectedDebts);
-  }, [selectedDebts]);
 
   const handleTransferenciaModalOpen = () => {
     setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
@@ -210,25 +204,126 @@ const BoxCtaCorriente = ({ onClose }) => {
     setMontoPagado(0); // Reiniciar el valor del monto a pagar al cerrar el diálogo
     setMetodoPago("");
   };
+  const validarRutChileno = (rut) => {
+    if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
+      // Si el formato del RUT no es válido, retorna false
+      return false;
+    }
 
-  const handleTransferData = async () => {
+    // Separar el número del RUT y el dígito verificador
+    const partesRut = rut.split("-");
+    const digitoVerificador = partesRut[1].toUpperCase();
+    const numeroRut = partesRut[0];
+
+    // Función para calcular el dígito verificador
+    const calcularDigitoVerificador = (T) => {
+      let M = 0;
+      let S = 1;
+      for (; T; T = Math.floor(T / 10)) {
+        S = (S + (T % 10) * (9 - (M++ % 6))) % 11;
+      }
+      return S ? String(S - 1) : "K";
+    };
+
+    // Validar el dígito verificador
+    return calcularDigitoVerificador(numeroRut) === digitoVerificador;
+  };
+  const handlePayment = async () => {
     try {
-      // Calcular el monto total pagado sumando los totales de las deudas seleccionadas
-      const montoPagado = selectedDebts.reduce(
-        (total, deuda) => total + deuda.total,
-        0
-      );
+      // Validar si el usuario ha ingresado el código de vendedor
+      if (!userData.codigoUsuario) {
+        setError("Por favor, ingresa el código de vendedor para continuar.");
+        return;
+      }
+
+      // Validar si el total a pagar es cero
+      if (grandTotal === 0) {
+        setError(
+          "No se puede generar la boleta de pago porque el total a pagar es cero."
+        );
+        return;
+      }
+
+      // Validar que se haya seleccionado al menos una deuda
+      if (selectedDebts.length === 0) {
+        setError(
+          "Por favor, selecciona al menos una deuda para realizar el pago."
+        );
+        return;
+      }
+
+      setLoading(true);
+
+      let endpoint =
+        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaByIdCliente";
+
+      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
+      if (metodoPago === "TRANSFERENCIA") {
+        endpoint =
+          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente";
+
+        // Validar datos de transferencia
+        if (
+          !nombre ||
+          !rut ||
+          !selectedBanco ||
+          !tipoCuenta ||
+          !nroCuenta ||
+          !fecha ||
+          !nroOperacion
+        ) {
+          setError(
+            "Por favor, completa todos los campos necesarios para la transferencia."
+          );
+          setLoading(false);
+          return;
+        }
+        if (!validarRutChileno(rut)) {
+          setError("El RUT ingresado NO es válido.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Validar el monto pagado
+      if (!montoPagado || montoPagado <= 0) {
+        setError("Por favor, ingresa un monto válido para el pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el método de pago
+      if (!metodoPago) {
+        setError("Por favor, selecciona un método de pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el código de usuario
+      if (
+        typeof userData.codigoUsuario !== "number" ||
+        userData.codigoUsuario <= 0
+      ) {
+        setError("El código de usuario no es válido.");
+        setLoading(false);
+        return;
+      }
+
+      // Otras validaciones que consideres necesarias...
+
+      // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
 
       const requestBody = {
         deudaIds: selectedDebts.map((deuda) => ({
           idCuentaCorriente: deuda.id,
           idCabecera: deuda.idCabecera,
-          total: deuda.total, // Utilizamos el total de cada deuda individual
+          total: deuda.total,
         })),
-        montoPagado: montoPagado, // Utilizamos el monto total pagado
+        montoPagado: montoPagado,
         metodoPago: metodoPago,
         idUsuario: userData.codigoUsuario,
         transferencias: {
+          idCuentaCorrientePago: 0,
           nombre: nombre,
           rut: rut,
           banco: selectedBanco,
@@ -239,86 +334,40 @@ const BoxCtaCorriente = ({ onClose }) => {
         },
       };
 
-      console.log("Request Body:", requestBody); // Verifica el cuerpo de la solicitud
+      console.log("Request Body:", requestBody);
 
-      // Realizar la solicitud de transferencia para cada deuda seleccionada
-      for (const deuda of selectedDebts) {
-        const response = await axios.post(
-          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
-          requestBody
-        );
+      const response = await axios.post(endpoint, requestBody);
 
-        console.log("Response:", response); // Verifica la respuesta de la solicitud
+      console.log("Response:", response.data);
 
-        if (response.status === 200) {
-          console.log("Transferencia exitosa:", response.data.descripcion);
-          setSnackbarOpen(true);
-          setSnackbarMessage(response.data.descripcion);
-          setSnackbarOpen(true);
-          setSearchResults([]);
-          clearSalesData();
-          setTransferenciaExitosa(true)///guardo datos de transferencia
-          setTimeout(() => {
-            handleClosePaymentDialog();
-            handleTransferenciaModalClose();
-            onClose();
-          }, 3000);
-        } else {
-          console.error("Error al realizar la transferencia");
-        }
-      }
-    } catch (error) {
-      console.error("Error al realizar la transferencia:", error);
-    }
-  };
-
-
-
-  const handlePayment = async () => {
-    try {
-      const requestBody = {
-        deudaIds: [
-          {
-            idCuentaCorriente: selectedDeuda.id, // Usar el ID de la deuda seleccionada
-            idCabecera: selectedDeuda.idCabecera, // Usar el ID de la cabecera de la deuda seleccionada
-            total: selectedDeuda.total, // Usar el total de la deuda seleccionada
-          },
-        ],
-        montoPagado: montoPagado, // Usar el monto a pagar ingresado por el usuario
-        metodoPago: metodoPago, // Método de pago (puedes cambiarlo según tus necesidades)
-      };
-      console.log("Datos enviados antes de la solicitud:", requestBody);
-
-      // Realizar la solicitud de pago
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaByIdCliente",
-        requestBody
-      );
-
-      // Aquí puedes manejar la respuesta, por ejemplo, actualizar los datos de venta después de realizar el pago
-      console.log("Respuesta de pago:", response.data);
-
-      // Cerrar el diálogo de pago
-      handleClosePaymentDialog();
-
-      if (response.data.statusCode === 200) {
-        // Utiliza los datos de respuesta del servidor para actualizar ventaData en BoxCtaCorriente
-        setVentaData(response.data.clienteDeuda);
-
-        // Mostrar el mensaje de respuesta del pago en el Snackbar
-        setSnackbarMessage(response.data.descripcion);
+      if (response.status === 200) {
+        // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
         setSnackbarOpen(true);
+        setSnackbarMessage(response.data.descripcion);
+        clearSalesData();
+        setSelectedUser(null);
+        setSelectedChipIndex([]);
+        setSearchResults([]);
+        setSelectedCodigoCliente(0);
+         setSearchText(""), 
+         handleClosePaymentDialog();
+         handleTransferenciaModalClose();
+         onClose();
+
+        // setTimeout(() => {
+          
+        //   onClose();
+        // }, 1000);
       } else {
-        // Maneja cualquier error o respuesta no exitosa aquí
-        console.error(
-          "Error en la respuesta del servidor:",
-          response.data.descripcion
-        );
+        console.error("Error al realizar el pago");
       }
     } catch (error) {
       console.error("Error al realizar el pago:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -326,6 +375,10 @@ const BoxCtaCorriente = ({ onClose }) => {
   const formatFecha = (fechaString) => {
     const fecha = new Date(fechaString);
     return fecha.toLocaleDateString("es-CL");
+  };
+  const calcularVuelto = () => {
+    const cambio = cantidadPagada - grandTotal;
+    return cambio > 0 ? cambio : 0;
   };
 
   return (
@@ -404,16 +457,16 @@ const BoxCtaCorriente = ({ onClose }) => {
                     <TableCell>{deuda.descripcionComprobante}</TableCell>
                     <TableCell>{deuda.nroComprobante}</TableCell>
                     <TableCell>${deuda.totalPagadoParcial}</TableCell>
-                    <TableCell sx={{width:1}}>{formatFecha(deuda.fecha)}</TableCell>
+                    <TableCell sx={{ width: 1 }}>
+                      {formatFecha(deuda.fecha)}
+                    </TableCell>
 
                     <TableCell>${deuda.total}</TableCell>
                     <TableCell sx={{ display: "none" }}>
                       ${deuda.idCabecera}
                     </TableCell>
 
-                    <TableCell>
-                   
-                    </TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -446,79 +499,143 @@ const BoxCtaCorriente = ({ onClose }) => {
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda </DialogTitle>
         <DialogContent>
-          <Grid spacing={2}>
-            {/* <Typography variant="body1">Monto a Pagar:</Typography> */}
+          <Grid item xs={12} md={6} lg={6}>
+            <Grid>
+              {error && (
+                <Grid item xs={12}>
+                  <Typography variant="body1" color="error">
+                    {error}
+                  </Typography>
+                </Grid>
+              )}
+              <TextField
+                sx={{ marginBottom: "5%" }}
+                margin="dense"
+                label="Monto a Pagar"
+                variant="outlined"
+                value={grandTotal}
+                onChange={(e) => setMontoPagado(e.target.value)}
+                fullWidth
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
+              />
+              <TextField
+                margin="dense"
+                fullWidth
+                label="Cantidad pagada"
+                value={cantidadPagada || ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (!value.trim()) {
+                    setCantidadPagada(0);
+                  } else {
+                    setCantidadPagada(parseFloat(value));
+                  }
+                }}
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
+              />
+              <TextField
+                margin="dense"
+                fullWidth
+                type="number"
+                label="Por pagar"
+                value={Math.max(0, grandTotal - cantidadPagada)}
+                InputProps={{ readOnly: true }}
+              />
+              {calcularVuelto() > 0 && (
+                <TextField
+                  margin="dense"
+                  fullWidth
+                  type="number"
+                  label="Vuelto"
+                  value={calcularVuelto()}
+                  InputProps={{ readOnly: true }}
+                />
+              )}
+            </Grid>
 
-            <TextField
-              margin="dense"
-              label="Monto a Pagar"
-              variant="outlined"
-              value={montoPagado}
-              onChange={(e) => setMontoPagado(e.target.value)}
-              fullWidth
-              InputProps={{ readOnly: true }}
-              inputProps={{
-                inputMode: "numeric", // Establece el modo de entrada como numérico
-                pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
-              }}
-            />
-            <Typography variant="body1">Selecciona método de pago:</Typography>
+            {/* <Typography variant="body1">Monto a Pagar:</Typography> */}
 
             <Grid
               container
+              spacing={2}
               item
               sm={12}
               md={12}
+              lg={12}
               sx={{ width: "100%", display: "flex", justifyContent: "center" }}
-              spacing={2}
             >
-              <Grid item xs={6} sm={3} md={3}>
+              {" "}
+              <Typography sx={{ marginTop: "7%" }} variant="h6">
+                Selecciona Método de Pago:
+              </Typography>
+              <Grid item xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
                   id="efectivo-btn"
                   fullWidth
-                  variant={metodoPago === "Efectivo" ? "contained" : "outlined"}
-                  onClick={() => setMetodoPago("Efectivo")}
+                  variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
+                  onClick={() => setMetodoPago("EFECTIVO")}
                 >
                   Efectivo
                 </Button>
               </Grid>
-              <Grid item xs={6} sm={3} md={3}>
+              <Grid item xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
                   id="debito-btn"
-                  variant={
-                    metodoPago === "Tarjeta Débito" ? "contained" : "outlined"
-                  }
-                  onClick={() => setMetodoPago("Tarjeta Débito")}
+                  variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
+                  onClick={() => setMetodoPago("DEBITO")}
                   fullWidth
                 >
-                  Tarjeta Débito
+                  Débito
                 </Button>
               </Grid>
-              <Grid item xs={6} sm={3} md={3}>
+              <Grid item xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
                   id="credito-btn"
-                  variant={
-                    metodoPago === "Tarjeta Crédito" ? "contained" : "outlined"
-                  }
-                  onClick={() => setMetodoPago("Tarjeta Crédito")}
+                  variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
+                  onClick={() => setMetodoPago("CREDITO")}
                   fullWidth
                 >
-                  Tarjeta Crédito
+                  Crédito
                 </Button>
               </Grid>
-              <Grid item xs={6} sm={3} md={3}>
+              <Grid item xs={12} sm={12} md={12}>
                 <Button
+                  fullWidth
                   sx={{ height: "100%" }}
                   id="transferencia-btn"
                   variant={
-                    metodoPago === "Transferencia" ? "contained" : "outlined"
+                    metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
                   }
                   onClick={() => handleTransferenciaModalOpen(selectedDebts)}
                 >
                   Transferencia
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={12}>
+                <Button
+                  sx={{ height: "100%" }}
+                  variant="contained"
+                  fullWidth
+                  color="secondary"
+                  disabled={!metodoPago || montoPagado <= 0}
+                  onClick={handlePayment}
+                >
+                  {loading ? (
+                    <>
+                      <CircularProgress size={20} /> Procesando...
+                    </>
+                  ) : (
+                    "Pagar"
+                  )}
                 </Button>
               </Grid>
             </Grid>
@@ -526,10 +643,14 @@ const BoxCtaCorriente = ({ onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClosePaymentDialog}>Cerrar</Button>
-          
-          <Button onClick={handlePayment} variant="contained" color="secondary">
-            Pagar
-          </Button>
+
+          {/* <Button
+            onClick={handleTransferData}
+            variant="contained"
+            color="secondary"
+          >
+            Pagarr
+          </Button> */}
         </DialogActions>
       </Dialog>
       <Snackbar
@@ -546,16 +667,23 @@ const BoxCtaCorriente = ({ onClose }) => {
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            {/* <Grid item xs={12} sm={6}>
-              {" "}
-              <Typography
-                variant="body1"
-                color={rutError ? "error" : "success"}
-              >
-                {rutError ? "RUT no válido" : "RUT válido"}
-              </Typography>
-            </Grid> */}
+            <Grid item xs={12} sm={12}>
+              {errorTransferenciaError && (
+                <p style={{ color: "red" }}> {errorTransferenciaError}</p>
+              )}
+            </Grid>
+            {error && (
+              <Grid item xs={12}>
+                <Typography variant="body1" color="error">
+                  {error}
+                </Typography>
+              </Grid>
+            )}
+
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Nombre
+              </InputLabel>
               <TextField
                 label="Nombre"
                 value={nombre}
@@ -564,16 +692,21 @@ const BoxCtaCorriente = ({ onClose }) => {
                 fullWidth
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa rut sin puntos y con guión
+              </InputLabel>
               <TextField
-                label="Rut "
+                label="ej: 11111111-1"
                 variant="outlined"
                 fullWidth
-                value={rut} // Asigna el estado `rut` como valor
+                value={rut}
                 onChange={(e) => setRut(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Banco</InputLabel>
               <TextField
                 select
                 label="Banco"
@@ -589,6 +722,9 @@ const BoxCtaCorriente = ({ onClose }) => {
               </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Tipo de Cuenta{" "}
+              </InputLabel>
               <TextField
                 select
                 label="Tipo de Cuenta"
@@ -596,7 +732,6 @@ const BoxCtaCorriente = ({ onClose }) => {
                 onChange={handleChangeTipoCuenta}
                 fullWidth
               >
-                {/* Mapeo del objeto tiposDeCuenta para generar los elementos MenuItem */}
                 {Object.entries(tiposDeCuenta).map(([key, value]) => (
                   <MenuItem key={key} value={value}>
                     {key}
@@ -604,49 +739,79 @@ const BoxCtaCorriente = ({ onClose }) => {
                 ))}
               </TextField>
             </Grid>
-
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Número de Cuenta{" "}
+              </InputLabel>
               <TextField
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
-                value={nroCuenta} // Asigna el estado `numeroCuenta` como valor
+                type="number"
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
+                value={nroCuenta}
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
               <TextField
                 label="Fecha"
                 variant="outlined"
                 fullWidth
-                type="date" // Especificamos que el tipo de input es 'date' para que aparezca un selector de fecha en el navegador
+                type="date"
                 value={fecha}
                 onChange={handleFechaChange}
                 InputLabelProps={{
-                  shrink: true, // Encoger la etiqueta para evitar solapamientos
+                  shrink: true,
+                }}
+                inputProps={{
+                  readOnly: true, // Deshabilita la entrada manual
                 }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Numero Operación
+              </InputLabel>
               <TextField
                 label="Numero Operación"
                 variant="outlined"
+                type="number"
                 fullWidth
-                value={nroOperacion} // Asigna el estado `numeroOperacion` como valor
+                value={nroOperacion}
                 onChange={(e) => setNroOperacion(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
               />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <Button
+                sx={{ height: "100%" }}
+                variant="contained"
+                fullWidth
+                color="secondary"
+                disabled={!metodoPago || montoPagado <= 0 || loading}
+                onClick={handlePayment}
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
+              </Button>
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-          <Button
-            onClick={handleTransferData}
-            variant="contained"
-            color="secondary"
-          >
-            Guardar Datos Transferencia
-          </Button>
         </DialogActions>
       </Dialog>
     </Grid>

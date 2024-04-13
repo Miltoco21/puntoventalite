@@ -30,16 +30,21 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const BoxBoleta = ({ onClose }) => {
   const {
-    userData,
-    ventaData,
+   salesData,
+    addToSalesData,
+    setPrecioData,
     grandTotal,
-    setGrandTotal,
-    salesData,
-    setSearchResults,
-    setSelectedUser,
+    ventaData,
     setVentaData,
+    searchResults,
+    setSearchResults,
+    updateSearchResults,
+    selectedUser,
+    setSelectedUser,
     selectedCodigoCliente,
+    setSelectedCodigoCliente,
     selectedCodigoClienteSucursal,
+    setSelectedCodigoClienteSucursal,
     clearSalesData,
   } = useContext(SelectedOptionsContext);
   const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para controlar la apertura del Snackbar
@@ -162,7 +167,7 @@ const BoxBoleta = ({ onClose }) => {
     } else setTransferenciaError("");
 
     if (!validarRutChileno(rut)) {
-      setTransferenciaError("El RUT ingresado NO es válido.");
+      setTransferenciaError("El RUT ingresado NOO es válido.");
       return;
     }
 
@@ -218,9 +223,13 @@ const BoxBoleta = ({ onClose }) => {
       if (response.status === 200) {
         setSnackbarMessage("Boleta guardada exitosamente");
         setSnackbarOpen(true);
-        setSearchResults([]);
-        setSelectedUser([]);
-        clearSalesData();
+        clearSalesData(); // Limpia los datos de ventas
+        setSelectedUser(null); // Desmarca el usuario seleccionado
+        setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
+        setSearchResults([]); // Limpia los resultados de búsqueda
+        setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
+        handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
+        handleOpenDeudasClientesDialog(0, 0);
 
         setTimeout(() => {
           onClose(); ////Cierre Modal al finalizar
@@ -249,6 +258,10 @@ const BoxBoleta = ({ onClose }) => {
     const rutRegex = /^\d{1,3}(?:\.\d{3})?-\d{1}[0-9kK]$/;
 
     console.log("Input RUT:", rut);
+    if (!rutRegex.test(rut)) {
+      setTransferenciaError("El RUT ingresado NO tiene el formato correcto.");
+      return false;
+    }
 
     // Eliminar puntos del RUT
     const rutWithoutDots = rut.replace(/\./g, "");
@@ -276,7 +289,7 @@ const BoxBoleta = ({ onClose }) => {
 
     // Comparar el dígito verificador ingresado con el esperado
     if (dv !== rutDV) {
-      setTransferenciaError("El RUT ingresado NO es válido.");
+      setTransferenciaError("El RUT ingresado NAAAA es válido.");
       return false;
     }
     if (dv === rutDV) {
@@ -315,7 +328,7 @@ const BoxBoleta = ({ onClose }) => {
 
     // Validación específica para RUT
     if (!validarRutChileno(rut)) {
-      newErrors.rut = "El RUT ingresado NO es válido.";
+      newErrors.rut = "El RUT ingresado NOt es válido.";
       isValid = false;
     }
 

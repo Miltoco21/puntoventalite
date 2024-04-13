@@ -22,7 +22,7 @@ import {
   Radio,
 } from "@mui/material";
 
-const Step1Component = ({ data, onNext,setStepData }) => {
+const Step1Component = ({ data, onNext, setStepData }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     data.selectedCategoryId || 0
   );
@@ -53,7 +53,7 @@ const Step1Component = ({ data, onNext,setStepData }) => {
   const [newFamily, setNewFamily] = useState("");
   const [newSubFamily, setNewSubFamily] = useState("");
   const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
-
+  const [selectionErrorMessage, setSelectionErrorMessage] = useState("");
   const handleRespuesta = (e) => {
     const value = e.target.value;
     setRespuestaSINO(value);
@@ -63,33 +63,79 @@ const Step1Component = ({ data, onNext,setStepData }) => {
     setPesoSINO(value);
   };
   const validateFields = () => {
-    if (
-      
-      !nombre ||
-      !marca
-    ) {
-      setEmptyFieldsMessage("Todos los campos son obligatorios.");
-    } else {
-      setEmptyFieldsMessage(""); // Si todos los campos están llenos, limpiar el mensaje de error
-    }
-  };
-  
-  // Llamamos a la función validateFields cada vez que cambie uno de los estados relevantes
-  
-
-  const handleNext = () => {
-    validateFields();
-    const step1Data = {
+    const selectedOptions = [
       selectedCategoryId,
       selectedSubCategoryId,
       selectedFamilyId,
       selectedSubFamilyId,
       marca,
       nombre,
-    };
-    setStepData((prevData) => ({ ...prevData, ...step1Data }));
-    onNext();
+    ];
+  
+    // Verificar si la categoría está seleccionada
+    if (selectedCategoryId === 0) {
+      setEmptyFieldsMessage("La categoría es obligatoria.");
+      return false;
+    }
+  
+    // Contar el número de opciones seleccionadas o completadas
+    const selectedCount = selectedOptions.filter(option => option !== 0 && option !== '').length;
+  
+    // Verificar si al menos tres opciones están seleccionadas o completadas
+    if (selectedCount < 3) {
+      setEmptyFieldsMessage("Debes seleccionar al menos tres opciones.");
+      return false;
+    } else {
+      setEmptyFieldsMessage("");
+      return true;
+    }
   };
+  
+  // const validateFields = () => {
+  //   if (
+ 
+
+  //     !nombre ||
+  //     !marca
+  //   ) {
+  //     setEmptyFieldsMessage("Todos los campos son obligatorios.");
+  //   } else {
+  //     setEmptyFieldsMessage(""); // Si todos los campos están llenos, limpiar el mensaje de error
+  //   }
+  // };
+
+  // Llamamos a la función validateFields cada vez que cambie uno de los estados relevantes
+
+  const handleNext = () => {
+    // Validar campos antes de continuar
+    const isValid = validateFields();
+    if (isValid) {
+      // Resto del código para continuar si los campos son válidos
+      const step1Data = {
+        selectedCategoryId,
+        selectedSubCategoryId,
+        selectedFamilyId,
+        selectedSubFamilyId,
+        marca,
+        nombre,
+      };
+      setStepData((prevData) => ({ ...prevData, ...step1Data }));
+      onNext();
+    }
+  };
+  // const handleNext = () => {
+  //   validateFields();
+  //   const step1Data = {
+  //     selectedCategoryId,
+  //     selectedSubCategoryId,
+  //     selectedFamilyId,
+  //     selectedSubFamilyId,
+  //     marca,
+  //     nombre,
+  //   };
+  //   setStepData((prevData) => ({ ...prevData, ...step1Data }));
+  //   onNext();
+  // };
 
   // const handleOpenDialog1 = () => {
   //   setOpenDialog1(true);
@@ -236,8 +282,27 @@ const Step1Component = ({ data, onNext,setStepData }) => {
     fetchSubFamilies();
   }, [selectedFamilyId, selectedCategoryId, selectedSubCategoryId]);
 
+  const validateSelections = () => {
+    const selectedOptions = [
+      selectedCategoryId,
+      selectedSubCategoryId,
+      selectedFamilyId,
+      selectedSubFamilyId,
+    ];
+    const selectedCount = selectedOptions.filter(
+      (option) => option !== 0
+    ).length;
+    if (selectedCount < 3) {
+      setSelectionErrorMessage("Debes seleccionar al menos tres opciones.");
+      return false;
+    } else {
+      setSelectionErrorMessage("");
+      return true;
+    }
+  };
+
   return (
-    <Paper  
+    <Paper
       elevation={3}
       sx={{
         padding: "16px",
@@ -357,7 +422,7 @@ const Step1Component = ({ data, onNext,setStepData }) => {
             onChange={(e) => setMarca(e.target.value)}
           />
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={12}>
           <Button
             variant="contained"
             color="secondary"
@@ -370,14 +435,14 @@ const Step1Component = ({ data, onNext,setStepData }) => {
 
         {/* Mensaje de validación */}
         <Grid item xs={12} md={8}>
-        <Box mt={2}>
-          {(  !nombre || !marca) && (
-            <Typography variant="body2" color="error">
-              {emptyFieldsMessage}
-            </Typography>
-          )}
-        </Box>
-      </Grid>
+          <Box mt={2}>
+            {(!nombre || !marca) && (
+              <Typography variant="body2" color="error">
+                {emptyFieldsMessage}
+              </Typography>
+            )}
+          </Box>
+        </Grid>
       </Grid>
 
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>

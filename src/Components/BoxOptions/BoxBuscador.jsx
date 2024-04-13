@@ -46,14 +46,12 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     setSelectedCodigoCliente,
     selectedCodigoClienteSucursal,
     setSelectedCodigoClienteSucursal,
+    selectedChipIndex, setSelectedChipIndex,
+    searchText, setSearchText
   } = useContext(SelectedOptionsContext);
 
-  const [searchText, setSearchText] = useState("");
-
-  const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
-
-  const [selectedChipIndex, setSelectedChipIndex] = useState([]);
   
+   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
 
 
 
@@ -148,6 +146,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
       handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
       handleOpenDeudasClientesDialog(0, 0);
+      
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );

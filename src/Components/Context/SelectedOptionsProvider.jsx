@@ -27,9 +27,13 @@ export const SelectedOptionsProvider = ({ children }) => {
   const [salesDataTimestamp, setSalesDataTimestamp] = useState(Date.now());
 
   const [selectedCodigoCliente, setSelectedCodigoCliente] = useState("");
-  const [selectedCodigoClienteSucursal, setSelectedCodigoClienteSucursal] = useState("");
+  const [selectedCodigoClienteSucursal, setSelectedCodigoClienteSucursal] =
+    useState("");
 
   const [selectedUser, setSelectedUser] = useState([]);
+  const [searchText, setSearchText] = useState("");
+
+  const [selectedChipIndex, setSelectedChipIndex] = useState([]);
 
   const [searchResults, setSearchResults] = useState([]);
   const updateSearchResults = (results) => {
@@ -40,7 +44,6 @@ export const SelectedOptionsProvider = ({ children }) => {
   const updateUserData = (data) => {
     setUserData(data);
   };
-  
 
   const calculateTotalPrice = (quantity, price) => {
     return quantity * price;
@@ -67,60 +70,64 @@ export const SelectedOptionsProvider = ({ children }) => {
   }, [salesData]);
   const addToSalesData = (product, quantity) => {
     const precioVenta = product.precioVenta || 0;
-    const cantidad = quantity !== undefined ? quantity : (product.cantidad || 1);
+    const cantidad = quantity !== undefined ? quantity : product.cantidad || 1;
 
     // Busca si el producto ya está en la lista de ventas
-    const existingProductIndex = salesData.findIndex((sale) => sale.idProducto === product.idProducto);
+    const existingProductIndex = salesData.findIndex(
+      (sale) => sale.idProducto === product.idProducto
+    );
 
     if (existingProductIndex !== -1) {
-        // Si el producto ya está en la lista, actualiza su cantidad sumando la cantidad adicional
-        const updatedSalesData = [...salesData];
-        updatedSalesData[existingProductIndex].quantity += cantidad;
-        updatedSalesData[existingProductIndex].total = calculateTotalPrice(updatedSalesData[existingProductIndex].quantity, precioVenta);
+      // Si el producto ya está en la lista, actualiza su cantidad sumando la cantidad adicional
+      const updatedSalesData = [...salesData];
+      updatedSalesData[existingProductIndex].quantity += cantidad;
+      updatedSalesData[existingProductIndex].total = calculateTotalPrice(
+        updatedSalesData[existingProductIndex].quantity,
+        precioVenta
+      );
 
-        // Actualiza el gran total sumando el total del nuevo producto o la cantidad adicional del producto existente
-        setGrandTotal((prevTotal) => prevTotal + (cantidad * precioVenta));
+      // Actualiza el gran total sumando el total del nuevo producto o la cantidad adicional del producto existente
+      setGrandTotal((prevTotal) => prevTotal + cantidad * precioVenta);
 
-        // Actualiza el estado de salesData con los cambios
-        setSalesData(updatedSalesData);
+      // Actualiza el estado de salesData con los cambios
+      setSalesData(updatedSalesData);
     } else {
-        // Si el producto no está en la lista, agrégalo normalmente
-        const newSale = {
-            quantity: cantidad,
-            descripcion: product.nombre,
-            precio: precioVenta,
-            total: calculateTotalPrice(cantidad, precioVenta),
-            idProducto: product.idProducto,
-        };
+      // Si el producto no está en la lista, agrégalo normalmente
+      const newSale = {
+        quantity: cantidad,
+        descripcion: product.nombre,
+        precio: precioVenta,
+        total: calculateTotalPrice(cantidad, precioVenta),
+        idProducto: product.idProducto,
+      };
 
-        setSalesData((prevSalesData) => {
-            const updatedSalesData = [...prevSalesData, newSale];
-            // Actualiza el gran total sumando el total del nuevo producto
-            setGrandTotal((prevTotal) => prevTotal + newSale.total);
-            return updatedSalesData;
-        });
+      setSalesData((prevSalesData) => {
+        const updatedSalesData = [...prevSalesData, newSale];
+        // Actualiza el gran total sumando el total del nuevo producto
+        setGrandTotal((prevTotal) => prevTotal + newSale.total);
+        return updatedSalesData;
+      });
     }
-};
+  };
 
+  //   const addToSalesData = (product, quantity) => {
+  //     const precioVenta = product.precioVenta || 0;
+  //     const cantidad = quantity !== undefined ? quantity : (product.cantidad || 1); // Usar la cantidad del producto si está disponible
 
-//   const addToSalesData = (product, quantity) => {
-//     const precioVenta = product.precioVenta || 0;
-//     const cantidad = quantity !== undefined ? quantity : (product.cantidad || 1); // Usar la cantidad del producto si está disponible
+  //     const newSale = {
+  //         quantity: cantidad, // Cambiar 'cantidad' a 'quantity'
+  //         descripcion: product.nombre,
+  //         precio: precioVenta,
+  //         total: calculateTotalPrice(cantidad, precioVenta),
+  //         idProducto: product.idProducto,
+  //     };
 
-//     const newSale = {
-//         quantity: cantidad, // Cambiar 'cantidad' a 'quantity'
-//         descripcion: product.nombre,
-//         precio: precioVenta,
-//         total: calculateTotalPrice(cantidad, precioVenta),
-//         idProducto: product.idProducto,
-//     };
-
-//     setSalesData((prevSalesData) => {
-//         const updatedSalesData = [...prevSalesData, newSale];
-//         setGrandTotal((prevTotal) => prevTotal + newSale.total);
-//         return updatedSalesData; // Asegúrate de que el retorno esté fuera de la función de setSalesData
-//     });
-// };
+  //     setSalesData((prevSalesData) => {
+  //         const updatedSalesData = [...prevSalesData, newSale];
+  //         setGrandTotal((prevTotal) => prevTotal + newSale.total);
+  //         return updatedSalesData; // Asegúrate de que el retorno esté fuera de la función de setSalesData
+  //     });
+  // };
 
   // const addToSalesData = (product, quantity=1 ) => {
   //   const precioVenta = product.precioVenta || 0;
@@ -142,10 +149,9 @@ export const SelectedOptionsProvider = ({ children }) => {
 
   //////LOGIN//////
   const clearSessionData = () => {
-    localStorage.removeItem('userData');
+    localStorage.removeItem("userData");
     // Limpia cualquier otro dato de sesión que puedas tener
   };
-  
 
   const clearSalesData = () => {
     setSalesData([]);
@@ -264,7 +270,7 @@ export const SelectedOptionsProvider = ({ children }) => {
         quantity,
         selectedUser,
         setSelectedUser,
-        clearSessionData, 
+        clearSessionData,
         calculateTotalPrice,
         description,
         setDescription,
@@ -277,8 +283,14 @@ export const SelectedOptionsProvider = ({ children }) => {
         searchResults,
         setSearchResults,
         updateSearchResults,
-        selectedCodigoCliente, setSelectedCodigoCliente,
-        selectedCodigoClienteSucursal, setSelectedCodigoClienteSucursal
+        selectedCodigoCliente,
+        setSelectedCodigoCliente,
+        selectedCodigoClienteSucursal,
+        setSelectedCodigoClienteSucursal,
+        selectedChipIndex,
+        setSelectedChipIndex,
+        searchText,
+        setSearchText,
       }}
     >
       {children}

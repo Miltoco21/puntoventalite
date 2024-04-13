@@ -178,7 +178,7 @@ const Step3Component = ({ data, onNext,stepData }) => {
       <form onSubmit={handleNext}>
         <Grid container spacing={2} item xs={12} md={12}>
           <Grid item xs={12} md={6}>
-            <InputLabel>Unidad de Compra</InputLabel>
+            <InputLabel sx={{ marginBottom: "2%" }}>Unidad de Compra</InputLabel>
             <Grid display="flex" alignItems="center">
               <Select
                 fullWidth
@@ -205,7 +205,7 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel>Ingresa Precio Costo</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Precio Costo</InputLabel>
               <TextField
                 sx={{ width: "100%" }}
                 label="Precio Costo"
@@ -221,7 +221,7 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel>Ingresa Precio Venta</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }} >Ingresa Precio Venta</InputLabel>
 
               <TextField
                 sx={{
@@ -239,7 +239,7 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel>Ingresa Stock Inicial</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }} >Ingresa Stock Inicial</InputLabel>
               <TextField
                 sx={{ width: "100%" }}
                 label="Stock Inicial"
@@ -255,11 +255,8 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12}>
             <Button
-              sx={{
-                marginLeft: "40px",
-                marginTop: "5px",
-                marginBottom: "12px",
-              }}
+             fullWidth
+             
               variant="contained"
               color="secondary"
               onClick={handleNext}
@@ -268,7 +265,7 @@ const Step3Component = ({ data, onNext,stepData }) => {
             </Button>
           </Grid>
           <Grid item xs={12} md={8}>
-            <Box mt={2}>
+            {/* <Box mt={2}>
               {(!selectedUnidadId ||
                 !precioCosto ||
                 !stockInicial ||
@@ -277,7 +274,7 @@ const Step3Component = ({ data, onNext,stepData }) => {
                   {emptyFieldsMessage}
                 </Typography>
               )}
-            </Box>
+            </Box> */}
           </Grid>
         </Grid>
       </form>

@@ -326,7 +326,17 @@ const BotonesCategorias = ({ onClose }) => {
               >
                 <Button
                 
-                sx={{width:"100%"}}
+                sx={{
+                  margin: 1,
+                  width: "100%",
+                 
+                  backgroundColor: "lightSalmon",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "coral",
+                    color: "white",
+                  },
+                }}
                   onClick={() => {
                     handleOpenDialog(category.idCategoria);
                     setSelectedOptions((prevOptions) => ({
@@ -426,8 +436,8 @@ const BotonesCategorias = ({ onClose }) => {
               ))}
             </List>
           )}
-          <Button onClick={handleShowFamilies}>Mostrar Familias</Button>
-          <Button onClick={handleShowProducts}>Mostrar Productos</Button>
+          {/* <Button onClick={handleShowFamilies}>Mostrar Familias</Button>
+          <Button onClick={handleShowProducts}>Mostrar Productos</Button> */}
         </DialogContent>
         <DialogActions>
           <Button
