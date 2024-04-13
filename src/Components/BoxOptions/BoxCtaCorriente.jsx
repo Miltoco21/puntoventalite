@@ -319,7 +319,7 @@ const BoxCtaCorriente = ({ onClose }) => {
           idCabecera: deuda.idCabecera,
           total: deuda.total,
         })),
-        montoPagado: montoPagado,
+        montoPagado: cantidad,
         metodoPago: metodoPago,
         idUsuario: userData.codigoUsuario,
         transferencias: {
