@@ -227,19 +227,19 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
 
       // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
 
-      const products = salesData.map((producto) => ({
-        codProducto: producto.id, // Ajustar la propiedad según el nombre real en tus datos
-        cantidad: producto.cantidad, // Ajustar la propiedad según el nombre real en tus datos
-        precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
-        descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
-      }));
+     
 
       const requestBody = {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: selectedCodigoClienteSucursal, // Ajustar según la lógica de tu aplicación
         codigoCliente: selectedCodigoCliente, // Ajustar según la lógica de tu aplicación
         total: grandTotal,
-        products: products,
+        products: salesData.map((producto) => ({
+          codProducto: producto.idProducto, // Ajustar la propiedad según el nombre real en tus datos
+          cantidad: producto.quantity, // Ajustar la propiedad según el nombre real en tus datos
+          precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
+          descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
+        })),
         metodoPago: metodoPago,
         transferencias: {
           idCuentaCorrientePago: 0,
