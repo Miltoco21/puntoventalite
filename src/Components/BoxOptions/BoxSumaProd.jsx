@@ -114,7 +114,6 @@ const BoxSumaProd = ({ venta }) => {
         if (response.data.cantidadRegistros === 0) {
           setOpenSnackbar(true);
           setSnackbarMessage("Producto No encontrado");
-          
 
           setTimeout(() => {
             setOpenSnackbar(false); ////Cierre Modal al finalizar
@@ -204,7 +203,7 @@ const BoxSumaProd = ({ venta }) => {
         justifyContent: "center",
       }}
     >
-      <Grid container item xs={12} md={12} lg={16}>
+      <Grid container item xs={12} md={12} lg={12}>
         <Paper
           elevation={13}
           sx={{
@@ -218,9 +217,9 @@ const BoxSumaProd = ({ venta }) => {
             width: "100%",
           }}
         >
-          <Grid item xs={12} lg={14} sx={{ minWidth: 200, width: "80%" }}>
+          <Grid item xs={12} lg={12} sx={{ minWidth: 200, width: "90%" }}>
             <div style={{ display: "flex" }}>
-              <Grid item xs={12} md={6} lg={14} sx={{ margin: "1px" }}>
+              <Grid item xs={12} md={12} lg={12} sx={{ margin: "1px" }}>
                 <TextField
                   sx={{
                     backgroundColor: "white",

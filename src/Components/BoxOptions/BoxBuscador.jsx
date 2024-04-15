@@ -46,31 +46,28 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     setSelectedCodigoCliente,
     selectedCodigoClienteSucursal,
     setSelectedCodigoClienteSucursal,
-    selectedChipIndex, setSelectedChipIndex,
-    searchText, setSearchText
+    selectedChipIndex,
+    setSelectedChipIndex,
+    searchText,
+    setSearchText,
   } = useContext(SelectedOptionsContext);
 
-  
-   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
-
-
-
+  const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
 
   useEffect(() => {
     // Cuando se realiza una búsqueda vacía o se borran los términos de búsqueda,
     // ocultar los componentes de precios y cta corriente
     if (searchText.trim() === "" || searchResults.length === 0) {
-      
     }
   }, [searchText, searchResults]);
 
   useEffect(() => {
-    if (searchResults.length===0) {
+    if (searchResults.length === 0) {
       // Si no hay usuario seleccionado, limpiar los datos relacionados
       clearSalesData();
       setSelectedChipIndex([]);
       setSelectedUser([]);
-       // Limpiar el índice del chip seleccionado
+      // Limpiar el índice del chip seleccionado
     }
   }, [searchResults]);
 
@@ -90,22 +87,24 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     } else {
       setSelectedUser(result); // Establece el usuario seleccionado como el resultado actual
       setSelectedChipIndex(index); // Establece el índice del chip seleccionado
-      handleUltimaCompraCliente( // Realiza acciones relacionadas con la última compra del cliente
+      handleUltimaCompraCliente(
+        // Realiza acciones relacionadas con la última compra del cliente
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      handleOpenPreciosClientesDialog( // Abre el diálogo de precios para el cliente seleccionado
+      handleOpenPreciosClientesDialog(
+        // Abre el diálogo de precios para el cliente seleccionado
         result.codigoCliente,
         result.codigoClienteSucursal
       );
-      handleOpenDeudasClientesDialog( // Abre el diálogo de deudas para el cliente seleccionado
+      handleOpenDeudasClientesDialog(
+        // Abre el diálogo de deudas para el cliente seleccionado
         result.codigoCliente,
         result.codigoClienteSucursal
       );
       clearSalesData(); // Limpia los datos de ventas
     }
   };
-  
 
   // const handleChipClick = (index, result) => {
   //   if (
@@ -146,7 +145,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
       handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
       handleOpenDeudasClientesDialog(0, 0);
-      
+
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );
@@ -172,11 +171,8 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     setSearchText(inputValue);
     if (inputValue.trim() === "") {
       setSearchResults([]);
-      setSelectedCodigoCliente(0),
-      clearSalesData();
-
+      setSelectedCodigoCliente(0), clearSalesData();
     }
-
   };
   const handleUltimaCompraCliente = async (
     codigoCliente,
@@ -236,113 +232,96 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   };
 
   return (
-    <Paper
-      elevation={13}
-      sx={{ marginBottom: "3px", backgroundColor: "#859398" }}
-    >
-      <Grid container spacing={1}>
-        <Grid item xs={12} md={12} lg={12}>
-          <Grid container spacing={2}>
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
+    <Grid container item xs={12} md={12} lg={12}>
+      <Paper
+        elevation={13}
+        sx={{
+          background: "#859398",
+          width: "100%",
+          marginTop: "2%",
+        }}
+      >
+        <Grid
+          container
+          sx={{ minWidth: 200, width: "100%", display: "flex" }}
+          spacing={2}
+          alignItems="center"
+        >
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper
+              elevation={0} // Sin elevación para que el borde funcione
               sx={{
+                background: "#859398", // Color de fondo blanco para el Paper interior
+                borderRadius: "5px", // Bordes redondeados
                 display: "flex",
-
-                justifyContent: "center",
-                gap: 1,
+                alignItems: "center",
+                padding: "8px", // Espaciado interno
               }}
             >
-              <Grid
-                item
-                xs={10}
-                sm={8}
-                md={8}
+              <TextField
+                fullWidth
+                placeholder="Ingrese Nombre Apellido"
+                value={searchText}
+                onChange={handleInputChange}
                 sx={{
-                  display: "flex",
-
-                  justifyContent: "center",
+                  backgroundColor: "white",
+                  borderRadius: "5px",
+                  margin: "1px",
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={handleSearch}
+                startIcon={<SearchIcon />}
+               
+                sx={{
+                  margin: "1px",
+                  height: "3.4rem",
+                  backgroundColor: "#283048",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#1c1b17",
+                  },
+                  marginLeft: "8px", // Margen izquierdo para separar el TextField del Button
                 }}
               >
-                <TextField
-                  sx={{
-                    backgroundColor: "white",
-                    borderRadius: "5px", // Ajusta el radio de los bordes según tus preferencias
-                    // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)", // Ajusta el sombreado según tus preferencias
-                  }}
-                  fullWidth
-                  label="Ingrese Nombre Apellido"
-                  value={searchText}
-                  onChange={handleInputChange}
-                />
-              </Grid>
-              <Grid item md={3}>
-                <Button
-                  sx={{
-                    width: "90%",
-                    height: "100%",
-                    backgroundColor: " #283048",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "#1c1b17 ",
-                      color: "white",
-                    },
-                  }}
-                  fullWidth
-                  variant="contained"
-                  onClick={handleSearch}
-                  startIcon={<SearchIcon />}
-                >
-                  Buscar
-                </Button>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              {searchResults && searchResults.length > 0 && (
-                <TableContainer>
-                  <ul
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "3px",
-                    }}
-                  >
-                    {searchResults.map((result, index) => (
-                      <ListItem key={result.codigoCliente}>
-                        <Chip
-                          sx={{
-                            display: "flex",
-                            margin: "auto",
-                            backgroundColor:
-                              selectedChipIndex === index
-                                ? "#A8EB12"
-                                : "#2196f3",
-                            transition: "background-color 0.3s ease",
-                          }}
-                          label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
-                          icon={
-                            selectedChipIndex === index ? (
-                              <CheckCircleIcon />
-                            ) : null
-                          } // Agrega el icono de verificación si el chip está seleccionado
-                          onClick={() => handleChipClick(index, result)} // Pasar el índice y el resultado al handleChipClick
-                        />
-                      </ListItem>
-                    ))}
-                  </ul>
-                </TableContainer>
-              )}
-            </Grid>
-            <Grid item xs={12}></Grid>
+                Buscar
+              </Button>
+            </Paper>
           </Grid>
         </Grid>
-      </Grid>
-    
-    </Paper>
+        {searchResults && searchResults.length > 0 && (
+          <TableContainer>
+            <ul
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "5px",
+                padding: 0,
+              }}
+            >
+              {searchResults.map((result, index) => (
+                <ListItem key={result.codigoCliente}>
+                  <Chip
+                    label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
+                    icon={
+                      selectedChipIndex === index ? <CheckCircleIcon /> : null
+                    }
+                    onClick={() => handleChipClick(index, result)}
+                    sx={{
+                      backgroundColor:
+                        selectedChipIndex === index ? "#A8EB12" : "#2196f3",
+                      transition: "background-color 0.3s ease",
+                    }}
+                  />
+                </ListItem>
+              ))}
+            </ul>
+          </TableContainer>
+        )}
+      </Paper>
+    </Grid>
   );
 };
 
 export default BoxBuscador;
-

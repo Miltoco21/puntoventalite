@@ -428,78 +428,79 @@ const BoxCtaCorriente = ({ onClose }) => {
           </Grid>
         </Grid>
       )}
-      <Grid item xs={12}>
-        {ventaData && ventaData.length > 0 && (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectAll}
-                      onChange={handleSelectAll}
-                      color="primary"
-                    />
-                  </TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell>Folio</TableCell>
-                  <TableCell>Pago Parcial</TableCell>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Total</TableCell>
-                  {/* <TableCell>Acciones</TableCell> */}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {ventaData.map((deuda, index) => (
-                  <TableRow key={deuda.id}>
-                    <TableCell>
-                      <Checkbox
-                        checked={deuda.selected || false}
-                        onChange={() => handleCheckboxChange(index)}
-                        color="primary"
-                      />
-                    </TableCell>
-                    <TableCell>{deuda.descripcionComprobante}</TableCell>
-                    <TableCell>{deuda.nroComprobante}</TableCell>
-                    <TableCell>${deuda.totalPagadoParcial}</TableCell>
-                    <TableCell sx={{ width: 1 }}>
-                      {formatFecha(deuda.fecha)}
-                    </TableCell>
+     <Grid item xs={12}>
+  {ventaData && ventaData.length > 0 && (
+    <TableContainer>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <Checkbox
+                checked={selectAll}
+                onChange={handleSelectAll}
+                color="primary"
+              />
+            </TableCell>
+            <TableCell>Descripción</TableCell>
+            <TableCell>Folio</TableCell>
+            <TableCell>Pago Parcial</TableCell>
+            <TableCell>Fecha</TableCell>
+            <TableCell>Total</TableCell>
+            {/* <TableCell>Acciones</TableCell> */}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {/* Ordenar ventaData por fecha ascendente */}
+          {ventaData.sort((a, b) => new Date(a.fecha) - new Date(b.fecha)).map((deuda, index) => (
+            <TableRow key={deuda.id}>
+              <TableCell>
+                <Checkbox
+                  checked={deuda.selected || false}
+                  onChange={() => handleCheckboxChange(index)}
+                  color="primary"
+                />
+              </TableCell>
+              <TableCell>{deuda.descripcionComprobante}</TableCell>
+              <TableCell>{deuda.nroComprobante}</TableCell>
+              <TableCell>${deuda.totalPagadoParcial}</TableCell>
+              <TableCell sx={{ width: 1 }}>
+                {formatFecha(deuda.fecha)}
+              </TableCell>
 
-                    <TableCell>${deuda.total}</TableCell>
-                    <TableCell sx={{ display: "none" }}>
-                      ${deuda.idCabecera}
-                    </TableCell>
+              <TableCell>${deuda.total}</TableCell>
+              <TableCell sx={{ display: "none" }}>
+                ${deuda.idCabecera}
+              </TableCell>
 
-                    <TableCell></TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+              <TableCell></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
 
-              <TableRow>
-                <TableCell colSpan={3} align="right">
-                  <Typography> Total Deuda : ${totalDeuda}</Typography>
-                </TableCell>
-              </TableRow>
+        <TableRow>
+          <TableCell colSpan={3} align="right">
+            <Typography> Total Deuda : ${totalDeuda}</Typography>
+          </TableCell>
+        </TableRow>
 
-              <TableRow>
-                <TableCell colSpan={3} align="right">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleOpenPaymentDialog}
-                    disabled={getTotalSelected() === 0}
-                  >
-                    Pagar Total Seleccionado (${getTotalSelected()})
-                  </Button>
-                </TableCell>
+        <TableRow>
+          <TableCell colSpan={3} align="right">
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOpenPaymentDialog}
+              disabled={getTotalSelected() === 0}
+            >
+              Pagar Total Seleccionado (${getTotalSelected()})
+            </Button>
+          </TableCell>
 
-                <TableCell></TableCell>
-              </TableRow>
-            </Table>
-          </TableContainer>
-        )}
-      </Grid>
+          <TableCell></TableCell>
+        </TableRow>
+      </Table>
+    </TableContainer>
+  )}
+</Grid>
 
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda </DialogTitle>
