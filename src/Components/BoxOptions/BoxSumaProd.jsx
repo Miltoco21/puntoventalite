@@ -43,6 +43,12 @@ import { AlignVerticalBottomOutlined } from "@mui/icons-material";
 const BoxSumaProd = ({ venta }) => {
   const {
     salesData,
+    selectedUser,
+    setSelectedUser,
+    selectedCodigoCliente,
+    setSelectedCodigoCliente,
+    selectedCodigoClienteSucursal,
+    
     setSalesData,
     grandTotal,
     addToSalesData,
@@ -55,7 +61,8 @@ const BoxSumaProd = ({ venta }) => {
   } = useContext(SelectedOptionsContext);
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const codigoCliente = selectedCodigoCliente ?? 0;
+
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -95,7 +102,7 @@ const BoxSumaProd = ({ venta }) => {
     if (searchTerm.trim() !== "") {
       try {
         const response = await axios.get(
-          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}`
+          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}&codigoCliente=${codigoCliente}`
         );
         console.log("Respuesta de la IdBYCODIGO:", response.data);
         console.log("Cantidad registros:", response.data.cantidadRegistros);
@@ -130,11 +137,13 @@ const BoxSumaProd = ({ venta }) => {
     }
   };
 
+  
+
   const handleDescripcionSearchButtonClick = async () => {
     if (searchTerm.trim() !== "") {
       try {
         const response = await axios.get(
-          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
+          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}&codigoCliente=${codigoCliente}`
         );
         console.log("Respuesta deScrpcion:", response.data);
         console.log("Cantidad registros:", response.data.cantidadRegistros);
