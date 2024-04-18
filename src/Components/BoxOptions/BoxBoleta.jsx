@@ -591,7 +591,7 @@ const BoxBoleta = ({ onClose }) => {
                 Débito
               </Button>
             </Grid>
-            <Grid item xs={12} sm={6} md={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
@@ -602,7 +602,7 @@ const BoxBoleta = ({ onClose }) => {
                 Crédito
               </Button>
             </Grid>
-            {/* <Grid item xs={12} sm={12} md={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
@@ -616,8 +616,8 @@ const BoxBoleta = ({ onClose }) => {
               >
                 Cuenta Corriente
               </Button>
-            </Grid> */}
-            <Grid item xs={12} sm={6} md={12}>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
               <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
@@ -633,7 +633,7 @@ const BoxBoleta = ({ onClose }) => {
                 Transferencia
               </Button>
             </Grid>
-            <Grid item xs={12} sm={6} md={12}>
+            <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
                 variant="contained"
