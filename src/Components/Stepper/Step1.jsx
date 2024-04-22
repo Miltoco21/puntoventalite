@@ -24,16 +24,16 @@ import {
 
 const Step1Component = ({ data, onNext, setStepData }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(
-    data.selectedCategoryId || 0
+    data.selectedCategoryId
   );
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState(
-    data.selectedSubCategoryId || 0
+    data.selectedSubCategoryId
   );
   const [selectedFamilyId, setSelectedFamilyId] = useState(
-    data.selectedFamilyId || 0
+    data.selectedFamilyId
   );
   const [selectedSubFamilyId, setSelectedSubFamilyId] = useState(
-    data.selectedSubFamilyId || 0
+    data.selectedSubFamilyId
   );
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubCategories] = useState([]);
@@ -63,37 +63,54 @@ const Step1Component = ({ data, onNext, setStepData }) => {
     setPesoSINO(value);
   };
   const validateFields = () => {
-    const selectedOptions = [
-      selectedCategoryId,
-      selectedSubCategoryId,
-      selectedFamilyId,
-      selectedSubFamilyId,
-      marca,
-      nombre,
-    ];
-  
-    // Verificar si la categoría está seleccionada
-    if (selectedCategoryId === 0) {
-      setEmptyFieldsMessage("La categoría es obligatoria.");
+    if (
+      selectedCategoryId === "" &&
+      selectedSubCategoryId === "" &&
+      selectedFamilyId === "" &&
+      selectedSubFamilyId === "" &&
+      nombre === "" &&
+      marca === ""
+  ) {
+      setEmptyFieldsMessage("Todos los campos son obligatorios.");
+      return false;
+  }
+
+    if (selectedCategoryId === "") {
+      setEmptyFieldsMessage("Debe seleccionar una Categoría.");
       return false;
     }
-  
-    // Contar el número de opciones seleccionadas o completadas
-    const selectedCount = selectedOptions.filter(option => option !== 0 && option !== '').length;
-  
-    // Verificar si al menos tres opciones están seleccionadas o completadas
-    if (selectedCount < 3) {
-      setEmptyFieldsMessage("Debes seleccionar al menos tres opciones.");
+    if (selectedSubCategoryId === "") {
+      setEmptyFieldsMessage("Debe seleccionar una Subcategoría.");
       return false;
-    } else {
-      setEmptyFieldsMessage("");
-      return true;
     }
+    if (selectedFamilyId === "") {
+      setEmptyFieldsMessage("Debe seleccionar una Familia.");
+      return false;
+    }
+    if (selectedSubFamilyId === "") {
+      setEmptyFieldsMessage("Debe seleccionar una Subfamilia.");
+      return false;
+    }
+    if (nombre==="") {
+      setEmptyFieldsMessage("Favor completar nombre.");
+      return false;
+    }
+    if (marca==="") {
+      setEmptyFieldsMessage("Favor completar marca.");
+      return false;
+    }
+
+   
+    
+    // Si todos los campos están llenos y se ha seleccionado al menos una opción para cada nivel, limpiar los mensajes de error
+    setSelectionErrorMessage("");
+    setEmptyFieldsMessage("");
+    return true;
   };
   
+
   // const validateFields = () => {
   //   if (
- 
 
   //     !nombre ||
   //     !marca
@@ -107,7 +124,6 @@ const Step1Component = ({ data, onNext, setStepData }) => {
   // Llamamos a la función validateFields cada vez que cambie uno de los estados relevantes
 
   const handleNext = () => {
-    // Validar campos antes de continuar
     const isValid = validateFields();
     if (isValid) {
       // Resto del código para continuar si los campos son válidos
@@ -169,19 +185,21 @@ const Step1Component = ({ data, onNext, setStepData }) => {
 
   // Funciones de Seleccion
   const handleCategorySelect = (categoryId) => {
-    setSelectedCategoryId(categoryId);
+    // Si se selecciona "Sin categoría", establece el valor como 0; de lo contrario, utiliza el valor seleccionado normalmente
+    setSelectedCategoryId(categoryId === '' ? 0 : categoryId);
   };
+  
 
   const handleSubCategorySelect = (subCategoryId) => {
-    setSelectedSubCategoryId(subCategoryId);
+    setSelectedSubCategoryId(subCategoryId === '' ? 0 :subCategoryId);
   };
 
   const handleFamilySelect = (familyId) => {
-    setSelectedFamilyId(familyId);
+    setSelectedFamilyId(familyId === '' ? 0 :familyId);
   };
 
   const handleSubFamilySelect = (subFamilyId) => {
-    setSelectedSubFamilyId(subFamilyId);
+    setSelectedSubFamilyId(subFamilyId === '' ? 0 :subFamilyId);
   };
   const handleCreateCategory = () => {
     // Implement the logic to create a new category here.
@@ -282,22 +300,24 @@ const Step1Component = ({ data, onNext, setStepData }) => {
     fetchSubFamilies();
   }, [selectedFamilyId, selectedCategoryId, selectedSubCategoryId]);
 
-  const validateSelections = () => {
-    const selectedOptions = [
-      selectedCategoryId,
-      selectedSubCategoryId,
-      selectedFamilyId,
-      selectedSubFamilyId,
-    ];
-    const selectedCount = selectedOptions.filter(
-      (option) => option !== 0
-    ).length;
-    if (selectedCount < 3) {
-      setSelectionErrorMessage("Debes seleccionar al menos tres opciones.");
-      return false;
-    } else {
-      setSelectionErrorMessage("");
-      return true;
+  const handleKeyDown = (event, field) => {
+    if (field === "marca") {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+    if (field === "nombre") {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+    if (field === "telefono") {
+      // Validar si la tecla presionada es un signo menos
+      if (event.key === "-" && formData.telefono === "") {
+        event.preventDefault(); // Prevenir ingreso de número negativo
+      }
     }
   };
 
@@ -340,29 +360,33 @@ const Step1Component = ({ data, onNext, setStepData }) => {
             </RadioGroup>
           </FormControl>
         </Grid> */}
-        <Grid item xs={12} md={6}>
-          <InputLabel>Selecciona Categoría</InputLabel>
-          <Select
-            fullWidth
-            value={selectedCategoryId}
-            onChange={(e) => handleCategorySelect(e.target.value)}
-            label="Selecciona Categoría"
-          >
-            {categories.map((category) => (
-              <MenuItem key={category.idCategoria} value={category.idCategoria}>
-                {category.descripcion}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
+       <Grid item xs={12} md={6}>
+  <InputLabel>Selecciona Categoría</InputLabel>
+  <Select
+    fullWidth
+    value={selectedCategoryId === 0 ? 0 : selectedCategoryId}
+    onChange={(e) => handleCategorySelect(e.target.value)}
+    label="Selecciona Categoría"
+  >
+    <MenuItem value={0}>Sin categoría</MenuItem>
+    {categories.map((category) => (
+      <MenuItem key={category.idCategoria} value={category.idCategoria}>
+        {category.descripcion}
+      </MenuItem>
+    ))}
+  </Select>
+</Grid>
+
         <Grid item xs={12} md={6}>
           <InputLabel>Selecciona Sub-Categoría</InputLabel>
           <Select
             fullWidth
-            value={selectedSubCategoryId}
+            value={selectedSubCategoryId === 0 ? 0 : selectedSubCategoryId}
+           
             onChange={(e) => handleSubCategorySelect(e.target.value)}
             label="Selecciona Sub-Categoría"
           >
+            <MenuItem value={0}>Sin subcategoría</MenuItem>
             {subcategories.map((subcategory) => (
               <MenuItem
                 key={subcategory.idSubcategoria}
@@ -377,10 +401,12 @@ const Step1Component = ({ data, onNext, setStepData }) => {
           <InputLabel>Selecciona Familia</InputLabel>
           <Select
             fullWidth
-            value={selectedFamilyId}
+            value={selectedFamilyId=== 0 ? 0 :selectedFamilyId}
             onChange={(e) => handleFamilySelect(e.target.value)}
             label="Selecciona Familia"
           >
+            {" "}
+            <MenuItem value={0}>Sin familia</MenuItem>
             {families.map((family) => (
               <MenuItem key={family.idFamilia} value={family.idFamilia}>
                 {family.descripcion}
@@ -392,10 +418,11 @@ const Step1Component = ({ data, onNext, setStepData }) => {
           <InputLabel>Selecciona Subfamilia</InputLabel>
           <Select
             fullWidth
-            value={selectedSubFamilyId}
+            value={selectedSubFamilyId=== 0 ? 0 :selectedSubFamilyId}
             onChange={(e) => handleSubFamilySelect(e.target.value)}
             label="Selecciona Subfamilia"
           >
+            <MenuItem value={0}>Sin subfamilia</MenuItem>
             {subfamilies.map((subfamily) => (
               <MenuItem
                 key={subfamily.idSubFamilia}
@@ -412,14 +439,17 @@ const Step1Component = ({ data, onNext, setStepData }) => {
             label="Ingrese Nombre"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
+            onKeyDown={(event) => handleKeyDown(event, "nombre")}
           />
         </Grid>
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
+            type="text"
             label="Ingrese Marca"
             value={marca}
             onChange={(e) => setMarca(e.target.value)}
+            onKeyDown={(event) => handleKeyDown(event, "marca")}
           />
         </Grid>
         <Grid item xs={12} md={12}>
@@ -436,7 +466,10 @@ const Step1Component = ({ data, onNext, setStepData }) => {
         {/* Mensaje de validación */}
         <Grid item xs={12} md={8}>
           <Box mt={2}>
-            {(!nombre || !marca) && (
+            {(!selectedSubCategoryId ||
+              !selectedFamilyId ||
+              !selectedSubFamilyId | !nombre ||
+              !marca) && (
               <Typography variant="body2" color="error">
                 {emptyFieldsMessage}
               </Typography>

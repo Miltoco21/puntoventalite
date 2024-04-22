@@ -357,6 +357,27 @@ const IngresoClientes = ({ onClose }) => {
       [name]: value,
     }));
   };
+  const handleKeyDown = (event, field) => {
+    if (field === 'nombre') {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== 'Backspace') {
+        event.preventDefault();
+      }
+    }
+    if (field === 'apellido') {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== 'Backspace') {
+        event.preventDefault();
+      }
+    }
+    if (field === 'telefono') {
+      // Validar si la tecla presionada es un signo menos
+      if (event.key === '-' && formData.telefono === '') {
+        event.preventDefault(); // Prevenir ingreso de número negativo
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     try {
       const emptyFields = Object.entries(formData)
@@ -542,6 +563,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.nombre}
                 onChange={handleInputChange}
+                onKeyDown={(event) => handleKeyDown(event, 'nombre')}
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
@@ -555,6 +577,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.apellido}
                 onChange={handleInputChange}
+                onKeyDown={(event) => handleKeyDown(event, 'apellido')}
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
@@ -580,6 +603,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.telefono}
                 onChange={handleInputChange}
+                onKeyDown={(event) => handleKeyDown(event, 'telefono')}
                 inputProps={{
                   inputMode: "numeric", // Establece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
@@ -645,7 +669,7 @@ const IngresoClientes = ({ onClose }) => {
                 Ingresa correo electrónico
               </InputLabel>
               <TextField
-              required
+                required
                 label="Correo"
                 name="correo"
                 type="email"

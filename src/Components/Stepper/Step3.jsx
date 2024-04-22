@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
+  Snackbar,
   FormControl,
   RadioGroup,
   FormControlLabel,
@@ -22,61 +23,134 @@ import {
   Typography,
 } from "@mui/material";
 
-const Step3Component = ({ data, onNext,stepData }) => {
+const Step3Component = ({ data, onNext, stepData }) => {
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockInicial, setStockInicial] = useState(data.stockInicial || "");
-  const [precioCosto, setPrecioCosto] = useState(data.precioCosto || "");
+  const [stockInicial, setStockInicial] = useState(data.stockInicial);
+  const [precioCosto, setPrecioCosto] = useState(data.precioCosto);
   const [selectedUnidadId, setSelectedUnidadId] = useState(
     data.selectedUnidadId || ""
   );
-  const [precioVenta, setPrecioVenta] = useState(data.precioVenta || "");
+
+  const [precioVenta, setPrecioVenta] = useState(data.precioVenta);
   const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
   const [openDialog1, setOpenDialog1] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  console.log("data:",data)
-  // console.log("onNext:",onNext)
-  // console.log("stepData:",stepData)
-  useEffect(() => {
-    if (!selectedUnidadId || !precioCosto || !stockInicial || !precioVenta) {
-      setEmptyFieldsMessage("Todos los campos son obligatorios.");
+  console.log("data:", data);
+  const validateFields = () => {
+    // Verificar si al menos un campo está lleno
+    if (
+      selectedUnidadId !== "" ||
+      precioCosto !== "" ||
+      precioVenta !== "" ||
+      stockInicial !== ""
+    ) {
+      // Verificar cada campo individualmente y mostrar el primer campo vacío
+      if (selectedUnidadId === "") {
+        setEmptyFieldsMessage("Debe seleccionar una unidad.");
+        return false;
+      }
+      if (precioCosto === "") {
+        setEmptyFieldsMessage("Favor completar precio de costo.");
+        return false;
+      }
+      if (precioVenta === "") {
+        setEmptyFieldsMessage("Favor completar precio de venta.");
+        return false;
+      }
+      if (stockInicial === "") {
+        setEmptyFieldsMessage("Favor completar Stock Inicial.");
+        return false;
+      }
+
+      // Si al menos un campo está lleno y no hay campos vacíos, limpiar el mensaje de error
+      setEmptyFieldsMessage("");
+      return true;
     } else {
-      setEmptyFieldsMessage(""); // Si todos los campos están llenos, limpiar el mensaje de error
+      // Si todos los campos están vacíos, mostrar un mensaje de error
+      setEmptyFieldsMessage("Todos los campos son obligatorios.");
+      return false;
     }
-  }, [selectedUnidadId, precioCosto, stockInicial, precioVenta]);
+  };
+  // const validateFields = () => {
+  //   // Verificar si todos los campos están vacíos
+  //   if (
+  //     selectedUnidadId === "" &&
+  //     precioCosto === "" &&
+  //     precioVenta === "" &&
+  //     stockInicial === ""
+  //   ) {
+  //     setEmptyFieldsMessage("Todos los campos son obligatorios.");
+  //     return false;
+  //   }
+
+  //   // Verificar cada campo individualmente y mostrar el primer campo vacío
+  //   if (selectedUnidadId === "") {
+  //     setEmptyFieldsMessage("Debe seleccionar una unidad.");
+  //     return false;
+  //   }
+  //   if (precioCosto === "") {
+  //     setEmptyFieldsMessage("Favor completar precio de costo.");
+  //     return false;
+  //   }
+  //   if (precioVenta === "") {
+  //     setEmptyFieldsMessage("Favor completar precio de venta.");
+  //     return false;
+  //   }
+  //   if (stockInicial === "") {
+  //     setEmptyFieldsMessage("Favor completar Stock Inicial.");
+  //     return false;
+  //   }
+
+  //   // Si todos los campos están completos, limpiar el mensaje de error
+  //   setEmptyFieldsMessage("");
+  //   return true;
+  // };
 
   const handleNext = async () => {
+    const isValid = validateFields();
+
+    if (!isValid) {
+      // Si los campos no son válidos, no continuar
+      return;
+    }
+
+    setLoading(true);
+
     // Crear objeto con los datos del paso 1
     const step1Data = {
-      respuestaSINO: "string",
-      pesoSINO: "string",
+      respuestaSINO: "",
+      pesoSINO: "",
       marca: data.marca,
       categoriaID: data.selectedCategoryId || 0, // Utilizamos 0 si el valor es undefined
       subCategoriaID: data.selectedSubCategoryId || 0,
       familiaID: data.selectedFamilyId || 0,
       subFamilia: data.selectedSubFamilyId || 0,
-      nombre: data.nombre // Debes proporcionar un valor adecuado aquí
+      nombre: data.nombre, // Debes proporcionar un valor adecuado aquí
     };
-  
+
     // Crear objeto con los datos del paso 3
     const step3Data = {
-      unidad:selectedUnidadId, // Debes proporcionar un valor adecuado aquí
+      unidad: selectedUnidadId, // Debes proporcionar un valor adecuado aquí
       precioCosto: parseFloat(precioCosto) || 0, // Convertir a número y usar 0 si no hay valor
-      stockInicial: parseInt(stockInicial) || 0 // Convertir a número entero y usar 0 si no hay valor
+      stockInicial: parseInt(stockInicial) || 0, // Convertir a número entero y usar 0 si no hay valor
     };
-  
+
     // Crear objeto con los datos del paso 4
     const step4Data = {
       formatoVenta: 0, // Debes proporcionar un valor adecuado aquí
-      precioVenta: parseFloat(precioVenta) || 0 // Convertir a número y usar 0 si no hay valor
+      precioVenta: parseFloat(precioVenta) || 0, // Convertir a número y usar 0 si no hay valor
     };
-  
+
     // Combinar todos los pasos en un solo objeto
     const requestData = {
       name: "string", // Debes proporcionar un valor adecuado aquí
       step1: step1Data,
       step2: {
         bodega: "string", // Debes proporcionar un valor adecuado aquí
-        proveedor: "string" // Debes proporcionar un valor adecuado aquí
+        proveedor: "string", // Debes proporcionar un valor adecuado aquí
       },
       step3: step3Data,
       step4: step4Data,
@@ -84,42 +158,40 @@ const Step3Component = ({ data, onNext,stepData }) => {
         stockCritico: 0, // Debes proporcionar un valor adecuado aquí
         impuesto: "string", // Debes proporcionar un valor adecuado aquí
         selectedFile: {}, // Debes proporcionar un valor adecuado aquí
-        nota: "string" // Debes proporcionar un valor adecuado aquí
-      }
+        nota: "string", // Debes proporcionar un valor adecuado aquí
+      },
     };
 
-     console.log("Datos objeto productos",requestData) 
-  
+    console.log("Datos objeto productos", requestData);
+
     try {
       // Enviar la petición POST al endpoint con los datos combinados
       const response = await axios.post(
         "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
         requestData
       );
-      
+
       // Manejar la respuesta de la API
       console.log("Response:", response);
-      
+      if (response.data.statusCode === 201) {
+        setSnackbarMessage("Producto guardado exitosamente");
+        setSnackbarOpen(true);
+      }
+
       // Llamar a la función onNext para continuar con el siguiente paso
       onNext(requestData, 3);
     } catch (error) {
-      // Manejar el error de la petición
+      setSnackbarMessage("Error al guardar el producto");
+      setSnackbarOpen(true);
       console.error("Error:", error);
-      
-      // Mostrar mensaje de error
-      // Por ejemplo:
-      // if (error.response) {
-      //   console.log("Error response:", error.response.data);
-      //   console.log("Error status:", error.response.status);
-      // } else if (error.request) {
-      //   console.log("Error request:", error.request);
-      // } else {
-      //   console.log("Error message:", error.message);
-      // }
+    } finally {
+      setLoading(false);
     }
   };
-  
 
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
   const handleOpenDialog1 = () => {
     setOpenDialog1(true);
   };
@@ -127,8 +199,9 @@ const Step3Component = ({ data, onNext,stepData }) => {
     setOpenDialog1(false);
   };
 
-  const handleUnidadSelect = (unidadId) => {
-    setSelectedUnidadId(unidadId);
+  const handleUnidadSelect = (selectedUnidadId) => {
+    setSelectedUnidadId(selectedUnidadId === "" ? 0 : selectedUnidadId);
+    console.log("Unidad seleccionada:", selectedUnidadId);
   };
   const handleCreateUnidad = () => {
     // Implement the logic to create a new category here.
@@ -154,17 +227,48 @@ const Step3Component = ({ data, onNext,stepData }) => {
   // }, []);
 
   const unidades = [
-    { id: 1, unidad: "KG" },
-    { id: 2, unidad: "UNI" },
-    { id: 3, unidad: "MM" },
-    { id: 4, unidad: "CM" },
-    { id: 5, unidad: "LT" },
-    { id: 6, unidad: "OZ" },
-    { id: 7, unidad: "CAJON" },
-    { id: 8, unidad: "DISPLAY" },
-    { id: 9, unidad: "PALLET" },
-    { id: 10, unidad: "MALLA" },
+    { idUnidad: 0, descripcion: "Sin unidad" },
+    { idUnidad: 1, descripcion: "KG" },
+    { idUnidad: 2, descripcion: "UNI" },
+    { idUnidad: 3, descripcion: "MM" },
+    { idUnidad: 4, descripcion: "CM" },
+    { idUnidad: 5, descripcion: "LT" },
+    { idUnidad: 6, descripcion: "OZ" },
+    { idUnidad: 7, descripcion: "CAJON" },
+    { idUnidad: 8, descripcion: "DISPLAY" },
+    { idUnidad: 9, descripcion: "PALLET" },
+    { idUnidad: 10, descripcion: "MALLA" },
   ];
+  const handleKeyDown = (event, field) => {
+    // Verificar en qué campo se está escribiendo
+    if (
+      field === "precioCosto" ||
+      field === "precioVenta" ||
+      field === "stockInicial"
+    ) {
+      // Permitir solo dígitos numéricos y la tecla de retroceso
+      // Excluir caracteres no numéricos y caracteres especiales específicos
+      if (
+        !/[0-9]/.test(event.key) &&
+        event.key !== "Backspace" &&
+        !/[`´']/.test(event.key)
+      ) {
+        event.preventDefault();
+      }
+    }
+  };
+  const handleChange = (event, field) => {
+    // Asegurar que el valor solo contenga números
+    // Eliminar caracteres especiales específicos
+    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    if (field === "precioCosto") {
+      setPrecioCosto(newValue);
+    } else if (field === "precioVenta") {
+      setPrecioVenta(newValue);
+    } else if (field === "stockInicial") {
+      setStockInicial(newValue);
+    }
+  };
 
   return (
     <Paper
@@ -178,9 +282,12 @@ const Step3Component = ({ data, onNext,stepData }) => {
       <form onSubmit={handleNext}>
         <Grid container spacing={2} item xs={12} md={12}>
           <Grid item xs={12} md={6}>
-            <InputLabel sx={{ marginBottom: "2%" }}>Unidad de Compra</InputLabel>
+            <InputLabel sx={{ marginBottom: "2%" }}>
+              Unidad de Compra
+            </InputLabel>
             <Grid display="flex" alignItems="center">
               <Select
+                required
                 fullWidth
                 sx={{ width: "100%" }}
                 value={selectedUnidadId}
@@ -188,30 +295,27 @@ const Step3Component = ({ data, onNext,stepData }) => {
                 label="Selecciona Unidad"
               >
                 {unidades.map((unidad) => (
-                  <MenuItem key={unidad.id} value={unidad.id}>
-                    {unidad.unidad}
+                  <MenuItem key={unidad.idUnidad} value={unidad.idUnidad}>
+                    {unidad.descripcion}
                   </MenuItem>
                 ))}
               </Select>
-              {/* <Button
-              size="large"
-              variant="outlined"
-              style={{ marginLeft: "18px", padding: "14px" }}
-              onClick={handleOpenDialog1}
-            >
-              +
-            </Button> */}
             </Grid>
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Precio Costo</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Precio Costo
+              </InputLabel>
               <TextField
+                required
                 sx={{ width: "100%" }}
                 label="Precio Costo"
+                name="precioCosto"
                 fullWidth
                 value={precioCosto}
-                onChange={(e) => setPrecioCosto(e.target.value)}
+                onChange={(event) => handleChange(event, "precioCosto")}
+                onKeyDown={(event) => handleKeyDown(event, "precioCosto")}
                 inputProps={{
                   inputMode: "numeric", // Establece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
@@ -221,15 +325,19 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel sx={{ marginBottom: "4%" }} >Ingresa Precio Venta</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Precio Venta
+              </InputLabel>
 
               <TextField
+                required
                 sx={{
                   width: "100%",
                 }}
                 fullWidth
                 value={precioVenta}
-                onChange={(e) => setPrecioVenta(e.target.value)}
+                onChange={(event) => handleChange(event, "precioVenta")}
+                onKeyDown={(event) => handleKeyDown(event, "precioVenta")}
                 inputProps={{
                   inputMode: "numeric", // Establece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
@@ -239,13 +347,17 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel sx={{ marginBottom: "4%" }} >Ingresa Stock Inicial</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }}>
+                Ingresa Stock Inicial
+              </InputLabel>
               <TextField
+                required
                 sx={{ width: "100%" }}
                 label="Stock Inicial"
                 fullWidth
                 value={stockInicial}
-                onChange={(e) => setStockInicial(e.target.value)}
+                onChange={(event) => handleChange(event, "stockInicial")}
+                onKeyDown={(event) => handleKeyDown(event, "stockInicial")}
                 inputProps={{
                   inputMode: "numeric", // Establece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
@@ -255,29 +367,32 @@ const Step3Component = ({ data, onNext,stepData }) => {
           </Grid>
           <Grid item xs={12}>
             <Button
-             fullWidth
-             
+              fullWidth
               variant="contained"
               color="secondary"
               onClick={handleNext}
+              disabled={loading}
             >
-              Guardar Producto 
+              {loading ? "Guardando..." : "Guardar Producto"}
             </Button>
           </Grid>
           <Grid item xs={12} md={8}>
-            {/* <Box mt={2}>
-              {(!selectedUnidadId ||
-                !precioCosto ||
-                !stockInicial ||
-                !precioVenta) && (
+            <Box mt={2}>
+              {
                 <Typography variant="body2" color="error">
                   {emptyFieldsMessage}
                 </Typography>
-              )}
-            </Box> */}
+              }
+            </Box>
           </Grid>
         </Grid>
       </form>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+      />
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>
         <DialogTitle>Crear Unidad de Compra</DialogTitle>
         <DialogContent sx={{ marginTop: "9px" }}>
