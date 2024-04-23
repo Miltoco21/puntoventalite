@@ -314,6 +314,28 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     return cambio > 0 ? cambio : 0;
   };
 
+  const handleKeyDown = (event, field) => {
+    if (field === "marca") {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+    if (field === "nombre") {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+    if (field === "telefono") {
+      // Validar si la tecla presionada es un signo menos
+      if (event.key === "-" && formData.telefono === "") {
+        event.preventDefault(); // Prevenir ingreso de número negativo
+      }
+    }
+  };
+
+
   return (
     <>
       <Grid container spacing={2}>
@@ -502,7 +524,9 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               <TextField
                 label="Nombre"
                 value={nombre}
+                name="nombre"
                 onChange={(e) => setNombre(e.target.value)}
+                onKeyDown={(event) => handleKeyDown(event, "nombre")}
                 variant="outlined"
                 fullWidth
               />
