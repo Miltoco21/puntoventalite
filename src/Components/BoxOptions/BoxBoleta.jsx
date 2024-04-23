@@ -2,6 +2,8 @@ import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from "dayjs";
 import {
   Paper,
@@ -29,7 +31,6 @@ import {
   TextField,
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
-
 const BoxBoleta = ({ onClose }) => {
   const {
     userData,
@@ -116,9 +117,12 @@ const BoxBoleta = ({ onClose }) => {
   };
 
   const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
-  // const fechaDayjs = dayjs(fecha);
-  const handleDateChange = (newDate) => {
-    setFecha(newDate);
+
+  const hoy = dayjs();
+  const inicioRango = dayjs().subtract(1, "week"); // Resta 1 semanas
+
+  const handleDateChange = (date) => {
+    setFecha(date);
   };
 
   // Estado para el valor seleccionado del banco
@@ -290,139 +294,6 @@ const BoxBoleta = ({ onClose }) => {
       setLoading(false);
     }
   };
-  // const handlePagoBoleta = async () => {
-  //  try {
-  //     // Validar si el usuario ha ingresado el código de vendedor
-  //     if (!userData.codigoUsuario) {
-  //       setError("Por favor, ingresa el código de vendedor para continuar.");
-  //       return;
-  //     }
-
-  //     // Validar si el total a pagar es cero
-  //     if (grandTotal === 0) {
-  //       setError(
-  //         "No se puede generar la boleta de pago porque el total a pagar es cero."
-  //       );
-  //       return;
-  //     }
-
-  //     // Validar que se haya seleccionado al menos una deuda
-
-  //     setLoading(true);
-
-  //     let endpoint =
-  //       'https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE';
-
-  //     // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
-  //     if (metodoPago === "TRANSFERENCIA") {
-  //       endpoint =
-  //         'https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE';
-
-  //       // Validar datos de transferencia
-  //       if (
-  //         !nombre ||
-  //         !rut ||
-  //         !selectedBanco ||
-  //         !tipoCuenta ||
-  //         !nroCuenta ||
-  //         !fecha ||
-  //         !nroOperacion
-  //       ) {
-  //         setError(
-  //           "Por favor, completa todos los campos necesarios para la transferencia."
-  //         );
-  //         setLoading(false);
-  //         return;
-  //       }
-  //       if (!validarRutChileno(rut)) {
-  //         setError("El RUT ingresado NO es válido.");
-  //         setLoading(false);
-  //         return;
-  //       }
-  //     }
-
-  //     // Validar el monto pagado
-  //     if (!montoPagado || montoPagado <= 0) {
-  //       setError("Por favor, ingresa un monto válido para el pago.");
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     // Validar el método de pago
-  //     if (!metodoPago) {
-  //       setError("Por favor, selecciona un método de pago.");
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     // Validar el código de usuario
-  //     if (
-  //       typeof userData.codigoUsuario !== "number" ||
-  //       userData.codigoUsuario <= 0
-  //     ) {
-  //       setError("El código de usuario no es válido.");
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     // Otras validaciones que consideres necesarias...
-
-  //     // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
-
-  //     const requestBody = {
-  //       deudaIds: selectedDebts.map((deuda) => ({
-  //         idCuentaCorriente: deuda.id,
-  //         idCabecera: deuda.idCabecera,
-  //         total: deuda.total,
-  //       })),
-  //       montoPagado: montoPagado,
-  //       metodoPago: metodoPago,
-  //       idUsuario: userData.codigoUsuario,
-  //       transferencias: {
-  //         idCuentaCorrientePago: 0,
-  //         nombre: nombre,
-  //         rut: rut,
-  //         banco: selectedBanco,
-  //         tipoCuenta: tipoCuenta,
-  //         nroCuenta: nroCuenta,
-  //         fecha: fecha,
-  //         nroOperacion: nroOperacion,
-  //       },
-  //     };
-
-  //     console.log("Request Body:", requestBody);
-
-  //     const response = await axios.post(endpoint, requestBody);
-
-  //     console.log("Response:", response.data);
-
-  //     if (response.status === 200) {
-  //       // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
-  //       setSnackbarOpen(true);
-  //       setSnackbarMessage(response.data.descripcion);
-  //       clearSalesData();
-  //       setSelectedUser(null);
-  //       setSelectedChipIndex([]);
-  //       setSearchResults([]);
-  //       setSelectedCodigoCliente(0);
-  //        setSearchText(""),
-  //        handleClosePaymentDialog();
-  //        handleTransferenciaModalClose();
-  //        onClose();
-
-  //       // setTimeout(() => {
-
-  //       //   onClose();
-  //       // }, 1000);
-  //     } else {
-  //       console.error("Error al realizar el pago");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error al realizar el pago:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
@@ -608,9 +479,7 @@ const BoxBoleta = ({ onClose }) => {
                 id={`${metodoPago}-btn`}
                 fullWidth
                 variant={
-                  metodoPago === "CUENTACORRIENTE"
-                    ? "contained"
-                    : "outlined"
+                  metodoPago === "CUENTACORRIENTE" ? "contained" : "outlined"
                 }
                 onClick={() => setMetodoPago("CUENTACORRIENTE")}
               >
@@ -758,15 +627,20 @@ const BoxBoleta = ({ onClose }) => {
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
-              <DatePicker
-                label="Selecciona una fecha"
-                value={fecha} // Pasa el estado 'fecha' como valor del DatePicker
-                onChange={handleDateChange} // Proporciona la función para manejar los cambios de fecha
-                renderInput={(params) => <TextField {...params} fullWidth />} // Esto es solo un ejemplo, asegúrate de proporcionar el componente de entrada correcto para renderizar el DatePicker
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Ingresa Fecha"
+                  value={fecha}
+                  onChange={handleDateChange}
+                  minDate={inicioRango}
+                  maxDate={hoy}
+                />
+              </LocalizationProvider>
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
                 Ingresa Numero Operación

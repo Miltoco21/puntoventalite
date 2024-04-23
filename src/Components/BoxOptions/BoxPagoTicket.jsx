@@ -24,6 +24,8 @@ import {
   Snackbar,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
@@ -115,9 +117,12 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   };
 
   const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
-  // const fechaDayjs = dayjs(fecha);
-  const handleDateChange = (newDate) => {
-    setFecha(newDate);
+
+  const hoy = dayjs();
+  const inicioRango = dayjs().subtract(1, "week"); // Resta 1 semanas
+
+  const handleDateChange = (date) => {
+    setFecha(date);
   };
 
   // Estado para el valor seleccionado del banco
@@ -226,8 +231,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       // Otras validaciones que consideres necesarias...
 
       // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
-
-     
 
       const requestBody = {
         idUsuario: userData.codigoUsuario,
@@ -572,12 +575,15 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
 
-              <DatePicker
-                label="Selecciona una fecha"
-                value={fecha} // Pasa el estado 'fecha' como valor del DatePicker
-                onChange={handleDateChange} // Proporciona la función para manejar los cambios de fecha
-                renderInput={(params) => <TextField {...params} fullWidth />} // Esto es solo un ejemplo, asegúrate de proporcionar el componente de entrada correcto para renderizar el DatePicker
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Ingresa Fecha"
+                  value={fecha}
+                  onChange={handleDateChange}
+                  minDate={inicioRango}
+                  maxDate={hoy}
+                />
+              </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>

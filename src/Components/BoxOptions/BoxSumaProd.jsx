@@ -244,7 +244,7 @@ const BoxSumaProd = ({ venta }) => {
             >
               <Alert
                 onClose={() => setOpenSnackbar(false)}
-                severity="info"
+                severity="success"
                 sx={{ width: "100%" }}
               >
                 {errorMessage}
@@ -256,9 +256,9 @@ const BoxSumaProd = ({ venta }) => {
 
       <Grid item xs={12}>
         <Paper elevation={1} sx={{ background: "#859398", margin: "5px" }}>
-          <IconButton onClick={toggleVisibility}>
+          {/* <IconButton onClick={toggleVisibility}>
             {isVisible ? <KeyboardDoubleArrowUp/> : <KeyboardDoubleArrowDownIcon />}
-          </IconButton>
+          </IconButton> */}
           {isVisible && (
             <TableContainer
               component={Paper}
@@ -323,7 +323,7 @@ const BoxSumaProd = ({ venta }) => {
               </TableHead>
               <TableBody style={{ maxHeight: "400px", overflowY: "auto" }}>
                 {salesData.map((sale, index) => (
-                  <TableRow key={index} sx={{ height: "33px" }}>
+                  <TableRow key={index} sx={{ height: "20%", }}>
                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
                       <TextField
                         value={sale.quantity === 0 ? "" : sale.quantity}
@@ -335,10 +335,11 @@ const BoxSumaProd = ({ venta }) => {
                             : newValue;
                           setSalesData(updatedSalesData);
                         }}
-                        style={{ width: 70 }}
+                        style={{ width: 84 }}
                         inputProps={{
                           inputMode: "numeric", // Establece el modo de entrada como numérico
-                          pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
+                          pattern: "[0-9]*",
+                          maxLength: 6, // Asegura que solo se puedan ingresar números
                         }}
                       />
                     </TableCell>
@@ -370,7 +371,7 @@ const BoxSumaProd = ({ venta }) => {
               }}
               elevation={18}
             >
-              <Typography>Total: {grandTotal}</Typography>
+            <Typography>Total: {grandTotal.toLocaleString('es-ES')}</Typography>
             </Paper>
           </TableContainer>
         </Paper>

@@ -752,7 +752,7 @@ const BoxGestionCaja = () => {
                       fontFamily: "Victor Mono"
                     }}
                   >
-                    TOTAL : $
+                    TOTAL:$
                     <span
                       style={{
                         color: "#00878889",
@@ -770,7 +770,7 @@ const BoxGestionCaja = () => {
                           fontWeight: "700",
                         }}
                       >
-                        {grandTotal}
+                       {" "}{grandTotal.toLocaleString('es-ES')}
                       </span>{" "}
                     </span>{" "}
                   </p>
