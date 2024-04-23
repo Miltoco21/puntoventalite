@@ -16,7 +16,7 @@ export const SelectedOptionsProvider = ({ children }) => {
     selectedProduct: null,
   });
   const [productInfo, setProductInfo] = useState(/* initial value */);
-
+  const [searchedProducts, setSearchedProducts] = useState([]);
   const [description, setDescription] = useState(/* initial value */);
   const [quantity, setQuantity] = useState(1);
   const [precioData, setPrecioData] = useState(null);
@@ -291,6 +291,8 @@ export const SelectedOptionsProvider = ({ children }) => {
         setSelectedChipIndex,
         searchText,
         setSearchText,
+        searchedProducts,
+         setSearchedProducts
       }}
     >
       {children}

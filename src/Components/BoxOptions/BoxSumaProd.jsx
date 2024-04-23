@@ -9,6 +9,7 @@ import {
   Grid,
   Button,
   TextField,
+  Alert,
   Snackbar,
   IconButton,
   Table,
@@ -29,16 +30,15 @@ import {
   DialogContent,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useMediaQuery } from "@mui/material";
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import axios from "axios";
-import Swal from "sweetalert2";
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+
+import { KeyboardDoubleArrowUp, Visibility, VisibilityOff } from "@mui/icons-material";
 
 import RemoveIcon from "@mui/icons-material/Remove";
-import AddIcon from "@mui/icons-material/Add";
-import TecladoPLU from "../Teclados/TecladoPLU";
-import TecladoPeso from "../Teclados/TecladoPeso";
+
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
-import { AlignVerticalBottomOutlined } from "@mui/icons-material";
 
 const BoxSumaProd = ({ venta }) => {
   const {
@@ -48,7 +48,7 @@ const BoxSumaProd = ({ venta }) => {
     selectedCodigoCliente,
     setSelectedCodigoCliente,
     selectedCodigoClienteSucursal,
-    
+
     setSalesData,
     grandTotal,
     addToSalesData,
@@ -58,11 +58,13 @@ const BoxSumaProd = ({ venta }) => {
     quantity,
     setQuantity,
     clearSalesData,
+    searchedProducts,
+    setSearchedProducts
+    
   } = useContext(SelectedOptionsContext);
 
   const theme = useTheme();
-  const codigoCliente = selectedCodigoCliente ?? 0;
-
+  const codigoCliente = selectedCodigoCliente ? selectedCodigoCliente : 0;
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -82,6 +84,12 @@ const BoxSumaProd = ({ venta }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [isVisible, setIsVisible] = useState(true);
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
   const calculateTotalPrice = (quantity, price) => quantity * price;
 
   const handlePluSubmit = (productInfo) => {
@@ -98,105 +106,76 @@ const BoxSumaProd = ({ venta }) => {
   const handleClose = () => setOpen(false);
   const handleClosePeso = () => setOpenPeso(false);
 
-  const handlePluSearchButtonClick = async () => {
-    if (searchTerm.trim() !== "") {
-      try {
+  const handleSearchButtonClick = async () => {
+    if (searchTerm.trim() === "") {
+      setErrorMessage("El campo de búsqueda está vacío");
+      setSearchedProducts([]);
+      setOpenSnackbar(true);
+      return; // Salimos de la función ya que no hay necesidad de realizar la búsqueda si está vacío
+    }
+    // Determinar si el término de búsqueda es numérico
+    const isNumeric = !isNaN(parseFloat(searchTerm)) && isFinite(searchTerm);
+
+    try {
+      if (isNumeric) {
+        // Realizar la búsqueda por PLU
         const response = await axios.get(
           `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}&codigoCliente=${codigoCliente}`
         );
-        console.log("Respuesta de la IdBYCODIGO:", response.data);
-        console.log("Cantidad registros:", response.data.cantidadRegistros);
-        if (response.data.cantidadRegistros > 0) {
-          const productoEncontrado = response.data.productos[0];
-          addToSalesData(productoEncontrado, quantity);
-          setProductByCodigo(productoEncontrado);
-          setSearchTerm("");
-          setOpenSnackbar(true);
-          setSnackbarMessage("Producto agregado");
-
-          setTimeout(() => {
-            setOpenSnackbar(false); ////Cierre Modal al finalizar
-          }, 1000);
-        }
-        if (response.data.cantidadRegistros === 0) {
-          setOpenSnackbar(true);
-          setSnackbarMessage("Producto No encontrado");
-
-          setTimeout(() => {
-            setOpenSnackbar(false); ////Cierre Modal al finalizar
-          }, 1000);
-        } else {
-          console.log("Producto no encontrado.");
-          setProductByCodigo(null);
-        }
-      } catch (error) {
-        console.error("Error al buscar el producto:", error);
-
-        setErrorMessage("");
-      }
-    }
-  };
-
-  
-
-  const handleDescripcionSearchButtonClick = async () => {
-    if (searchTerm.trim() !== "") {
-      try {
+        handleSearchSuccess(response, "PLU");
+      } else {
+        // Realizar la búsqueda por descripción
         const response = await axios.get(
           `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}&codigoCliente=${codigoCliente}`
         );
-        console.log("Respuesta deScrpcion:", response.data);
-        console.log("Cantidad registros:", response.data.cantidadRegistros);
-        if (response.data.cantidadRegistros > 0) {
-          setProducts(response.data.productos);
-        } else {
-          console.log("Producto no encontrado.");
-          setProducts([]);
-          setErrorMessage("Descripción o producto no encontrado");
-        }
-      } catch (error) {
-        console.error("Error al buscar el producto por descripción:", error);
-        setErrorMessage("Error al buscar el producto por descripción");
+        handleSearchSuccess(response, "Descripción");
       }
+    } catch (error) {
+      console.error("Error al buscar el producto:", error);
+      setErrorMessage("Error al buscar el producto");
+      setOpenSnackbar(true);
+      setSnackbarMessage("Error al buscar el producto");
+      setTimeout(() => {
+        setOpenSnackbar(false);
+      }, 3000);
     }
   };
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}`
-        );
-        setProducts(response.data.productos);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
 
-    if (searchTerm.trim() !== "") {
-      fetchProducts();
+  const handleSearchSuccess = (response, searchType) => {
+    if (response.data && response.data.cantidadRegistros > 0) {
+      setSearchedProducts(response.data.productos);
+      setSearchTerm("");
+      setOpenSnackbar(true);
+      setErrorMessage(`Productos encontrados (${searchType})`);
+      setTimeout(() => {
+        setOpenSnackbar(false);
+      }, 3000);
+    } else if (response.data && response.data.cantidadRegistros === 0) {
+      setErrorMessage(`No se encontraron resultados (${searchType})`);
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        setOpenSnackbar(false);
+      }, 3000);
     } else {
-      setProducts(0); // Si el término de búsqueda está vacío, limpiar la lista de productos
-    }
-  }, [searchTerm]);
-
-  const handleAddProductToSales = (product) => {
-    if (product) {
-      addToSalesData(product, quantity); // Agregar el producto seleccionado a salesData con la cantidad actual
-      setQuantity(1); // Restablecer la cantidad a 1 después de agregar el producto
+      setErrorMessage(`Error al buscar el producto (${searchType})`);
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        setOpenSnackbar(false);
+      }, 3000);
     }
   };
 
-  const handlePesoSubmit = (pesoValue) => {
-    setPeso(pesoValue);
-    handleClose();
-    if (productInfo) {
-      addToSalesData(productInfo, quantity); // Utiliza la cantidad del estado
-      setQuantity(1); // Restablece la cantidad a 1 después de agregar el producto
-    }
+  const handleAddSelectedProduct = (product) => {
+    addToSalesData(product, quantity);
+    setSearchedProducts([]); // Limpiar los productos buscados después de agregar uno
   };
-  const handleQuantityInputChange = (event) => {
-    setQuantity(event.target.value);
-  };
+
+  // const handleAddProductToSales = (product) => {
+  //   if (product) {
+  //     addToSalesData(product, quantity); // Agregar el producto seleccionado a salesData con la cantidad actual
+  //     setQuantity(1); // Restablecer la cantidad a 1 después de agregar el producto
+  //   }
+  // };
 
   const handleClearSalesData = () => clearSalesData();
 
@@ -253,101 +232,70 @@ const BoxSumaProd = ({ venta }) => {
                   },
                 }}
                 size="large"
-                onClick={() => {
-                  handlePluSearchButtonClick();
-                  handleDescripcionSearchButtonClick();
-                }}
+                onClick={handleSearchButtonClick}
               >
                 PLU
               </Button>
-              {/* <Button
-                sx={{
-                  margin: "1px",
-                  backgroundColor: " #283048",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "#1c1b17 ",
-                    color: "white",
-                  },
-                }}
-                size="large"
-                onClick={handleOpenPeso}
-              >
-                Peso
-              </Button> */}
             </div>
             <Snackbar
               open={openSnackbar}
-              // onClose={handleCloseSnackbar}
-              message={snackbarMessage}
-              autoHideDuration={1000}
-            />
-            {searchTerm.trim() !== "" &&
-              searchTerm.length > 4 &&
-              errorMessage && (
-                <Typography variant="body4" color="error">
-                  {errorMessage}
-                </Typography>
-              )}
+              autoHideDuration={6000}
+              onClose={() => setOpenSnackbar(false)}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity="info"
+                sx={{ width: "100%" }}
+              >
+                {errorMessage}
+              </Alert>
+            </Snackbar>
           </Grid>
         </Paper>
       </Grid>
 
       <Grid item xs={12}>
-        <Paper
-          elevation={1}
-          sx={{
-            background: "#859398",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            margin: "5px",
-          }}
-        >
-          <TableContainer
-            component={Paper}
-            style={{ overflowX: "auto", maxHeight: "200px" }}
-          >
-            <Table>
-              <TableHead sx={{ background: "white", height: "30%" }}>
-                <TableBody style={{ maxHeight: "100px", overflowY: "auto" }}>
-                  {searchTerm.trim() !== "" && products.length > 0 ? (
-                    products.map((product) => (
-                      <TableRow key={product.id} sx={{ height: "15%" }}>
-                        <TableCell>{product.nombre}</TableCell>
-                        <TableCell sx={{ width: "21%" }}>
-                          Plu:{""}
-                          {product.idProducto}
-                        </TableCell>
-                        <TableCell sx={{ width: "21%" }}>
-                          <Button
-                            onClick={() => {
-                              addToSalesData(product);
-                              setProducts([]); // Cerrar la búsqueda después de agregar el producto
-                            }}
-                            variant="contained"
-                            color="secondary"
-                          >
-                            Agregar
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : searchTerm.trim() !== "" &&
-                    searchTerm.length < 2 &&
-                    !isNaN(searchTerm) ? (
-                    <TableRow>
-                      <TableCell colSpan={1}>
-                        <Typography variant="body4" color="error">
-                          {errorMessage}
-                        </Typography>
+        <Paper elevation={1} sx={{ background: "#859398", margin: "5px" }}>
+          <IconButton onClick={toggleVisibility}>
+            {isVisible ? <KeyboardDoubleArrowUp/> : <KeyboardDoubleArrowDownIcon />}
+          </IconButton>
+          {isVisible && (
+            <TableContainer
+              component={Paper}
+              style={{ overflowX: "auto", maxHeight: 200 }}
+            >
+              <Table>
+                {/* <TableHead sx={{ background: "#859398", height: "30%" }}>
+                <TableRow>
+                  <TableCell>Nombre</TableCell>
+                  <TableCell>PLU</TableCell>
+                  <TableCell>Agregar</TableCell>
+                </TableRow>
+              </TableHead> */}
+                <TableBody>
+                  {searchedProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>{product.nombre}</TableCell>
+                      <TableCell sx={{ width: "21%" }}>
+                        Plu:{""}
+                        {product.idProducto}
+                      </TableCell>
+
+                      <TableCell>
+                        <Button
+                          onClick={() => handleAddSelectedProduct(product)}
+                          variant="contained"
+                          color="secondary"
+                        >
+                          Agregar
+                        </Button>
                       </TableCell>
                     </TableRow>
-                  ) : null}
+                  ))}
                 </TableBody>
-              </TableHead>
-            </Table>
-          </TableContainer>
+              </Table>
+            </TableContainer>
+          )}
         </Paper>
       </Grid>
 

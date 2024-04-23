@@ -15,6 +15,8 @@ import {
   TableRow,
   Chip,
   Typography,
+  Snackbar,
+  Alert,
   Slider,
   Dialog,
   DialogContent,
@@ -53,7 +55,8 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   } = useContext(SelectedOptionsContext);
 
   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
-
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   useEffect(() => {
     // Cuando se realiza una búsqueda vacía o se borran los términos de búsqueda,
     // ocultar los componentes de precios y cta corriente
@@ -106,65 +109,77 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     }
   };
 
-  // const handleChipClick = (index, result) => {
-  //   if (
-  //     selectedUser &&
-  //     selectedUser.codigoCliente === result.codigoCliente &&
-  //     selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
-  //   ) {
-  //     clearSalesData();
-  //     setSelectedUser(null);
-  //     setSelectedChipIndex([]);
-  //     setSearchResults([]);
-  //     setSelectedCodigoCliente(0);
-  //   } else {
-  //     setSelectedUser(result);
-  //     setSelectedChipIndex(index);
-  //     handleUltimaCompraCliente(
-  //       result.codigoCliente,
-  //       result.codigoClienteSucursal
-  //     );
-  //     handleOpenPreciosClientesDialog(
-  //       result.codigoCliente,
-  //       result.codigoClienteSucursal
-  //     );
-  //     handleOpenDeudasClientesDialog(
-  //       result.codigoCliente,
-  //       result.codigoClienteSucursal
-  //     );
-  //     clearSalesData();
-  //   }
-  // };
-
   const handleSearch = async () => {
+    // Verificar si el campo de búsqueda está vacío
+    if (searchText.trim() === "") {
+      // Si está vacío, configurar el mensaje del Snackbar y mostrarlo
+      setSnackbarMessage("El campo de búsqueda está vacío");
+      setSnackbarOpen(true);
+      return; // Salir de la función si el campo de búsqueda está vacío
+    }
+
     try {
-      clearSalesData(); // Limpia los datos de ventas
-      setSelectedUser(null); // Desmarca el usuario seleccionado
-      setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
-      setSearchResults([]); // Limpia los resultados de búsqueda
-      setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
-      handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
+      clearSalesData();
+      setSelectedUser(null);
+      setSelectedChipIndex([]);
+      setSearchResults([]);
+      setSelectedCodigoCliente(0);
+      handleOpenPreciosClientesDialog(0, 0);
       handleOpenDeudasClientesDialog(0, 0);
 
       const response = await axios.get(
         `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );
-      if (Array.isArray(response.data.clienteSucursal)) {
+      if (
+        Array.isArray(response.data.clienteSucursal) &&
+        response.data.clienteSucursal.length > 0
+      ) {
         setSearchResults(response.data.clienteSucursal);
-        // También actualiza el contexto con los resultados de la búsqueda
         updateSearchResults(response.data.clienteSucursal);
+        setSnackbarMessage(""); // Limpiar el mensaje del Snackbar si hay resultados
       } else {
         setSearchResults([]);
-        // También actualiza el contexto con los resultados de la búsqueda vacíos
         updateSearchResults([]);
+        setSnackbarMessage("No se encontraron resultados"); // Configurar el mensaje del Snackbar si no hay resultados
       }
     } catch (error) {
       console.error("Error fetching data:", error);
       setSearchResults([]);
-      // También actualiza el contexto con los resultados de la búsqueda vacíos en caso de error
       updateSearchResults([]);
+      setSnackbarMessage("Error al buscar"); // Configurar el mensaje del Snackbar en caso de error
     }
+    setSnackbarOpen(true); // Mostrar el Snackbar
   };
+
+  // const handleSearch = async () => {
+  //   try {
+  //     clearSalesData(); // Limpia los datos de ventas
+  //     setSelectedUser(null); // Desmarca el usuario seleccionado
+  //     setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
+  //     setSearchResults([]); // Limpia los resultados de búsqueda
+  //     setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
+  //     handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
+  //     handleOpenDeudasClientesDialog(0, 0);
+
+  //     const response = await axios.get(
+  //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
+  //     );
+  //     if (Array.isArray(response.data.clienteSucursal)) {
+  //       setSearchResults(response.data.clienteSucursal);
+  //       // También actualiza el contexto con los resultados de la búsqueda
+  //       updateSearchResults(response.data.clienteSucursal);
+  //     } else {
+  //       setSearchResults([]);
+  //       // También actualiza el contexto con los resultados de la búsqueda vacíos
+  //       updateSearchResults([]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //     setSearchResults([]);
+  //     // También actualiza el contexto con los resultados de la búsqueda vacíos en caso de error
+  //     updateSearchResults([]);
+  //   }
+  // };
 
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
@@ -273,7 +288,6 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                 variant="contained"
                 onClick={handleSearch}
                 startIcon={<SearchIcon />}
-               
                 sx={{
                   margin: "1px",
                   height: "3.4rem",
@@ -319,6 +333,20 @@ const BoxBuscador = (handleClosePreciosClientes) => {
             </ul>
           </TableContainer>
         )}
+
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity="info"
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
       </Paper>
     </Grid>
   );
