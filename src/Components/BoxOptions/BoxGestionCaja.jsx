@@ -13,7 +13,7 @@ import {
   Button,
   DialogContent,
   Dialog,
- 
+  Alert,
   DialogActions,
   DialogTitle,
   TableRow,
@@ -39,7 +39,7 @@ import BoxPagoTicket from "./BoxPagoTicket";
 import BoxBuscador from "./BoxBuscador";
 import BoxPreciosClientes from "./BoxPreciosClientes";
 import StepperSI from "../Stepper/StepperSI";
-import StepperNo from "../Stepper/StepperNo"
+import StepperNo from "../Stepper/StepperNo";
 import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente";
 import BoxBoleta from "./BoxBoleta";
 import Boxfactura from "./Boxfactura";
@@ -52,6 +52,7 @@ const BoxGestionCaja = () => {
     salesData,
     calculateTotalPrice,
     clearSalesData,
+    selectedUser,
     addToSalesData,
   } = useContext(SelectedOptionsContext);
 
@@ -99,6 +100,9 @@ const BoxGestionCaja = () => {
   const [selectedCabecera, setSelectedCabecera] = useState(null);
   const [expandedAccordion, setExpandedAccordion] = useState(null);
   const [productoData, setProductoData] = useState([]);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -457,12 +461,7 @@ const BoxGestionCaja = () => {
   const handleCloseStock = () => {
     setOpenStockDialog(false);
   };
-  const handleOpenTicket = () => {
-    setOpenTicketDialog(true);
-  };
-  const handleCloseTicket = () => {
-    setOpenTicketDialog(false);
-  };
+ 
   const handleOpenPrecioCliente = () => {
     setOpenPreciosClienteDialog(true);
   };
@@ -510,30 +509,57 @@ const BoxGestionCaja = () => {
   const handleCloseDeudasDialog = () => {
     setOpenDeudasDialog(false);
   };
+  const handleOpenTicket = () => {
+
+
+    if (Array.isArray(selectedUser)) {
+      setSnackbarMessage("No se puede emitir el documento TICKET  sin usuario.");
+      console.log("No se puede emitir el documento TICKET sin usuario.");
+      console.log(selectedUser);
+      setSnackbarOpen(true);
+    } else {
+      setOpenTicketDialog(true);
+    }
+    
+  };
+  const handleCloseTicket = () => {
+    setOpenTicketDialog(false);
+  };
   const handleOpenBoletaDialog = () => {
-    setOpenBoletaDialog(true);
+    if (Array.isArray(selectedUser)) {
+      setSnackbarMessage("No se puede emitir el documento BOLETA sin usuario.");
+      console.log("No se puede emitir el documento BOLETA sin usuario.");
+      console.log(selectedUser);
+      setSnackbarOpen(true);
+    } else {
+      setOpenBoletaDialog(true);
+    }
   };
   const handleCloseBoletaDialog = () => {
     setOpenBoletaDialog(false);
   };
 
   const handleOpenFacturaDialog = () => {
-    setOpenFacturaDialog(true);
+    if (Array.isArray(selectedUser)) {
+      setSnackbarMessage("No se puede emitir el documento FACTURA  sin usuario.");
+      console.log("No se puede emitir el documento FACTURA sin usuario.");
+      console.log(selectedUser);
+      setSnackbarOpen(true);
+    } else {
+      setOpenFacturaDialog(true);
+    }
   };
   const handleCloseFacturaDialog = () => {
     setOpenFacturaDialog(false);
   };
 
-
-
   return (
     <Paper
       elevation={5}
       sx={{
-        background: "#859398",  /* fallback for old browsers */
+        background: "#859398" /* fallback for old browsers */,
         /* Chrome 10-25, Safari 5.1-6 */
 
-        
         display: "flex",
         flexDirection: "column",
         maxWidth: "1000px",
@@ -588,17 +614,17 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-           sx={{
-            width: "90%",
-            height: "80px",
-            backgroundColor: " #283048",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#1c1b17 ",
+            sx={{
+              width: "90%",
+              height: "80px",
+              backgroundColor: " #283048",
               color: "white",
-            },
-            margin: "5px",
-          }}
+              "&:hover": {
+                backgroundColor: "#1c1b17 ",
+                color: "white",
+              },
+              margin: "5px",
+            }}
             onClick={handleOpenCategoria}
           >
             {/* <LockPersonIcon /> */}
@@ -665,17 +691,17 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-              sx={{
-                width: "90%",
-                height: "80px",
-                backgroundColor: " #283048",
+            sx={{
+              width: "90%",
+              height: "80px",
+              backgroundColor: " #283048",
+              color: "white",
+              "&:hover": {
+                backgroundColor: "#1c1b17 ",
                 color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin: "5px",
-              }}
+              },
+              margin: "5px",
+            }}
             onClick={handleOpenDeudasDialog}
           >
             {/* <CoffeeIcon /> */}
@@ -684,7 +710,7 @@ const BoxGestionCaja = () => {
         </Grid>
         <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
           <Button
-             sx={{
+            sx={{
               width: "90%",
               height: "80px",
               backgroundColor: " #283048",
@@ -745,11 +771,10 @@ const BoxGestionCaja = () => {
                 >
                   <p
                     style={{
-                      
                       margin: "6px",
                       fontSize: "36px",
                       fontWeight: "bold",
-                      fontFamily: "Victor Mono"
+                      fontFamily: "Victor Mono",
                     }}
                   >
                     TOTAL:$
@@ -762,15 +787,16 @@ const BoxGestionCaja = () => {
                     >
                       <span
                         style={{
-                          height:"600%",
+                          height: "600%",
                           color: "#E1213B",
                           fontSize: "36px",
                           fontFamily: "Victor Mono",
-                         
+
                           fontWeight: "700",
                         }}
                       >
-                       {" "}{grandTotal.toLocaleString('es-ES')}
+                        {" "}
+                        {grandTotal.toLocaleString("es-ES")}
                       </span>{" "}
                     </span>{" "}
                   </p>
@@ -782,18 +808,19 @@ const BoxGestionCaja = () => {
                   sx={{ display: "flex", justifyContent: "center" }}
                 >
                   <Button
-                   sx={{
-                    margin: "7px",
-                    width: "80%",
-                    height: "60px",
-                    background: "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                    color: "black",
-                    "&:hover": {
-                      backgroundColor: "red",
-                      color: "white",
-                    },
-                  }}
-                    onClick={handleOpenBoletaDialog }
+                    sx={{
+                      margin: "7px",
+                      width: "80%",
+                      height: "60px",
+                      background:
+                        "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                      color: "black",
+                      "&:hover": {
+                        backgroundColor: "red",
+                        color: "white",
+                      },
+                    }}
+                    onClick={handleOpenBoletaDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
                     <Typography variant="h7"> Boleta</Typography>
@@ -805,14 +832,14 @@ const BoxGestionCaja = () => {
                       margin: "7px",
                       width: "80%",
                       height: "60px",
-                      background: "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                      background:
+                        "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
                       color: "black",
                       "&:hover": {
                         backgroundColor: "red",
                         color: "white",
                       },
                     }}
-                    
                     onClick={handleOpenFacturaDialog}
                     // onClick={() => handleNavigationChange(null, 12)}
                   >
@@ -821,17 +848,18 @@ const BoxGestionCaja = () => {
                 </Grid>
                 <Grid item xs={4}>
                   <Button
-                   sx={{
-                    margin: "7px",
-                    width: "80%",
-                    height: "60px",
-                    background: "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                    color: "black",
-                    "&:hover": {
-                      backgroundColor: "red",
-                      color: "white",
-                    },
-                  }}
+                    sx={{
+                      margin: "7px",
+                      width: "80%",
+                      height: "60px",
+                      background:
+                        "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                      color: "black",
+                      "&:hover": {
+                        backgroundColor: "red",
+                        color: "white",
+                      },
+                    }}
                     onClick={() => {
                       console.log("Botón de Ticket presionado");
                       handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
@@ -847,6 +875,19 @@ const BoxGestionCaja = () => {
           </Grid>
         </Grid>
       </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
       <Dialog open={openCategoria} onClose={handleCloseCategoria}>
         <DialogContent>
@@ -887,9 +928,9 @@ const BoxGestionCaja = () => {
         autoHideDuration={5000}
         onClose={handleCloseSuccessSnackbar}
       >
-        <MuiAlert onClose={handleCloseSuccessSnackbar} severity="success">
+        <Alert onClose={handleCloseSuccessSnackbar} severity="success">
           {successMessage}
-        </MuiAlert>
+        </Alert>
       </Snackbar>
 
       <Dialog open={openRecoveryDialog} onClose={handleCloseRecoveryDialog}>
@@ -964,7 +1005,7 @@ const BoxGestionCaja = () => {
       </Dialog>
       <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
         <DialogContent onClose={handleCloseDeudasDialog}>
-          <BoxCtaCorriente onClose={handleCloseDeudasDialog}/>
+          <BoxCtaCorriente onClose={handleCloseDeudasDialog} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>
@@ -973,7 +1014,7 @@ const BoxGestionCaja = () => {
 
       <Dialog open={openBoletaDialog} onClose={handleCloseBoletaDialog}>
         <DialogContent onClose={handleCloseBoletaDialog}>
-          <BoxBoleta onClose={handleCloseBoletaDialog}/>
+          <BoxBoleta onClose={handleCloseBoletaDialog} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseBoletaDialog}>Cerrar</Button>
@@ -981,7 +1022,7 @@ const BoxGestionCaja = () => {
       </Dialog>
       <Dialog open={openFacturaDialog} onClose={handleCloseFacturaDialog}>
         <DialogContent onClose={handleCloseFacturaDialog}>
-          <Boxfactura onClose={handleCloseFacturaDialog}/>
+          <Boxfactura onClose={handleCloseFacturaDialog} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseFacturaDialog}>Cerrar</Button>

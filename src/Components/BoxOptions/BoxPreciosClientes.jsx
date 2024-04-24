@@ -162,7 +162,27 @@ const BoxPreciosClientes = ({
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
-
+   const handleKeyDown = (event, field) => {
+    if (field === "marca") {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+    if (field === "nombre") {
+      const regex = /^[a-zA-Z]*$/;
+      if (!regex.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+    if (field === "precio") {
+      // Validar si la tecla presionada es un signo menos
+      if (!/^\d+$/.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault();
+      }
+    }
+  };
+  
   return (
     <>
     {console.log("searchResultsssss:", searchResults)}
@@ -216,6 +236,9 @@ const BoxPreciosClientes = ({
                               <TableCell>{item.nombre}</TableCell>
                               <TableCell>
                                 <TextField
+                               
+                                  name="precio"
+                                  onKeyDown={(event) => handleKeyDown(event, "precio")}
                                   variant="outlined"
                                   fullWidth
                                   value={

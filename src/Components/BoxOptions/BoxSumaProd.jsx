@@ -30,11 +30,15 @@ import {
   DialogContent,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import axios from "axios";
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
 
-import { KeyboardDoubleArrowUp, Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  KeyboardDoubleArrowUp,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 
 import RemoveIcon from "@mui/icons-material/Remove";
 
@@ -59,8 +63,7 @@ const BoxSumaProd = ({ venta }) => {
     setQuantity,
     clearSalesData,
     searchedProducts,
-    setSearchedProducts
-    
+    setSearchedProducts,
   } = useContext(SelectedOptionsContext);
 
   const theme = useTheme();
@@ -178,7 +181,32 @@ const BoxSumaProd = ({ venta }) => {
   // };
 
   const handleClearSalesData = () => clearSalesData();
-
+  const handleKeyDown = (event, field) => {
+    // Verificar en qué campo se está escribiendo
+    if (
+      field === "precioCosto" ||
+      field === "precioVenta" ||
+      field === "stockInicial"
+    ) {
+      // Permitir solo dígitos numéricos y la tecla de retroceso
+      // Excluir caracteres no numéricos y caracteres especiales específicos
+      if (
+        !/[0-9]/.test(event.key) &&
+        event.key !== "Backspace" &&
+        !/[`´']/.test(event.key)
+      ) {
+        event.preventDefault();
+      }
+    }
+  };
+  const handleChange = (event, field) => {
+    // Asegurar que el valor solo contenga números
+    // Eliminar caracteres especiales específicos
+    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    if (field === "precio") {
+      setPrecioCosto(newValue);
+    }
+  };
   return (
     <Paper
       elevation={13}
@@ -323,9 +351,31 @@ const BoxSumaProd = ({ venta }) => {
               </TableHead>
               <TableBody style={{ maxHeight: "400px", overflowY: "auto" }}>
                 {salesData.map((sale, index) => (
-                  <TableRow key={index} sx={{ height: "20%", }}>
+                  <TableRow key={index} sx={{ height: "20%" }}>
                     <TableCell sx={{ display: "flex", alignItems: "center" }}>
                       <TextField
+                        name="precio"
+                        onKeyDown={(event) => handleKeyDown(event, "precio")}
+                        value={sale.precio}
+                        onChange={(event) => {
+                          const newValue = event.target.value;
+                          // Validar si el nuevo valor es un número positivo
+                          if (/^\d+$/.test(newValue) && newValue >= 0) {
+                            const updatedSalesData = [...salesData];
+                            updatedSalesData[index].precio = newValue;
+                            setSalesData(updatedSalesData);
+                          }
+                        }}
+                        style={{ width: 84 }}
+                        inputProps={{
+                          inputMode: "numeric", // Establece el modo de entrada como numérico
+                          pattern: "[0-9]*",
+                          maxLength: 6, // Asegura que solo se puedan ingresar números
+                        }}
+                      />
+                      {/* <TextField
+                        name="precio"
+                       onKeyDown={(event) => handleKeyDown(event, "precio")}
                         value={sale.quantity === 0 ? "" : sale.quantity}
                         onChange={(event) => {
                           const newValue = parseInt(event.target.value);
@@ -341,7 +391,7 @@ const BoxSumaProd = ({ venta }) => {
                           pattern: "[0-9]*",
                           maxLength: 6, // Asegura que solo se puedan ingresar números
                         }}
-                      />
+                      /> */}
                     </TableCell>
                     <TableCell>{sale.descripcion}</TableCell>
                     <TableCell>{sale.precio}</TableCell>
@@ -371,7 +421,9 @@ const BoxSumaProd = ({ venta }) => {
               }}
               elevation={18}
             >
-            <Typography>Total: {grandTotal.toLocaleString('es-ES')}</Typography>
+              <Typography>
+                Total: {grandTotal.toLocaleString("es-ES")}
+              </Typography>
             </Paper>
           </TableContainer>
         </Paper>

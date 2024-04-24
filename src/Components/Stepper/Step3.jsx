@@ -39,75 +39,8 @@ const Step3Component = ({ data, onNext, stepData }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   console.log("data:", data);
-  const validateFields = () => {
-    // Verificar si al menos un campo está lleno
-    if (
-      selectedUnidadId !== "" ||
-      precioCosto !== "" ||
-      precioVenta !== "" ||
-      stockInicial !== ""
-    ) {
-      // Verificar cada campo individualmente y mostrar el primer campo vacío
-      if (selectedUnidadId === "") {
-        setEmptyFieldsMessage("Debe seleccionar una unidad.");
-        return false;
-      }
-      if (precioCosto === "") {
-        setEmptyFieldsMessage("Favor completar precio de costo.");
-        return false;
-      }
-      if (precioVenta === "") {
-        setEmptyFieldsMessage("Favor completar precio de venta.");
-        return false;
-      }
-      if (stockInicial === "") {
-        setEmptyFieldsMessage("Favor completar Stock Inicial.");
-        return false;
-      }
-
-      // Si al menos un campo está lleno y no hay campos vacíos, limpiar el mensaje de error
-      setEmptyFieldsMessage("");
-      return true;
-    } else {
-      // Si todos los campos están vacíos, mostrar un mensaje de error
-      setEmptyFieldsMessage("Todos los campos son obligatorios.");
-      return false;
-    }
-  };
-  // const validateFields = () => {
-  //   // Verificar si todos los campos están vacíos
-  //   if (
-  //     selectedUnidadId === "" &&
-  //     precioCosto === "" &&
-  //     precioVenta === "" &&
-  //     stockInicial === ""
-  //   ) {
-  //     setEmptyFieldsMessage("Todos los campos son obligatorios.");
-  //     return false;
-  //   }
-
-  //   // Verificar cada campo individualmente y mostrar el primer campo vacío
-  //   if (selectedUnidadId === "") {
-  //     setEmptyFieldsMessage("Debe seleccionar una unidad.");
-  //     return false;
-  //   }
-  //   if (precioCosto === "") {
-  //     setEmptyFieldsMessage("Favor completar precio de costo.");
-  //     return false;
-  //   }
-  //   if (precioVenta === "") {
-  //     setEmptyFieldsMessage("Favor completar precio de venta.");
-  //     return false;
-  //   }
-  //   if (stockInicial === "") {
-  //     setEmptyFieldsMessage("Favor completar Stock Inicial.");
-  //     return false;
-  //   }
-
-  //   // Si todos los campos están completos, limpiar el mensaje de error
-  //   setEmptyFieldsMessage("");
-  //   return true;
-  // };
+ 
+  
 
   const handleNext = async () => {
     const isValid = validateFields();
@@ -211,6 +144,46 @@ const Step3Component = ({ data, onNext, stepData }) => {
     setOpenDialog1(false);
   };
 
+  const validateFields = () => {
+    
+    // Verificar si todos los campos están vacíos
+    if (
+      selectedUnidadId === "" &&
+      precioCosto === "" &&
+      precioVenta === "" &&
+      stockInicial === ""
+    ) {
+      setEmptyFieldsMessage("Todos los campos son obligatorios.");
+      return false;
+    }
+   
+    // Verificar cada campo individualmente y mostrar el primer campo vacío
+    if (selectedUnidadId === "") {
+      setEmptyFieldsMessage("Debe seleccionar una unidad.");
+      return false;
+    }
+  
+    if (precioCosto === "") {
+      setEmptyFieldsMessage("Favor completar precio de costo.");
+      return false;
+    }
+  
+    if (precioVenta === "") {
+      setEmptyFieldsMessage("Favor completar precio de venta.");
+      return false;
+    }
+  
+    if (stockInicial === "") {
+      setEmptyFieldsMessage("Favor completar Stock Inicial.");
+      return false;
+    }
+  
+    // Si todos los campos están completos, limpiar el mensaje de error
+    setEmptyFieldsMessage("");
+    return true;
+  };
+  
+
   // useEffect(() => {
   //   async function fetchBodegas() {
   //     try {
@@ -241,26 +214,17 @@ const Step3Component = ({ data, onNext, stepData }) => {
   ];
   const handleKeyDown = (event, field) => {
     // Verificar en qué campo se está escribiendo
-    if (
-      field === "precioCosto" ||
-      field === "precioVenta" ||
-      field === "stockInicial"
-    ) {
-      // Permitir solo dígitos numéricos y la tecla de retroceso
-      // Excluir caracteres no numéricos y caracteres especiales específicos
-      if (
-        !/[0-9]/.test(event.key) &&
-        event.key !== "Backspace" &&
-        !/[`´']/.test(event.key)
-      ) {
-        event.preventDefault();
-      }
+   if (field === "precio") {
+    // Permitir solo dígitos numéricos y la tecla de retroceso
+    if (!/^\d+$/.test(event.key) && event.key !== "Backspace") {
+      event.preventDefault();
     }
+  }
   };
   const handleChange = (event, field) => {
     // Asegurar que el valor solo contenga números
     // Eliminar caracteres especiales específicos
-    const newValue = event.target.value.replace(/[^0-9]/g, "");
+    const newValue = event.target.value.replace(/[^0000000-9]/g, "");
     if (field === "precioCosto") {
       setPrecioCosto(newValue);
     } else if (field === "precioVenta") {
@@ -334,6 +298,7 @@ const Step3Component = ({ data, onNext, stepData }) => {
                 sx={{
                   width: "100%",
                 }}
+                label="Precio Venta"
                 fullWidth
                 value={precioVenta}
                 onChange={(event) => handleChange(event, "precioVenta")}

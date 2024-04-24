@@ -13,6 +13,7 @@ import {
   Container,
   TableHead,
   TableRow,
+  InputLabel,
   Chip,
   Typography,
   Snackbar,
@@ -81,7 +82,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       selectedUser.codigoClienteSucursal === result.codigoClienteSucursal
     ) {
       clearSalesData(); // Limpia los datos de ventas
-      setSelectedUser(null); // Desmarca el usuario seleccionado
+      setSelectedUser([]); // Desmarca el usuario seleccionado
       setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
       setSearchResults([]); // Limpia los resultados de búsqueda
       setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
@@ -259,10 +260,22 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         <Grid
           container
           sx={{ minWidth: 200, width: "100%", display: "flex" }}
-          spacing={2}
           alignItems="center"
         >
           <Grid item xs={12} md={12} lg={12}>
+            <InputLabel
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                margin: 1,
+               // Cambiar el color del texto a azul
+                fontSize: "1.2rem", // Cambiar el tamaño del texto
+                fontWeight: "bold", // Hacer el texto en negrita
+                // Puedes agregar más estilos aquí según tus necesidades
+              }}
+            >
+              Buscador de usuarios
+            </InputLabel>
             <Paper
               elevation={0} // Sin elevación para que el borde funcione
               sx={{
@@ -270,7 +283,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                 borderRadius: "5px", // Bordes redondeados
                 display: "flex",
                 alignItems: "center",
-                padding: "8px", // Espaciado interno
+                margin: 1,
               }}
             >
               <TextField
