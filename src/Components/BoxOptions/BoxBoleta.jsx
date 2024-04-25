@@ -595,13 +595,7 @@ const BoxBoleta = ({ onClose }) => {
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
-            {error && (
-              <Grid item xs={12}>
-                <Typography variant="body1" color="error">
-                  {error}
-                </Typography>
-              </Grid>
-            )}
+            
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>

@@ -1,5 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import {
   Paper,
   Avatar,
@@ -8,6 +13,7 @@ import {
   Stack,
   InputLabel,
   Typography,
+  CircularProgress,
   Snackbar,
   Button,
   Table,
@@ -25,38 +31,48 @@ import {
   TextField,
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from "dayjs";
-const Boxfactura = ({ onClose }) => {
+const BoxFactura = ({ onClose }) => {
   const {
     userData,
-    ventaData,
-    grandTotal,
-    clearSalesData,
     salesData,
+    addToSalesData,
+    setPrecioData,
+    grandTotal,
+    ventaData,
     setVentaData,
     searchResults,
+    setSearchResults,
+    updateSearchResults,
+    selectedUser,
+    setSelectedUser,
     selectedCodigoCliente,
+    setSelectedCodigoCliente,
     selectedCodigoClienteSucursal,
+    setSelectedCodigoClienteSucursal,
+    setSelectedChipIndex,
+    selectedChipIndex,
+    searchText,
+    setSearchText,
+    clearSalesData,
   } = useContext(SelectedOptionsContext);
-  const [cantidadPagada, setCantidadPagada] = useState(0);
-
-  const [loading, setLoading] = useState(false);
-
-  const [metodoPago, setMetodoPago] = useState("");
-  const [error, setError] = useState(null);
-  const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para controlar la apertura del Snackbar
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  console.log("salesData:", salesData);
+
+  const navigate = useNavigate();
+  const [metodoPago, setMetodoPago] = useState("");
+  const [cantidadPagada, setCantidadPagada] = useState(grandTotal);
+  const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
   const [rut, setRut] = useState(""); // Estado para almacenar el rut
   const [nroCuenta, setNroCuenta] = useState(""); // Estado para almacenar el número de cuenta
   const [nroOperacion, setNroOperacion] = useState(""); // Estado para almacenar el número de operación
   const [selectedDebts, setSelectedDebts] = useState([]);
-  const [tipoCuenta, setTipoCuenta] = useState(""); 
-  const [errorTransferenciaError, setTransferenciaError] = useState(""); 
+  const [tipoCuenta, setTipoCuenta] = useState("");
+  const [errorTransferenciaError, setTransferenciaError] = useState("");
   const tiposDeCuenta = {
     "Cuenta Corriente": "Cuenta Corriente",
     "Cuenta de Ahorro": "Cuenta de Ahorro",
@@ -69,7 +85,6 @@ const Boxfactura = ({ onClose }) => {
   const handleChangeTipoCuenta = (event) => {
     setTipoCuenta(event.target.value); // Actualizar el estado del tipo de cuenta seleccionado
   };
-
 
   const bancosChile = [
     { id: 1, nombre: "Banco de Chile" },
@@ -92,12 +107,11 @@ const Boxfactura = ({ onClose }) => {
     // Agrega más bancos según sea necesario
   ];
 
+  const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
+
   const hoy = dayjs();
   const inicioRango = dayjs().subtract(1, "week"); // Resta 1 semanas
 
-
-  const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
-  // const fechaDayjs = dayjs(fecha);
   const handleDateChange = (date) => {
     setFecha(date);
   };
@@ -111,39 +125,7 @@ const Boxfactura = ({ onClose }) => {
   };
 
   // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
-  console.log(
-    "selectedDebts justo antes de abrir el diálogo de transferencia:",
-    selectedDebts
-  );
-  useEffect(() => {
-    console.log("selectedDebts cambió:", selectedDebts);
-  }, [selectedDebts]);
-  console.log("salesData:", salesData);
-  console.log("searchResults FACTURA:", searchResults);
-  // const [clienteDatosFactura, setClienteDatosFactura] = useState({
-  //   rut: searchResults[0].rutResponsable,
-  //   razonSocial: searchResults[0].razonSocial,
-  //   nombre: searchResults[0].nombreResponsable,
-  //   apellido: searchResults[0].apellidoResponsable,
-  //   direccion: searchResults[0].direccion,
-  //   region: searchResults[0].region,
-  //   comuna: searchResults[0].comuna,
-  //   giro: searchResults[0].giro,
-  // });
 
-  useEffect(() => {
-    // Calcular el total de los productos seleccionados
-    const totalVenta = salesData.reduce(
-      (total, producto) => total + producto.precio,
-      0
-    );
-    // Establecer el total como el monto pagado
-    setCantidadPagada(totalVenta);
-  }, [salesData]);
-
-  const handleCloseSnackbar = () => {
-    setSnackbarOpen(false);
-  };
   const handleTransferenciaModalOpen = () => {
     setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
@@ -152,7 +134,8 @@ const Boxfactura = ({ onClose }) => {
     setOpenTransferenciaModal(false);
   };
 
-  const handlePagoFactura = async () => {
+  
+  const handlePagoBoleta = async () => {
     try {
       // Validar si el usuario ha ingresado el código de vendedor
       if (!userData.codigoUsuario) {
@@ -299,7 +282,7 @@ const Boxfactura = ({ onClose }) => {
           precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
           descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
         })),
-        metodoPago: cantidadPagada,
+        metodoPago: metodoPago,
         transferencias: {
           idCuentaCorrientePago: 0,
           nombre: nombre,
@@ -341,13 +324,14 @@ const Boxfactura = ({ onClose }) => {
       setLoading(false);
     }
   };
-  const handleMetodoPagoClick = (metodo) => {
-    setSelectedMethod(metodo);
-  };
- 
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
+  const handleMetodoPagoClick = (metodo) => {
+    setSelectedMethod(metodo);
+  };
+
   const validarRutChileno = (rut) => {
     if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
       // Si el formato del RUT no es válido, retorna false
@@ -378,6 +362,7 @@ const Boxfactura = ({ onClose }) => {
     return cambio > 0 ? cambio : 0;
   };
 
+  
   const handleKeyDown = (event, field) => {
     if (field === "marca") {
       const regex = /^[a-zA-Z]*$/;
@@ -416,22 +401,23 @@ const Boxfactura = ({ onClose }) => {
         event.preventDefault(); // Prevenir la entrada de un monto menor al grandTotal
       }
     }
-    
   };
 
   return (
-    <Grid container spacing={2}>
-    <Grid item xs={12} md={6} lg={6}>
-      <Typography sx={{ marginBottom: "2%" }} variant="h4">Pagar Factura</Typography>
-  
-      {error && (
-        <Grid item xs={12}>
-          <Typography variant="body1" color="error">
-            {error}
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={6}>
+          <Typography variant="h4" sx={{ marginBottom: "2%" }}>
+            Pagar Factura
           </Typography>
-        </Grid>
-      )}
-      <TextField
+          {error && (
+            <Grid item xs={12}>
+              <Typography variant="body1" color="error">
+                {error}
+              </Typography>
+            </Grid>
+          )}
+          <TextField
             sx={{ marginBottom: "5%" }}
             margin="dense"
             label="Monto a Pagar"
@@ -444,7 +430,7 @@ const Boxfactura = ({ onClose }) => {
               pattern: "[0-9]*",
             }}
           />
-     <TextField
+          <TextField
             margin="dense"
             fullWidth
             name="cantidadPagada "
@@ -465,7 +451,16 @@ const Boxfactura = ({ onClose }) => {
             }}
             disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
           />
-       {calcularVuelto() > 0 && (
+         
+          <TextField
+            margin="dense"
+            fullWidth
+            type="number"
+            label="Por pagar"
+            value={Math.max(0, grandTotal - cantidadPagada)}
+            InputProps={{ readOnly: true }}
+          />
+          {calcularVuelto() > 0 && (
             <TextField
               margin="dense"
               fullWidth
@@ -475,17 +470,21 @@ const Boxfactura = ({ onClose }) => {
               InputProps={{ readOnly: true }}
             />
           )}
-    </Grid>
-  
-    <Grid item xs={12} sm={12} md={6}>
-      <Grid container spacing={1} alignItems="center" justifyContent="center">
-        <Grid item xs={12}>
-          <Typography sx={{ marginTop: "7%" }} variant="h6">
-            Selecciona Método de Pago:
-          </Typography>
         </Grid>
-        <Grid item xs={12} sm={12} md={12}>
-        <Button
+        <Grid item xs={12} md={6} lg={6}>
+          <Grid
+            container
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Grid item xs={12}>
+              <Typography sx={{ marginTop: "7%" }} variant="h6">
+                Selecciona Método de Pago:
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 fullWidth
@@ -495,10 +494,9 @@ const Boxfactura = ({ onClose }) => {
               >
                 Efectivo
               </Button>
-        </Grid>
-        
-        <Grid item xs={12} sm={12} md={12}>
-        <Button
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
@@ -509,10 +507,9 @@ const Boxfactura = ({ onClose }) => {
               >
                 Débito
               </Button>
-        </Grid>
-       
-        <Grid item xs={12} sm={12} md={12}>
-        <Button
+            </Grid>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
@@ -525,9 +522,8 @@ const Boxfactura = ({ onClose }) => {
                 Crédito
               </Button>
             </Grid>
-      </Grid>
-      <Grid item xs={12} sm={12} md={12}>
-            <Button
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
                 sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
                 fullWidth
@@ -544,13 +540,13 @@ const Boxfactura = ({ onClose }) => {
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
               <Button
-                sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
+                sx={{ height: "100%" }}
                 variant={
                   metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
                 }
                 onClick={() => {
-                  handleMetodoPagoClick("TRANSFERENCIA");
+                  setMetodoPago("TRANSFERENCIA");
                   handleTransferenciaModalOpen(selectedDebts);
                 }}
                 fullWidth
@@ -558,7 +554,6 @@ const Boxfactura = ({ onClose }) => {
                 Transferencia
               </Button>
             </Grid>
-
             <Grid item xs={12} sm={12} md={12}>
               <Button
                 sx={{ height: "100%" }}
@@ -566,7 +561,7 @@ const Boxfactura = ({ onClose }) => {
                 fullWidth
                 color="secondary"
                 disabled={!metodoPago || cantidadPagada <= 0 || loading}
-                onClick={handlePagoFactura}
+                onClick={handlePagoBoleta}
               >
                 {loading ? (
                   <>
@@ -577,35 +572,30 @@ const Boxfactura = ({ onClose }) => {
                 )}
               </Button>
             </Grid>
-    </Grid>
-  
-    <Snackbar
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      open={snackbarOpen}
-      autoHideDuration={6000}
-      onClose={handleCloseSnackbar}
-      message={snackbarMessage}
-    />
-  
-  <Dialog
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        open={snackbarOpen}
+        onClose={onClose}
+        message={snackbarMessage}
+      />
+
+      <Dialog
         open={openTransferenciaModal}
         onClose={handleTransferenciaModalClose}
       >
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12}>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
               {errorTransferenciaError && (
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
-            {/* {error && (
-              <Grid item xs={12}>
-                <Typography variant="body1" color="error">
-                  {error}
-                </Typography>
-              </Grid>
-            )} */}
+            
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
@@ -627,11 +617,13 @@ const Boxfactura = ({ onClose }) => {
                 Ingresa rut sin puntos y con guión
               </InputLabel>
               <TextField
+                name="rut"
                 label="ej: 11111111-1"
                 variant="outlined"
                 fullWidth
                 value={rut}
                 onChange={(e) => setRut(e.target.value)}
+                onKeyDown={(event) => handleKeyDown(event, "rut")}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -688,7 +680,6 @@ const Boxfactura = ({ onClose }) => {
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
-
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Ingresa Fecha"
@@ -699,6 +690,7 @@ const Boxfactura = ({ onClose }) => {
                 />
               </LocalizationProvider>
             </Grid>
+
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
                 Ingresa Numero Operación
@@ -723,7 +715,7 @@ const Boxfactura = ({ onClose }) => {
                 fullWidth
                 color="secondary"
                 disabled={!metodoPago || cantidadPagada <= 0 || loading}
-                onClick={ handlePagoFactura}
+                onClick={handlePagoBoleta}
               >
                 {loading ? (
                   <>
@@ -738,18 +730,10 @@ const Boxfactura = ({ onClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-          {/* <Button
-            onClick={handleTransferData}
-            variant="contained"
-            color="secondary"
-          >
-            Pagar
-          </Button> */}
         </DialogActions>
       </Dialog>
-  </Grid>
-  
+    </>
   );
 };
 
-export default Boxfactura;
+export default BoxFactura;
