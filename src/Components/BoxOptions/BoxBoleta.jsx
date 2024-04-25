@@ -19,6 +19,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  InputAdornment,
   TableContainer,
   MenuItem,
   TableHead,
@@ -111,10 +112,14 @@ const BoxBoleta = ({ onClose }) => {
 
   const hoy = dayjs();
   const inicioRango = dayjs().subtract(1, "week"); // Resta 1 semanas
-
+ 
   const handleDateChange = (date) => {
-    setFecha(date);
+    // Realizar el formateo de la fecha a día-mes-año
+    const formattedDate = date.format("DD-MM-YYYY");
+    // Establecer el estado de la fecha formateada
+    setFecha(formattedDate);
   };
+  const [open, setOpen] = useState(false);
 
   // Estado para el valor seleccionado del banco
   const [selectedBanco, setSelectedBanco] = useState("");
@@ -134,7 +139,6 @@ const BoxBoleta = ({ onClose }) => {
     setOpenTransferenciaModal(false);
   };
 
-  
   const handlePagoBoleta = async () => {
     try {
       // Validar si el usuario ha ingresado el código de vendedor
@@ -152,16 +156,13 @@ const BoxBoleta = ({ onClose }) => {
       } else {
         setError("");
       }
-     
 
       // Validar si el total a pagar es cero
       if (cantidadPagada <= 0) {
-        setError(
-          "No se puede generar la boleta de pago porque el total cero."
-        );
+        setError("No se puede generar la boleta de pago porque el total cero.");
         return;
       }
-      if (!metodoPago ||cantidadPagada <= 0) {
+      if (!metodoPago || cantidadPagada <= 0) {
         setError("Por favor, ingresa un monto válido para el pago.");
         setLoading(false);
         return;
@@ -362,7 +363,6 @@ const BoxBoleta = ({ onClose }) => {
     return cambio > 0 ? cambio : 0;
   };
 
-  
   const handleKeyDown = (event, field) => {
     if (field === "marca") {
       const regex = /^[a-zA-Z]*$/;
@@ -385,6 +385,9 @@ const BoxBoleta = ({ onClose }) => {
           event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
         }
       }
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
     }
     if (field === "cantidadPagada") {
       // Validar si la tecla presionada es un dígito o la tecla de retroceso
@@ -451,7 +454,7 @@ const BoxBoleta = ({ onClose }) => {
             }}
             disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
           />
-         
+
           <TextField
             margin="dense"
             fullWidth
@@ -503,7 +506,8 @@ const BoxBoleta = ({ onClose }) => {
                 onClick={() => {
                   setMetodoPago("DEBITO");
                   setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
-              }}                fullWidth
+                }}
+                fullWidth
               >
                 Débito
               </Button>
@@ -516,7 +520,7 @@ const BoxBoleta = ({ onClose }) => {
                 onClick={() => {
                   setMetodoPago("CREDITO");
                   setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
-              }}               
+                }}
                 fullWidth
               >
                 Crédito
@@ -533,7 +537,7 @@ const BoxBoleta = ({ onClose }) => {
                 onClick={() => {
                   setMetodoPago("CUENTACORRIENTE");
                   setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
-              }}   
+                }}
               >
                 Cuenta Corriente
               </Button>
@@ -595,7 +599,6 @@ const BoxBoleta = ({ onClose }) => {
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
-            
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
@@ -677,8 +680,38 @@ const BoxBoleta = ({ onClose }) => {
                 onChange={(e) => setNroCuenta(e.target.value)}
               />
             </Grid>
-
             <Grid item xs={12} sm={6}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InputLabel sx={{ marginBottom: "4%" }}>
+                Selecciona Fecha {" "}
+              </InputLabel>
+          <DatePicker
+          format="DD-MM-YYYY"
+            value={fecha}
+            onChange={(newValue) => {
+              setFecha(newValue);
+            }}
+            
+           
+            minDate={inicioRango}
+            maxDate={hoy}
+            textField={(params) => (
+              <TextField
+                {...params}
+                label="Ingresa Fecha"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {formatFecha(fecha)}
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+          />
+        </LocalizationProvider>
+      </Grid>
+            {/* <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
@@ -689,7 +722,7 @@ const BoxBoleta = ({ onClose }) => {
                   maxDate={hoy}
                 />
               </LocalizationProvider>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>

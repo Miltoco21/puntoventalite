@@ -704,6 +704,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
 
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
+                    format="DD-MM-YYYY"
                   label="Ingresa Fecha"
                   value={fecha}
                   onChange={handleDateChange}

@@ -682,6 +682,7 @@ const BoxFactura = ({ onClose }) => {
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
+                  format="DD-MM-YYYY"
                   label="Ingresa Fecha"
                   value={fecha}
                   onChange={handleDateChange}
