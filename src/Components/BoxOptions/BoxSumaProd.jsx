@@ -28,6 +28,7 @@ import {
   Slider,
   Dialog,
   DialogContent,
+  InputLabel,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
@@ -208,34 +209,118 @@ const BoxSumaProd = ({ venta }) => {
     }
   };
   return (
-    <Paper
-      elevation={13}
-      sx={{
-        background: "#859398",
-        display: "flex",
-        flexDirection: "column",
-        maxWidth: "1200px",
-        margin: "0 auto",
-        justifyContent: "center",
-      }}
-    >
-      <Grid container item xs={12} md={12} lg={12}>
-        <Paper
-          elevation={13}
-          sx={{
-            background: "#859398",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            padding: "5px",
-            margin: "5px",
+    <Grid container item xs={12} md={12} lg={12}>
+      <Paper
+        elevation={13}
+        sx={{
+          background: "#859398",
 
-            width: "100%",
-          }}
-        >
-          <Grid item xs={12} lg={12} sx={{ minWidth: 200, width: "90%" }}>
+          width: "100%",
+          margin: 1,
+
+          justifyContent: "center",
+        }}
+      >
+        <Grid container item xs={12} md={12} lg={12}>
+          <Grid
+            item
+            xs={12}
+            md={12}
+            lg={12}
+            sx={{ minWidth: 200, width: "100%", background: "#859398" }}
+          >
+            <div style={{ alignItems: "center" }}>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                sx={{ display: "flex", margin: 1 }}
+              >
+                <InputLabel
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: 1,
+                    fontSize: "1.2rem",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Buscador de productos
+                </InputLabel>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                md={10}
+                lg={3}
+                sx={{
+                  margin: 1,
+                  display: "flex",
+                  justifyContent: { xs: "flex-start", md: "flex-end" },
+                }}
+              >
+                <TextField
+                  sx={{
+                    backgroundColor: "white",
+                    borderRadius: "5px",
+                  }}
+                  inputRef={inputRef}
+                  fullWidth
+                  focused
+                  placeholder="Ingresa Código"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Button
+                  sx={{
+                    margin: "1px",
+                    backgroundColor: " #283048",
+                    color: "white",
+                    "&:hover": {
+                      backgroundColor: "#1c1b17 ",
+                      color: "white",
+                    },
+                  }}
+                  onClick={handleSearchButtonClick}
+                >
+                  PLU
+                </Button>
+              </Grid>
+            </div>
+            <Snackbar
+              open={openSnackbar}
+              autoHideDuration={6000}
+              onClose={() => setOpenSnackbar(false)}
+            >
+              <Alert
+                onClose={() => setOpenSnackbar(false)}
+                severity="success"
+                sx={{ width: "100%" }}
+              >
+                {errorMessage}
+              </Alert>
+            </Snackbar>
+          </Grid>
+
+          {/* <Grid item xs={12} lg={12} sx={{ minWidth: 200, width: "90%" }}>
             <div style={{ display: "flex" }}>
+           
               <Grid item xs={12} md={12} lg={12} sx={{ margin: "1px" }}>
+              <InputLabel
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                margin: 1,
+               // Cambiar el color del texto a azul
+                fontSize: "1.2rem", // Cambiar el tamaño del texto
+                fontWeight: "bold", // Hacer el texto en negrita
+                // Puedes agregar más estilos aquí según tus necesidades
+              }}
+            >
+              Buscador de productos
+            </InputLabel>
                 <TextField
                   sx={{
                     backgroundColor: "white",
@@ -251,6 +336,7 @@ const BoxSumaProd = ({ venta }) => {
               </Grid>
               <Button
                 sx={{
+                 
                   margin: "1px",
                   backgroundColor: " #283048",
                   color: "white",
@@ -259,7 +345,7 @@ const BoxSumaProd = ({ venta }) => {
                     color: "white",
                   },
                 }}
-                size="large"
+                
                 onClick={handleSearchButtonClick}
               >
                 PLU
@@ -278,102 +364,101 @@ const BoxSumaProd = ({ venta }) => {
                 {errorMessage}
               </Alert>
             </Snackbar>
-          </Grid>
-        </Paper>
-      </Grid>
+          </Grid> */}
+        </Grid>
 
-      <Grid item xs={12}>
-        <Paper elevation={1} sx={{ background: "#859398", margin: "5px" }}>
-          {/* <IconButton onClick={toggleVisibility}>
+        <Grid item xs={12}>
+          <Paper elevation={1} sx={{ background: "#859398", margin: 1 }}>
+            {/* <IconButton onClick={toggleVisibility}>
             {isVisible ? <KeyboardDoubleArrowUp/> : <KeyboardDoubleArrowDownIcon />}
           </IconButton> */}
-          {isVisible && (
-            <TableContainer
-              component={Paper}
-              style={{ overflowX: "auto", maxHeight: 200 }}
-            >
-              <Table>
-                {/* <TableHead sx={{ background: "#859398", height: "30%" }}>
+            {isVisible && (
+              <TableContainer
+                component={Paper}
+                style={{ overflowX: "auto", maxHeight: 200 }}
+              >
+                <Table>
+                  {/* <TableHead sx={{ background: "#859398", height: "30%" }}>
                 <TableRow>
                   <TableCell>Nombre</TableCell>
                   <TableCell>PLU</TableCell>
                   <TableCell>Agregar</TableCell>
                 </TableRow>
               </TableHead> */}
-                <TableBody>
-                  {searchedProducts.map((product) => (
-                    <TableRow key={product.id}>
-                      <TableCell>{product.nombre}</TableCell>
-                      <TableCell sx={{ width: "21%" }}>
-                        Plu:{""}
-                        {product.idProducto}
-                      </TableCell>
+                  <TableBody>
+                    {searchedProducts.map((product) => (
+                      <TableRow key={product.id}>
+                        <TableCell>{product.nombre}</TableCell>
+                        <TableCell sx={{ width: "21%" }}>
+                          Plu:{""}
+                          {product.idProducto}
+                        </TableCell>
 
-                      <TableCell>
-                        <Button
-                          onClick={() => handleAddSelectedProduct(product)}
-                          variant="contained"
-                          color="secondary"
-                        >
-                          Agregar
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </Paper>
-      </Grid>
+                        <TableCell>
+                          <Button
+                            onClick={() => handleAddSelectedProduct(product)}
+                            variant="contained"
+                            color="secondary"
+                          >
+                            Agregar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Paper>
+        </Grid>
 
-      <Grid item xs={12}>
-        <Paper
-          elevation={1}
-          sx={{
-            background: "#859398",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            margin: "5px",
-          }}
-        >
-          <TableContainer component={Paper} style={{ overflowX: "auto" }}>
-            <Table>
-              <TableHead sx={{ background: "#859398", height: "30%" }}>
-                <TableRow>
-                  <TableCell>Cantidad</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell>Precio</TableCell>
-                  <TableCell>Total</TableCell>
-                  <TableCell>Eliminar</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody style={{ maxHeight: "400px", overflowY: "auto" }}>
-                {salesData.map((sale, index) => (
-                  <TableRow key={index} sx={{ height: "20%" }}>
-                    <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                      <TextField
-                        name="precio"
-                        onKeyDown={(event) => handleKeyDown(event, "precio")}
-                        value={sale.precio}
-                        onChange={(event) => {
-                          const newValue = event.target.value;
-                          // Validar si el nuevo valor es un número positivo
-                          if (/^\d+$/.test(newValue) && newValue >= 0) {
-                            const updatedSalesData = [...salesData];
-                            updatedSalesData[index].precio = newValue;
-                            setSalesData(updatedSalesData);
-                          }
-                        }}
-                        style={{ width: 84 }}
-                        inputProps={{
-                          inputMode: "numeric", // Establece el modo de entrada como numérico
-                          pattern: "[0-9]*",
-                          maxLength: 6, // Asegura que solo se puedan ingresar números
-                        }}
-                      />
-                      {/* <TextField
+        <Grid item xs={12}>
+          <Paper
+            elevation={1}
+            sx={{
+              background: "#859398",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              margin: "5px",
+            }}
+          >
+            <TableContainer component={Paper} style={{ overflowX: "auto" }}>
+              <Table>
+                <TableHead sx={{ background: "#859398", height: "30%" }}>
+                  <TableRow>
+                    <TableCell>Cantidad</TableCell>
+                    <TableCell>Descripción</TableCell>
+                    <TableCell>Precio</TableCell>
+                    <TableCell>Total</TableCell>
+                    <TableCell>Eliminar</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody style={{ maxHeight: "400px", overflowY: "auto" }}>
+                  {salesData.map((sale, index) => (
+                    <TableRow key={index} sx={{ height: "20%" }}>
+                      <TableCell sx={{ display: "flex", alignItems: "center" }}>
+                        <TextField
+                          name="precio"
+                          onKeyDown={(event) => handleKeyDown(event, "precio")}
+                          value={sale.precio}
+                          onChange={(event) => {
+                            const newValue = event.target.value;
+                            // Validar si el nuevo valor es un número positivo
+                            if (/^\d+$/.test(newValue) && newValue >= 0) {
+                              const updatedSalesData = [...salesData];
+                              updatedSalesData[index].precio = newValue;
+                              setSalesData(updatedSalesData);
+                            }
+                          }}
+                          style={{ width: 84 }}
+                          inputProps={{
+                            inputMode: "numeric", // Establece el modo de entrada como numérico
+                            pattern: "[0-9]*",
+                            maxLength: 6, // Asegura que solo se puedan ingresar números
+                          }}
+                        />
+                        {/* <TextField
                         name="precio"
                        onKeyDown={(event) => handleKeyDown(event, "precio")}
                         value={sale.quantity === 0 ? "" : sale.quantity}
@@ -392,43 +477,44 @@ const BoxSumaProd = ({ venta }) => {
                           maxLength: 6, // Asegura que solo se puedan ingresar números
                         }}
                       /> */}
-                    </TableCell>
-                    <TableCell>{sale.descripcion}</TableCell>
-                    <TableCell>{sale.precio}</TableCell>
-                    <TableCell>
-                      {calculateTotalPrice(sale.quantity, sale.precio)}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        onClick={() => removeFromSalesData(index)}
-                        color="secondary"
-                      >
-                        <RemoveIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <Paper
-              sx={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                padding: "21px",
-                margin: "5px",
-              }}
-              elevation={18}
-            >
-              <Typography>
-                Total: {grandTotal.toLocaleString("es-ES")}
-              </Typography>
-            </Paper>
-          </TableContainer>
-        </Paper>
-      </Grid>
-    </Paper>
+                      </TableCell>
+                      <TableCell>{sale.descripcion}</TableCell>
+                      <TableCell>{sale.precio}</TableCell>
+                      <TableCell>
+                        {calculateTotalPrice(sale.quantity, sale.precio)}
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => removeFromSalesData(index)}
+                          color="secondary"
+                        >
+                          <RemoveIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Paper
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: "21px",
+                  margin: "5px",
+                }}
+                elevation={18}
+              >
+                <Typography>
+                  Total: {grandTotal.toLocaleString("es-ES")}
+                </Typography>
+              </Paper>
+            </TableContainer>
+          </Paper>
+        </Grid>
+      </Paper>
+    </Grid>
   );
 };
 

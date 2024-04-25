@@ -14,6 +14,7 @@ import {
   Grid,
   useTheme,
   useMediaQuery,
+  InputLabel
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
@@ -43,96 +44,107 @@ const UserProfileCard = () => {
   }, [userData]);
 
   return (
-    <TableContainer component={Paper} sx={{ background: "#859398",}}>
-      <Table aria-label="simple table" sx={{ minWidth: 140 }}>
-        <TableHead >
-          <TableRow>
-          <Typography sx={{ width: "100%", textAlign: "center" }}>Información Vendedor</Typography>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {vendedor && (
-            <>
-              <TableRow>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  component="th"
-                  scope="row"
-                >
-                  Nombre y Apellidos
-                </TableCell>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  align="right"
-                >
-                  {vendedor.nombre}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  component="th"
-                  scope="row"
-                >
-                  Código
-                </TableCell>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  align="right"
-                >
-                  {vendedor.codigo}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  component="th"
-                  scope="row"
-                >
-                  Caja
-                </TableCell>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  align="right"
-                >
-                  {vendedor.caja}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  component="th"
-                  scope="row"
-                >
-                  Nº Última Operación
-                </TableCell>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  align="right"
-                >
-                  {vendedor.operacion}
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  component="th"
-                  scope="row"
-                >
-                  Última Boleta
-                </TableCell>
-                <TableCell
-                  sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                  align="right"
-                >
-                  {vendedor.boleta}
-                </TableCell>
-              </TableRow>
-            </>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Paper sx={{ background: "#859398" }}>
+      <InputLabel
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                margin: 1,
+               // Cambiar el color del texto a azul
+                fontSize: "1.2rem", // Cambiar el tamaño del texto
+                fontWeight: "bold", // Hacer el texto en negrita
+                // Puedes agregar más estilos aquí según tus necesidades
+              }}
+            >
+              Información Vendedor
+            </InputLabel>
+            
+      <TableContainer>
+        <Table aria-label="simple table" sx={{ minWidth: 140 }}>
+          <TableBody>
+            {vendedor && (
+              <>
+                <TableRow>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    component="th"
+                    scope="row"
+                  >
+                    Nombre y Apellidos
+                  </TableCell>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    align="right"
+                  >
+                    {vendedor.nombre}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    component="th"
+                    scope="row"
+                  >
+                    Código
+                  </TableCell>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    align="right"
+                  >
+                    {vendedor.codigo}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    component="th"
+                    scope="row"
+                  >
+                    Caja
+                  </TableCell>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    align="right"
+                  >
+                    {vendedor.caja}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    component="th"
+                    scope="row"
+                  >
+                    Nº Última Operación
+                  </TableCell>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    align="right"
+                  >
+                    {vendedor.operacion}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    component="th"
+                    scope="row"
+                  >
+                    Última Boleta
+                  </TableCell>
+                  <TableCell
+                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
+                    align="right"
+                  >
+                    {vendedor.boleta}
+                  </TableCell>
+                </TableRow>
+              </>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 };
 

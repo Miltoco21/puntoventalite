@@ -254,7 +254,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         sx={{
           background: "#859398",
           width: "100%",
-          marginTop: "2%",
+          margin: "0 auto",
         }}
       >
         <Grid

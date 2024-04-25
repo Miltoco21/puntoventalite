@@ -16,11 +16,11 @@ const Home = () => {
   return (
     <>
       <CssBaseline />
-      <Container sx={{
-  background: "rgb(146, 181, 176)",
-  
-}}
->
+      <Container
+        sx={{
+          background: "rgb(146, 181, 176)",
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Navbar />
@@ -28,24 +28,24 @@ const Home = () => {
 
           {/* Main Content */}
           <Grid item xs={12}>
-            <Grid container spacing={2}>
+            <Grid container>
               {/* BoxDatosCaja */}
-              <Grid item xs={12} sm={12} md={6}lg={6} style={{ position: "relative" }}>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                style={{ position: "relative" }}
+              >
                 <BoxDatosCaja />
-                <BoxBuscador/>
-                {/* BoxSumaProd with absolute positioning */}
-                <BoxSumaProd
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                  }}
-                />
+                <BoxBuscador />
+
+                <BoxSumaProd />
               </Grid>
 
               {/* BoxGestionCaja */}
-              <Grid item xs={12}  sm={12} md={6}>
+              <Grid item xs={12} sm={12} md={6}>
                 <BoxGestionCaja />
               </Grid>
             </Grid>

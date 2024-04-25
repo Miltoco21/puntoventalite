@@ -145,137 +145,200 @@ const Boxfactura = ({ onClose }) => {
     setSnackbarOpen(false);
   };
   const handleTransferenciaModalOpen = () => {
-    setMetodoPago("Transferencia"); // Establece el método de pago como "Transferencia"
+    setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
-   
   };
   const handleTransferenciaModalClose = () => {
     setOpenTransferenciaModal(false);
   };
 
-  // const handleGenerarTicket = async () => {
-  //   try {
-  //     if (metodoPago === "TRANSFERENCIA" && !transferenciaExitosa) {
-  //       // Si el método de pago es transferencia y la transferencia no ha sido exitosa,
-  //       // entonces no procesar el pago y mostrar un mensaje de error
-  //       setError(
-  //         "Por favor, complete la transferencia correctamente antes de generar el ticket."
-  //       );
-  //       return;
-  //     }
-
-  //     if (grandTotal === 0) {
-  //       setError(
-  //         "No se puede generar el ticket de pago porque el total a pagar es cero."
-  //       );
-  //       return;
-  //     }
-
-  //     if (isNaN(cantidadPagada) || cantidadPagada < 0) {
-  //       setError("Por favor, ingresa una cantidad pagada válida.");
-  //       return;
-  //     }
-
-  //     const codigoClienteSucursal = searchResults[0].codigoClienteSucursal;
-  //     const codigoCliente = searchResults[0].codigoCliente;
-
-  //     const ticket = {
-  //       idUsuario: userData.codigoUsuario,
-  //       codigoClienteSucursal: codigoClienteSucursal,
-  //       codigoCliente: codigoCliente,
-  //       total: grandTotal,
-  //       products: salesData.map((sale) => ({
-  //         codProducto: sale.idProducto,
-  //         cantidad: sale.quantity,
-  //         precioUnidad: sale.precio,
-  //         descripcion: sale.descripcion,
-  //       })),
-  //       metodoPago: metodoPago,
-  //       transferencias: {
-  //         nombre: nombre,
-  //         rut: rut,
-  //         banco: selectedBanco,
-  //         tipoCuenta: tipoCuenta,
-  //         nroCuenta: nroCuenta,
-  //         fecha: fecha,
-  //         nroOperacion: nroOperacion,
-  //       },
-  //     };
-
-  //     console.log("Datos enviados por Axios:", ticket);
-  //     const response = await axios.post(
-  //       "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket",
-  //       ticket
-  //     );
-
-  //     console.log("Respuesta del servidor:", response.data);
-  //     if (response.status === 200) {
-  //       setSnackbarMessage(response.data.descripcion);
-  //       setSnackbarOpen(true);
-  //       setSearchResults([]);
-  //       clearSalesData();
-  //       setTransferenciaExitosa(true);
-
-  //       // Esperar 4 segundos antes de cerrar el modal
-  //       setTimeout(() => {
-  //         onCloseTicket();
-  //       }, 3000);
-  //     }
-  //     console.log(
-  //       "Información TICKET al servidor en:",
-  //       new Date().toLocaleString()
-  //     );
-  //   } catch (error) {
-  //     console.error("Error al generar la boleta electrónica:", error);
-  //     setError("Error al generar la boleta electrónica.");
-  //   }
-  // };
-
   const handlePagoFactura = async () => {
     try {
-      const pagoFactura = {
+      // Validar si el usuario ha ingresado el código de vendedor
+      if (!userData.codigoUsuario) {
+        setError("Por favor, ingresa el código de vendedor para continuar.");
+        return;
+      }
+      if (cantidadPagada < grandTotal) {
+        setError("Cantidad pagada no puede ser menor que el monto a pagar .");
+        return;
+      }
+      if (grandTotal - cantidadPagada > 0) {
+        setError("Cantidad pagada no puede ser menor que 0, ni estar vacia .");
+        return;
+      } else {
+        setError("");
+      }
+     
+
+      // Validar si el total a pagar es cero
+      if (cantidadPagada <= 0) {
+        setError(
+          "No se puede generar la boleta de pago porque el total cero."
+        );
+        return;
+      }
+      if (!metodoPago ||cantidadPagada <= 0) {
+        setError("Por favor, ingresa un monto válido para el pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el método de pago
+      if (!metodoPago) {
+        setError("Por favor, selecciona un método de pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el código de usuario
+      if (
+        typeof userData.codigoUsuario !== "number" ||
+        userData.codigoUsuario <= 0
+      ) {
+        setError("El código de usuario no es válido.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar que se haya seleccionado al menos una deuda
+
+      setLoading(true);
+
+      let endpoint =
+        "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+
+      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
+      if (metodoPago === "TRANSFERENCIA") {
+        endpoint =
+          "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+
+        // Validar datos de transferencia
+        if (
+          nombre === "" &&
+          rut === "" &&
+          selectedBanco === "" &&
+          tipoCuenta === "" &&
+          nroCuenta === "" &&
+          fecha === "" &&
+          nroOperacion === ""
+        ) {
+          setTransferenciaError(
+            "Por favor, completa todos los campos necesarios para la transferencia."
+          );
+          setLoading(false);
+          return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setTransferenciaError("");
+        }
+        if (nombre === "") {
+          setTransferenciaError("Por favor, ingresa el nombre.");
+          setLoading(false);
+          return;
+        }
+        if (rut === "") {
+          setTransferenciaError("Por favor, ingresa el RUT.");
+          setLoading(false);
+          return;
+        }
+        if (!validarRutChileno(rut)) {
+          setTransferenciaError("El RUT ingresado NO es válido.");
+          setLoading(false);
+          return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setTransferenciaError("");
+        }
+
+        if (selectedBanco === "") {
+          setTransferenciaError("Por favor, selecciona el banco.");
+          setLoading(false);
+          return;
+        }
+
+        if (tipoCuenta === "") {
+          setTransferenciaError("Por favor, selecciona el tipo de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroCuenta === "") {
+          setTransferenciaError("Por favor, ingresa el número de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (fecha === "") {
+          setTransferenciaError("Por favor, selecciona la fecha.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroOperacion === "") {
+          setTransferenciaError("Por favor, ingresa el número de operación.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Validar el monto pagado
+
+      // Otras validaciones que consideres necesarias...
+
+      // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
+
+      const requestBody = {
         idUsuario: userData.codigoUsuario,
-        codigoClienteSucursal: selectedCodigoClienteSucursal,
-        codigoCliente: selectedCodigoCliente,
+        codigoClienteSucursal: selectedCodigoClienteSucursal, // Ajustar según la lógica de tu aplicación
+        codigoCliente: selectedCodigoCliente, // Ajustar según la lógica de tu aplicación
         total: grandTotal,
         products: salesData.map((producto) => ({
-          codProducto: producto.idProducto,
-          cantidad: producto.quantity,
-          precioUnidad: producto.precio,
-          descripcion: producto.descripcion,
+          codProducto: producto.idProducto, // Ajustar la propiedad según el nombre real en tus datos
+          cantidad: producto.quantity, // Ajustar la propiedad según el nombre real en tus datos
+          precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
+          descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
         })),
-        metodoPago: metodoPago,
-        clienteDatosFactura: {
-          rut: searchResults[0].rutResponsable,
-          razonSocial: searchResults[0].razonSocial,
-          nombre: searchResults[0].nombreResponsable,
-          apellido: searchResults[0].apellidoResponsable,
-          direccion: searchResults[0].direccion,
-          region: searchResults[0].region,
-          comuna: searchResults[0].comuna,
-          giro: searchResults[0].giro,
+        metodoPago: cantidadPagada,
+        transferencias: {
+          idCuentaCorrientePago: 0,
+          nombre: nombre,
+          rut: rut,
+          banco: selectedBanco,
+          tipoCuenta: tipoCuenta,
+          nroCuenta: nroCuenta,
+          fecha: fecha,
+          nroOperacion: nroOperacion,
         },
       };
 
-      console.log("Datos Factura antes de enviar la solicitud:", pagoFactura);
+      console.log("Request Body:", requestBody);
 
-      const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/GestionDTE/GenerarFacturaDTE",
-        pagoFactura
-      );
+      const response = await axios.post(endpoint, requestBody);
+
+      console.log("Response:", response.data);
+
       if (response.status === 200) {
-        setSnackbarMessage("Factura guardada exitosamente");
+        // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
         setSnackbarOpen(true);
-        setTimeout(() => {
-          onClose(); ////Cierre Modal al finalizar
-        }, 2000);
+        setSnackbarMessage(response.data.descripcion);
         clearSalesData();
-      }
+        setSelectedUser(null);
+        setSelectedChipIndex([]);
+        setSearchResults([]);
+        setSelectedCodigoCliente(0);
+        setSearchText(""), handleTransferenciaModalClose();
 
-      console.log("Datos después de enviar la solicitud:", response.data);
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+      } else {
+        console.error("Error al realizar el pago");
+      }
     } catch (error) {
-      console.error("Error al enviar la solicitud:", error);
-      setSnackbarMessage("Error en el proceso");
+      console.error("Error al realizar el pago:", error);
+    } finally {
+      setLoading(false);
     }
   };
   const handleMetodoPagoClick = (metodo) => {
@@ -285,83 +348,31 @@ const Boxfactura = ({ onClose }) => {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
-  const handleTransferData = async (
-    
-   
-    metodoPago,
-    transferencias
-  ) => {
-    try {
-      console.log("Datos de transferencia:");
-      console.log("Monto pagado:", grandTotal);
-      console.log("Método de pago:", metodoPago);
-      console.log("Datos de transferencia:", transferencias);
-      console.log("Tipo de selectedDebts:", typeof selectedDebts);
-
-      // Convertir selectedDebts en un array de valores
-      const selectedDebtsArray = Object.values(selectedDebts);
-
-      // Iterar sobre el array selectedDebtsArray
-      for (const deuda of selectedDebtsArray) {
-        console.log("Deuda seleccionada:");
-        console.log("ID de la deuda:", deuda.id);
-        console.log("ID de la cabecera:", deuda.idCabecera);
-        console.log("Total de la deuda:", deuda.total);
-
-        const requestBody = {
-          deudaIds: [
-            {
-              idCuentaCorriente: deuda.id,
-              idCabecera: deuda.idCabecera,
-              total:  grandTotal,
-            },
-          ],
-          cantidadPagada: grandTotal,
-          metodoPago: metodoPago,
-          idUsuario: userData.codigoUsuario,
-          transferencias: {
-            // idCuentaCorrientePago: 0,
-            nombre: nombre,
-            rut: rut,
-            banco: banco,
-            tipoCuenta: tipoCuenta,
-            nroCuenta: nroCuenta,
-            fecha: fecha,
-            nroOperacion: nroOperacion,
-          },
-        };
-
-        console.log("Datos de la solicitud antes de enviarla:");
-        console.log(requestBody);
-
-        // Aquí realizamos la llamada POST para cada deuda
-        const response = await axios.post(
-          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente",
-          requestBody
-        );
-
-        if (response.status === 200) {
-          console.log("Transferencia realizada con éxito");
-          setSnackbarMessage(response.data.descripcion);
-          setSnackbarOpen(true);
-
-          setSearchResults([]);
-
-          clearSalesData();
-
-          setTimeout(() => {
-            handleClosePaymentDialog(true);
-            handleTransferenciaModalClose(true);
-            onClose(); ////Cierre Modal al finalizar
-          }, 3000);
-        } else {
-          console.error("Error al realizar la transferencia");
-        }
-      }
-    } catch (error) {
-      console.error("Error al realizar la transferencia:", error);
+  const validarRutChileno = (rut) => {
+    if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
+      // Si el formato del RUT no es válido, retorna false
+      return false;
     }
+
+    // Separar el número del RUT y el dígito verificador
+    const partesRut = rut.split("-");
+    const digitoVerificador = partesRut[1].toUpperCase();
+    const numeroRut = partesRut[0];
+
+    // Función para calcular el dígito verificador
+    const calcularDigitoVerificador = (T) => {
+      let M = 0;
+      let S = 1;
+      for (; T; T = Math.floor(T / 10)) {
+        S = (S + (T % 10) * (9 - (M++ % 6))) % 11;
+      }
+      return S ? String(S - 1) : "K";
+    };
+
+    // Validar el dígito verificador
+    return calcularDigitoVerificador(numeroRut) === digitoVerificador;
   };
+
   const calcularVuelto = () => {
     const cambio = cantidadPagada - grandTotal;
     return cambio > 0 ? cambio : 0;
@@ -380,18 +391,38 @@ const Boxfactura = ({ onClose }) => {
         event.preventDefault();
       }
     }
-    if (field === "telefono") {
-      // Validar si la tecla presionada es un signo menos
-      if (event.key === "-" && formData.telefono === "") {
-        event.preventDefault(); // Prevenir ingreso de número negativo
+    if (field === "rut") {
+      // Validar si la tecla presionada es un signo menos, un número, la letra 'k' o 'K', el guion '-' o la tecla de retroceso
+      const allowedCharacters = /^[0-9kK-]+$/i; // Corregida para permitir el guion
+      if (!allowedCharacters.test(event.key)) {
+        // Verificar si la tecla presionada es el retroceso
+        if (event.key !== "Backspace") {
+          event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+        }
       }
     }
+    if (field === "cantidadPagada") {
+      // Validar si la tecla presionada es un dígito o la tecla de retroceso
+      const isDigitOrBackspace = /^[0-9\b]+$/;
+      if (!isDigitOrBackspace.test(event.key)) {
+        event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+      }
+
+      // Obtener el valor actual del campo cantidadPagada
+      const currentValue = parseFloat(cantidadPagada);
+
+      // Validar si el nuevo valor sería menor que el grandTotal
+      if (currentValue * 10 + parseInt(event.key) < grandTotal * 10) {
+        event.preventDefault(); // Prevenir la entrada de un monto menor al grandTotal
+      }
+    }
+    
   };
 
   return (
     <Grid container spacing={2}>
     <Grid item xs={12} md={6} lg={6}>
-      <Typography variant="h4">Pagar Factura</Typography>
+      <Typography sx={{ marginBottom: "2%" }} variant="h4">Pagar Factura</Typography>
   
       {error && (
         <Grid item xs={12}>
@@ -401,37 +432,39 @@ const Boxfactura = ({ onClose }) => {
         </Grid>
       )}
       <TextField
-        margin="dense"
-        fullWidth
-        label="Monto a Pagar"
-        variant="outlined"
-        value={grandTotal}
-        InputProps={{ readOnly: true }}
-        onChange={(e) => setCantidadPagada(e.target.value)}
-      />
-      <TextField
-        margin="dense"
-        fullWidth
-        type="number"
-        label="Cantidad pagada"
-        value={cantidadPagada || ""}
-        onChange={(e) => {
-          const value = e.target.value;
-          if (!value.trim()) {
-            setCantidadPagada(0);
-          } else {
-            setCantidadPagada(parseFloat(value));
-          }
-        }}
-      />
-      <TextField
-        margin="dense"
-        fullWidth
-        type="number"
-        label="Por pagar"
-        value={Math.max(0, grandTotal - cantidadPagada)}
-        InputProps={{ readOnly: true }}
-      />
+            sx={{ marginBottom: "5%" }}
+            margin="dense"
+            label="Monto a Pagar"
+            variant="outlined"
+            value={grandTotal}
+            onChange={(e) => setMontoPagado(e.target.value)}
+            fullWidth
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
+          />
+     <TextField
+            margin="dense"
+            fullWidth
+            name="cantidadPagada "
+            label="Cantidad pagada"
+            value={cantidadPagada || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!value.trim()) {
+                setCantidadPagada(0);
+              } else {
+                setCantidadPagada(parseFloat(value));
+              }
+            }}
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+              maxLength: 9,
+            }}
+            disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
+          />
        {calcularVuelto() > 0 && (
             <TextField
               margin="dense"
@@ -452,76 +485,98 @@ const Boxfactura = ({ onClose }) => {
           </Typography>
         </Grid>
         <Grid item xs={12} sm={12} md={12}>
-          <Button
-            sx={{ height: "100%" }}
-            fullWidth
-            variant={metodoPago === "Efectivo" ? "contained" : "outlined"}
-            onClick={() => setMetodoPago("Efectivo")}
-          >
-            Efectivo
-          </Button>
+        <Button
+                id={`${metodoPago}-btn`}
+                sx={{ height: "100%" }}
+                fullWidth
+                variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
+                onClick={() => setMetodoPago("EFECTIVO")}
+                disabled={loading || cantidadPagada <= 0} // Deshabilitar si hay una carga en progreso o la cantidad pagada es menor o igual a cero
+              >
+                Efectivo
+              </Button>
         </Grid>
+        
         <Grid item xs={12} sm={12} md={12}>
-          <Button
-            sx={{ height: "100%" }}
-            variant={
-              metodoPago === "Tarjeta Débito" ? "contained" : "outlined"
-            }
-            onClick={() => setMetodoPago("Tarjeta Débito")}
-            fullWidth
-          >
-            Débito
-          </Button>
+        <Button
+                id={`${metodoPago}-btn`}
+                sx={{ height: "100%" }}
+                variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
+                onClick={() => {
+                  setMetodoPago("DEBITO");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}                fullWidth
+              >
+                Débito
+              </Button>
         </Grid>
+       
         <Grid item xs={12} sm={12} md={12}>
-          <Button
-            sx={{ height: "100%" }}
-            variant={
-              metodoPago === "Tarjeta Crédito" ? "contained" : "outlined"
-            }
-            onClick={() => setMetodoPago("Tarjeta Crédito")}
-            fullWidth
-          >
-            Crédito
-          </Button>
-        </Grid>
-        <Grid item xs={12} sm={12} md={12}>
-          <Button
-            sx={{ height: "100%" }}
-            variant={
-              metodoPago === "Transferencia" ? "contained" : "outlined"
-            }
-            onClick={() => handleTransferenciaModalOpen(selectedDebts)}
-            fullWidth
-          >
-            Transferencia
-          </Button>
-        </Grid>
-        <Grid item xs={12} sm={12} md={12}>
-              <Button
+        <Button
+                id={`${metodoPago}-btn`}
+                sx={{ height: "100%" }}
+                variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
+                onClick={() => {
+                  setMetodoPago("CREDITO");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}               
+                fullWidth
+              >
+                Crédito
+              </Button>
+            </Grid>
+      </Grid>
+      <Grid item xs={12} sm={12} md={12}>
+            <Button
                 sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
                 fullWidth
                 variant={
-                  metodoPago === "CUENTACORRIENTE"
-                    ? "contained"
-                    : "outlined"
+                  metodoPago === "CUENTACORRIENTE" ? "contained" : "outlined"
                 }
-                onClick={() => setMetodoPago("CUENTACORRIENTE")}
+                onClick={() => {
+                  setMetodoPago("CUENTACORRIENTE");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}   
               >
                 Cuenta Corriente
               </Button>
             </Grid>
-      </Grid>
-      <Button
-        fullWidth
-        variant="contained"
-        color="secondary"
-        disabled={!metodoPago || cantidadPagada <= 0}
-        onClick={handlePagoFactura}
-      >
-        Pagar
-      </Button>
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                id={`${metodoPago}-btn`}
+                variant={
+                  metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
+                }
+                onClick={() => {
+                  handleMetodoPagoClick("TRANSFERENCIA");
+                  handleTransferenciaModalOpen(selectedDebts);
+                }}
+                fullWidth
+              >
+                Transferencia
+              </Button>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
+              <Button
+                sx={{ height: "100%" }}
+                variant="contained"
+                fullWidth
+                color="secondary"
+                disabled={!metodoPago || cantidadPagada <= 0 || loading}
+                onClick={handlePagoFactura}
+              >
+                {loading ? (
+                  <>
+                    <CircularProgress size={20} /> Procesando...
+                  </>
+                ) : (
+                  "Pagar"
+                )}
+              </Button>
+            </Grid>
     </Grid>
   
     <Snackbar
@@ -532,25 +587,25 @@ const Boxfactura = ({ onClose }) => {
       message={snackbarMessage}
     />
   
-    <Dialog
-      open={openTransferenciaModal}
-      onClose={handleTransferenciaModalClose}
-    >
-      <DialogTitle>Transferencia</DialogTitle>
-      <DialogContent>
+  <Dialog
+        open={openTransferenciaModal}
+        onClose={handleTransferenciaModalClose}
+      >
+        <DialogTitle>Transferencia</DialogTitle>
+        <DialogContent>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
               {errorTransferenciaError && (
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
-            {error && (
+            {/* {error && (
               <Grid item xs={12}>
                 <Typography variant="body1" color="error">
                   {error}
                 </Typography>
               </Grid>
-            )}
+            )} */}
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
@@ -633,6 +688,7 @@ const Boxfactura = ({ onClose }) => {
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
+
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Ingresa Fecha"
@@ -667,7 +723,7 @@ const Boxfactura = ({ onClose }) => {
                 fullWidth
                 color="secondary"
                 disabled={!metodoPago || cantidadPagada <= 0 || loading}
-                onClick={handlePagoFactura }
+                onClick={ handlePagoFactura}
               >
                 {loading ? (
                   <>
@@ -680,41 +736,17 @@ const Boxfactura = ({ onClose }) => {
             </Grid>
           </Grid>
         </DialogContent>
-      <DialogActions>
-        <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
-        <Button
-          onClick={() => {
-            if (
-              !nombre ||
-              !rut ||
-              !selectedBanco ||
-              !tipoCuenta ||
-              !nroCuenta ||
-              !fecha ||
-              !nroOperacion
-            ) {
-              setTransferenciaError(
-                "Por favor complete todos los campos obligatorios."
-              );
-              return;
-            }
-            handleTransferData(selectedDebts, cantidadPagada, metodoPago, {
-              nombre: nombre,
-              rut: rut,
-              banco: selectedBanco,
-              tipoCuenta: tipoCuenta,
-              nroCuenta: nroCuenta,
-              fecha: fecha,
-              nroOperacion: nroOperacion,
-            });
-          }}
-          variant="contained"
-          color="secondary"
-        >
-          Guardar Datos Transferencia
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <DialogActions>
+          <Button onClick={handleTransferenciaModalClose}>Cerrar</Button>
+          {/* <Button
+            onClick={handleTransferData}
+            variant="contained"
+            color="secondary"
+          >
+            Pagar
+          </Button> */}
+        </DialogActions>
+      </Dialog>
   </Grid>
   
   );

@@ -108,14 +108,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     // Agrega más bancos según sea necesario
   ];
 
-  const obtenerFechaActual = () => {
-    const fecha = new Date();
-    const year = fecha.getFullYear();
-    const month = (fecha.getMonth() + 1).toString().padStart(2, "0");
-    const day = fecha.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
   const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
 
   const hoy = dayjs();
@@ -158,12 +150,60 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         setError("Por favor, ingresa el código de vendedor para continuar.");
         return;
       }
+      if (cantidadPagada < grandTotal) {
+        setError("Cantidad pagada no puede ser menor que el monto a pagar .");
+        return;
+      }
+      if (grandTotal - cantidadPagada > 0) {
+        setError("Cantidad pagada no puede ser menor que 0, ni estar vacia .");
+        return;
+      } else {
+        setError("");
+      }
+      if (cantidadPagada <= 0) {
+        setError("No se puede generar la boleta de pago porque el total cero.");
+        return;
+      }
+      if (!metodoPago || cantidadPagada <= 0) {
+        setError("Por favor, ingresa un monto válido para el pago.");
+        setLoading(false);
+        return;
+      }
 
-      // Validar si el total a pagar es cero
-      if (grandTotal === 0) {
-        setError(
-          "No se puede generar la boleta de pago porque el total a pagar es cero."
-        );
+      // Validar el método de pago
+      if (!metodoPago) {
+        setError("Por favor, selecciona un método de pago.");
+        setLoading(false);
+        return;
+      }
+      if (!metodoPago || cantidadPagada <= 0) {
+        setError("Por favor, ingresa un monto válido para el pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el código de usuario
+      if (
+        typeof userData.codigoUsuario !== "number" ||
+        userData.codigoUsuario <= 0
+      ) {
+        setError("El código de usuario no es válido.");
+        setLoading(false);
+        return;
+      }
+      if (!metodoPago) {
+        setError("Por favor, selecciona un método de pago.");
+        setLoading(false);
+        return;
+      }
+
+      // Validar el código de usuario
+      if (
+        typeof userData.codigoUsuario !== "number" ||
+        userData.codigoUsuario <= 0
+      ) {
+        setError("El código de usuario no es válido.");
+        setLoading(false);
         return;
       }
 
@@ -181,52 +221,74 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
 
         // Validar datos de transferencia
         if (
-          !nombre ||
-          !rut ||
-          !selectedBanco ||
-          !tipoCuenta ||
-          !nroCuenta ||
-          !fecha ||
-          !nroOperacion
+          nombre === "" &&
+          rut === "" &&
+          selectedBanco === "" &&
+          tipoCuenta === "" &&
+          nroCuenta === "" &&
+          fecha === "" &&
+          nroOperacion === ""
         ) {
-          setError(
+          setTransferenciaError(
             "Por favor, completa todos los campos necesarios para la transferencia."
           );
           setLoading(false);
           return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setTransferenciaError("");
+        }
+        if (nombre === "") {
+          setTransferenciaError("Por favor, ingresa el nombre.");
+          setLoading(false);
+          return;
+        }
+        if (rut === "") {
+          setTransferenciaError("Por favor, ingresa el RUT.");
+          setLoading(false);
+          return;
         }
         if (!validarRutChileno(rut)) {
-          setError("El RUT ingresado NO es válido.");
+          setTransferenciaError("El RUT ingresado NO es válido.");
           setLoading(false);
           return;
         } else {
           // Limpiar el error relacionado con el RUT
-          setError("");
+          setTransferenciaError("");
+        }
+
+        if (selectedBanco === "") {
+          setTransferenciaError("Por favor, selecciona el banco.");
+          setLoading(false);
+          return;
+        }
+
+        if (tipoCuenta === "") {
+          setTransferenciaError("Por favor, selecciona el tipo de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroCuenta === "") {
+          setTransferenciaError("Por favor, ingresa el número de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (fecha === "") {
+          setTransferenciaError("Por favor, selecciona la fecha.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroOperacion === "") {
+          setTransferenciaError("Por favor, ingresa el número de operación.");
+          setLoading(false);
+          return;
         }
       }
 
-      if (!metodoPago || cantidadPagada <= 0) {
-        setError("Por favor, ingresa un monto válido para el pago.");
-        setLoading(false);
-        return;
-      }
-
       // Validar el método de pago
-      if (!metodoPago) {
-        setError("Por favor, selecciona un método de pago.");
-        setLoading(false);
-        return;
-      }
-
-      // Validar el código de usuario
-      if (
-        typeof userData.codigoUsuario !== "number" ||
-        userData.codigoUsuario <= 0
-      ) {
-        setError("El código de usuario no es válido.");
-        setLoading(false);
-        return;
-      }
 
       // Otras validaciones que consideres necesarias...
 
@@ -243,7 +305,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
           descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
         })),
-        metodoPago: metodoPago,
+        metodoPago: cantidadPagada,
         transferencias: {
           idCuentaCorrientePago: 0,
           nombre: nombre,
@@ -279,7 +341,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         console.error("Error al realizar el pago");
       }
     } catch (error) {
-      console.error("Error al generar la boleta electrónica:", error);
+      console.error("Error al generar la factura electrónica:", error);
     } finally {
       setLoading(false);
     }
@@ -327,21 +389,41 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         event.preventDefault();
       }
     }
-    if (field === "telefono") {
-      // Validar si la tecla presionada es un signo menos
-      if (event.key === "-" && formData.telefono === "") {
-        event.preventDefault(); // Prevenir ingreso de número negativo
+    if (field === "rut") {
+      // Validar si la tecla presionada es un signo menos, un número, la letra 'k' o 'K', el guion '-' o la tecla de retroceso
+      const allowedCharacters = /^[0-9kK-]+$/i; // Corregida para permitir el guion
+      if (!allowedCharacters.test(event.key)) {
+        // Verificar si la tecla presionada es el retroceso
+        if (event.key !== "Backspace") {
+          event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+        }
       }
     }
-  };
+    if (field === "cantidadPagada") {
+      // Validar si la tecla presionada es un dígito o la tecla de retroceso
+      const isDigitOrBackspace = /^[0-9\b]+$/;
+      if (!isDigitOrBackspace.test(event.key)) {
+        event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+      }
 
+      // Obtener el valor actual del campo cantidadPagada
+      const currentValue = parseFloat(cantidadPagada);
+
+      // Validar si el nuevo valor sería menor que el grandTotal
+      if (currentValue * 10 + parseInt(event.key) < grandTotal * 10) {
+        event.preventDefault(); // Prevenir la entrada de un monto menor al grandTotal
+      }
+    }
+    
+  };
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
-          <Typography variant="h4">Pagar Ticket</Typography>
-
+        <Typography variant="h4" sx={{ marginBottom: "2%" }}>
+            Pagar Ticket
+          </Typography>
           {error && (
             <Grid item xs={12}>
               <Typography variant="body1" color="error">
@@ -350,16 +432,22 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             </Grid>
           )}
           <TextField
+            sx={{ marginBottom: "5%" }}
             margin="dense"
-            fullWidth
-            type="number"
-            label="Total de la compra"
+            label="Monto a Pagar"
+            variant="outlined"
             value={grandTotal}
-            InputProps={{ readOnly: true }}
+            onChange={(e) => setMontoPagado(e.target.value)}
+            fullWidth
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
           />
           <TextField
             margin="dense"
             fullWidth
+            name="cantidadPagada "
             label="Cantidad pagada"
             value={cantidadPagada || ""}
             onChange={(e) => {
@@ -370,6 +458,12 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 setCantidadPagada(parseFloat(value));
               }
             }}
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+              maxLength: 9,
+            }}
+            disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
           />
           <TextField
             margin="dense"
@@ -404,49 +498,58 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               </Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
-              <Button
-                sx={{ height: "100%" }}
+            <Button
                 id={`${metodoPago}-btn`}
+                sx={{ height: "100%" }}
                 fullWidth
                 variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
-                onClick={() => handleMetodoPagoClick("EFECTIVO")}
+                onClick={() => setMetodoPago("EFECTIVO")}
+                disabled={loading || cantidadPagada <= 0} // Deshabilitar si hay una carga en progreso o la cantidad pagada es menor o igual a cero
               >
                 Efectivo
               </Button>
             </Grid>
 
             <Grid item xs={12} sm={12} md={12}>
-              <Button
-                sx={{ height: "100%" }}
+            <Button
                 id={`${metodoPago}-btn`}
-                fullWidth
-                variant={metodoPago === "TARJETA" ? "contained" : "outlined"}
-                onClick={() => handleMetodoPagoClick("TARJETA")}
+                sx={{ height: "100%" }}
+                variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
+                onClick={() => {
+                  setMetodoPago("DEBITO");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}                fullWidth
               >
                 Débito
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
-              <Button
-                sx={{ height: "100%" }}
+            <Button
                 id={`${metodoPago}-btn`}
-                fullWidth
+                sx={{ height: "100%" }}
                 variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
-                onClick={() => handleMetodoPagoClick("CREDITO")}
+                onClick={() => {
+                  setMetodoPago("CREDITO");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}               
+                fullWidth
               >
                 Crédito
               </Button>
             </Grid>
 
             <Grid item xs={12} sm={12} md={12}>
-              <Button
+            <Button
                 sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
                 fullWidth
                 variant={
                   metodoPago === "CUENTACORRIENTE" ? "contained" : "outlined"
                 }
-                onClick={() => handleMetodoPagoClick("CUENTACORRIENTE")}
+                onClick={() => {
+                  setMetodoPago("CUENTACORRIENTE");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}   
               >
                 Cuenta Corriente
               </Button>
@@ -509,13 +612,13 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
-            {error && (
+            {/* {error && (
               <Grid item xs={12}>
                 <Typography variant="body1" color="error">
                   {error}
                 </Typography>
               </Grid>
-            )}
+            )} */}
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>

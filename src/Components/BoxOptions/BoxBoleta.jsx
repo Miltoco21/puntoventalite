@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import {
   Paper,
@@ -62,7 +62,6 @@ const BoxBoleta = ({ onClose }) => {
   console.log("salesData:", salesData);
 
   const navigate = useNavigate();
-  const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
   const [cantidadPagada, setCantidadPagada] = useState(grandTotal);
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
@@ -108,14 +107,6 @@ const BoxBoleta = ({ onClose }) => {
     // Agrega más bancos según sea necesario
   ];
 
-  const obtenerFechaActual = () => {
-    const fecha = new Date();
-    const year = fecha.getFullYear();
-    const month = (fecha.getMonth() + 1).toString().padStart(2, "0");
-    const day = fecha.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
   const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
 
   const hoy = dayjs();
@@ -134,13 +125,6 @@ const BoxBoleta = ({ onClose }) => {
   };
 
   // Agrega este console.log para verificar el valor de selectedDebts justo antes de abrir el diálogo de transferencia
-  console.log(
-    "selectedDebts justo antes de abrir el diálogo de transferencia:",
-    selectedDebts
-  );
-  useEffect(() => {
-    console.log("selectedDebts cambió:", selectedDebts);
-  }, [selectedDebts]);
 
   const handleTransferenciaModalOpen = () => {
     setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
@@ -150,15 +134,7 @@ const BoxBoleta = ({ onClose }) => {
     setOpenTransferenciaModal(false);
   };
 
-  useEffect(() => {
-    // Calcular el total de los productos seleccionados
-    const totalVenta = salesData.reduce(
-      (total, producto) => total + producto.precio,
-      0
-    );
-    // Establecer el total como el monto pagado
-    setMontoPagado(totalVenta);
-  }, [salesData]);
+  
   const handlePagoBoleta = async () => {
     try {
       // Validar si el usuario ha ingresado el código de vendedor
@@ -166,55 +142,26 @@ const BoxBoleta = ({ onClose }) => {
         setError("Por favor, ingresa el código de vendedor para continuar.");
         return;
       }
+      if (cantidadPagada < grandTotal) {
+        setError("Cantidad pagada no puede ser menor que el monto a pagar .");
+        return;
+      }
+      if (grandTotal - cantidadPagada > 0) {
+        setError("Cantidad pagada no puede ser menor que 0, ni estar vacia .");
+        return;
+      } else {
+        setError("");
+      }
+     
 
       // Validar si el total a pagar es cero
-      if (grandTotal === 0) {
+      if (cantidadPagada <= 0) {
         setError(
-          "No se puede generar la boleta de pago porque el total a pagar es cero."
+          "No se puede generar la boleta de pago porque el total cero."
         );
         return;
       }
-
-      // Validar que se haya seleccionado al menos una deuda
-
-      setLoading(true);
-
-      let endpoint =
-        "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
-
-      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
-      if (metodoPago === "TRANSFERENCIA") {
-        endpoint =
-          "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
-
-        // Validar datos de transferencia
-        if (
-          !nombre ||
-          !rut ||
-          !selectedBanco ||
-          !tipoCuenta ||
-          !nroCuenta ||
-          !fecha ||
-          !nroOperacion
-        ) {
-          setError(
-            "Por favor, completa todos los campos necesarios para la transferencia."
-          );
-          setLoading(false);
-          return;
-        }
-        if (!validarRutChileno(rut)) {
-          setError("El RUT ingresado NO es válido.");
-          setLoading(false);
-          return;
-        } else {
-          // Limpiar el error relacionado con el RUT
-          setError("");
-        }
-      }
-
-      // Validar el monto pagado
-      if (!metodoPago || cantidadPagada <= 0) {
+      if (!metodoPago ||cantidadPagada <= 0) {
         setError("Por favor, ingresa un monto válido para el pago.");
         setLoading(false);
         return;
@@ -236,6 +183,89 @@ const BoxBoleta = ({ onClose }) => {
         setLoading(false);
         return;
       }
+
+      // Validar que se haya seleccionado al menos una deuda
+
+      setLoading(true);
+
+      let endpoint =
+        "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+
+      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
+      if (metodoPago === "TRANSFERENCIA") {
+        endpoint =
+          "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+
+        // Validar datos de transferencia
+        if (
+          nombre === "" &&
+          rut === "" &&
+          selectedBanco === "" &&
+          tipoCuenta === "" &&
+          nroCuenta === "" &&
+          fecha === "" &&
+          nroOperacion === ""
+        ) {
+          setTransferenciaError(
+            "Por favor, completa todos los campos necesarios para la transferencia."
+          );
+          setLoading(false);
+          return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setTransferenciaError("");
+        }
+        if (nombre === "") {
+          setTransferenciaError("Por favor, ingresa el nombre.");
+          setLoading(false);
+          return;
+        }
+        if (rut === "") {
+          setTransferenciaError("Por favor, ingresa el RUT.");
+          setLoading(false);
+          return;
+        }
+        if (!validarRutChileno(rut)) {
+          setTransferenciaError("El RUT ingresado NO es válido.");
+          setLoading(false);
+          return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setTransferenciaError("");
+        }
+
+        if (selectedBanco === "") {
+          setTransferenciaError("Por favor, selecciona el banco.");
+          setLoading(false);
+          return;
+        }
+
+        if (tipoCuenta === "") {
+          setTransferenciaError("Por favor, selecciona el tipo de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroCuenta === "") {
+          setTransferenciaError("Por favor, ingresa el número de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (fecha === "") {
+          setTransferenciaError("Por favor, selecciona la fecha.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroOperacion === "") {
+          setTransferenciaError("Por favor, ingresa el número de operación.");
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Validar el monto pagado
 
       // Otras validaciones que consideres necesarias...
 
@@ -332,38 +362,7 @@ const BoxBoleta = ({ onClose }) => {
     return cambio > 0 ? cambio : 0;
   };
 
-  const validateFields = () => {
-    const requiredFields = [
-      "nombre",
-      "rut",
-      "selectedBanco",
-      "tipoCuenta",
-      "nroCuenta",
-      "fecha",
-      "nroOperacion",
-    ];
-    let isValid = true;
-    const newErrors = {};
-
-    requiredFields.forEach((field) => {
-      if (!fields[field]) {
-        newErrors[field] = `El campo ${field} es requerido.`;
-        isValid = false;
-      }
-    });
-
-    // Validación específica para RUT
-
-    // Validación de cantidad pagada
-    if (cantidadPagada < grandTotal) {
-      newErrors.cantidadPagada = "La cantidad pagada es insuficiente.";
-      isValid = false;
-    }
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
+  
   const handleKeyDown = (event, field) => {
     if (field === "marca") {
       const regex = /^[a-zA-Z]*$/;
@@ -377,10 +376,29 @@ const BoxBoleta = ({ onClose }) => {
         event.preventDefault();
       }
     }
-    if (field === "telefono") {
-      // Validar si la tecla presionada es un signo menos
-      if (event.key === "-" && formData.telefono === "") {
-        event.preventDefault(); // Prevenir ingreso de número negativo
+    if (field === "rut") {
+      // Validar si la tecla presionada es un signo menos, un número, la letra 'k' o 'K', el guion '-' o la tecla de retroceso
+      const allowedCharacters = /^[0-9kK-]+$/i; // Corregida para permitir el guion
+      if (!allowedCharacters.test(event.key)) {
+        // Verificar si la tecla presionada es el retroceso
+        if (event.key !== "Backspace") {
+          event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+        }
+      }
+    }
+    if (field === "cantidadPagada") {
+      // Validar si la tecla presionada es un dígito o la tecla de retroceso
+      const isDigitOrBackspace = /^[0-9\b]+$/;
+      if (!isDigitOrBackspace.test(event.key)) {
+        event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+      }
+
+      // Obtener el valor actual del campo cantidadPagada
+      const currentValue = parseFloat(cantidadPagada);
+
+      // Validar si el nuevo valor sería menor que el grandTotal
+      if (currentValue * 10 + parseInt(event.key) < grandTotal * 10) {
+        event.preventDefault(); // Prevenir la entrada de un monto menor al grandTotal
       }
     }
   };
@@ -415,6 +433,7 @@ const BoxBoleta = ({ onClose }) => {
           <TextField
             margin="dense"
             fullWidth
+            name="cantidadPagada "
             label="Cantidad pagada"
             value={cantidadPagada || ""}
             onChange={(e) => {
@@ -428,8 +447,11 @@ const BoxBoleta = ({ onClose }) => {
             inputProps={{
               inputMode: "numeric",
               pattern: "[0-9]*",
+              maxLength: 9,
             }}
+            disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
           />
+         
           <TextField
             margin="dense"
             fullWidth
@@ -468,6 +490,7 @@ const BoxBoleta = ({ onClose }) => {
                 fullWidth
                 variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
                 onClick={() => setMetodoPago("EFECTIVO")}
+                disabled={loading || cantidadPagada <= 0} // Deshabilitar si hay una carga en progreso o la cantidad pagada es menor o igual a cero
               >
                 Efectivo
               </Button>
@@ -477,8 +500,10 @@ const BoxBoleta = ({ onClose }) => {
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
-                onClick={() => setMetodoPago("DEBITO")}
-                fullWidth
+                onClick={() => {
+                  setMetodoPago("DEBITO");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}                fullWidth
               >
                 Débito
               </Button>
@@ -488,7 +513,10 @@ const BoxBoleta = ({ onClose }) => {
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
-                onClick={() => setMetodoPago("CREDITO")}
+                onClick={() => {
+                  setMetodoPago("CREDITO");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}               
                 fullWidth
               >
                 Crédito
@@ -502,7 +530,10 @@ const BoxBoleta = ({ onClose }) => {
                 variant={
                   metodoPago === "CUENTACORRIENTE" ? "contained" : "outlined"
                 }
-                onClick={() => setMetodoPago("CUENTACORRIENTE")}
+                onClick={() => {
+                  setMetodoPago("CUENTACORRIENTE");
+                  setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
+              }}   
               >
                 Cuenta Corriente
               </Button>
@@ -529,7 +560,7 @@ const BoxBoleta = ({ onClose }) => {
                 variant="contained"
                 fullWidth
                 color="secondary"
-                disabled={!metodoPago || montoPagado <= 0 || loading}
+                disabled={!metodoPago || cantidadPagada <= 0 || loading}
                 onClick={handlePagoBoleta}
               >
                 {loading ? (
@@ -559,7 +590,7 @@ const BoxBoleta = ({ onClose }) => {
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12}>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
               {errorTransferenciaError && (
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
@@ -592,11 +623,13 @@ const BoxBoleta = ({ onClose }) => {
                 Ingresa rut sin puntos y con guión
               </InputLabel>
               <TextField
+                name="rut"
                 label="ej: 11111111-1"
                 variant="outlined"
                 fullWidth
                 value={rut}
                 onChange={(e) => setRut(e.target.value)}
+                onKeyDown={(event) => handleKeyDown(event, "rut")}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -687,7 +720,7 @@ const BoxBoleta = ({ onClose }) => {
                 variant="contained"
                 fullWidth
                 color="secondary"
-                disabled={!metodoPago || montoPagado <= 0 || loading}
+                disabled={!metodoPago || cantidadPagada <= 0 || loading}
                 onClick={handlePagoBoleta}
               >
                 {loading ? (
