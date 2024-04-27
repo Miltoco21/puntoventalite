@@ -301,18 +301,39 @@ const Step1Component = ({ data, onNext, setStepData }) => {
   }, [selectedFamilyId, selectedCategoryId, selectedSubCategoryId]);
 
   const handleKeyDown = (event, field) => {
-    if (field === "marca") {
-      const regex = /^[a-zA-Z]*$/;
-      if (!regex.test(event.key) && event.key !== "Backspace") {
+
+    // if (field === "nombre" || field === "marca") {
+    //   const regex = /^[a-zA-Z\s]*$/; // Permitir letras y espacios en blanco
+    //   if (
+    //     !regex.test(event.key) &&
+    //     event.key !== "Backspace" &&
+    //     event.key !== " "
+    //   ) {
+    //     event.preventDefault();
+    //   }
+    // }
+    if (field === "nombre" || field === "marca") {
+      const regex = /^[a-zA-Z0-9\s]*$/; // Permitir letras, números y espacios en blanco
+      if (
+        !regex.test(event.key) &&
+        event.key !== "Backspace" &&
+        event.key !== " "
+      ) {
         event.preventDefault();
       }
     }
-    if (field === "nombre") {
-      const regex = /^[a-zA-Z]*$/;
-      if (!regex.test(event.key) && event.key !== "Backspace") {
-        event.preventDefault();
-      }
-    }
+    // if (field === "marca") {
+    //   const regex = /^[a-zA-Z]*$/;
+    //   if (!regex.test(event.key) && event.key !== "Backspace") {
+    //     event.preventDefault();
+    //   }
+    // }
+    // if (field === "nombre") {
+    //   const regex = /^[a-zA-Z]*$/;
+    //   if (!regex.test(event.key) && event.key !== "Backspace") {
+    //     event.preventDefault();
+    //   }
+    // }
     if (field === "telefono") {
       // Validar si la tecla presionada es un signo menos
       if (event.key === "-" && formData.telefono === "") {

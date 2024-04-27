@@ -94,6 +94,15 @@ const IngresoClientes = ({ onClose }) => {
     // Validar el dígito verificador
     return calcularDigitoVerificador(numeroRut) === digitoVerificador;
   };
+
+  const validateUrl = (url) => {
+    // Expresión regular para validar una URL más general
+    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+    const urlWithoutSchemeRegex =
+      /^[^ :\/?#]+(\.[^ :\/?#]+)+(:\d+)?(\/[^ ?#]*)?(\?[^ #]*)?(#[^ ]*)?$/;
+
+    return urlRegex.test(url) || urlWithoutSchemeRegex.test(url);
+  };
   const [formData, setFormData] = useState({
     rut: "",
     nombre: "",
@@ -358,36 +367,89 @@ const IngresoClientes = ({ onClose }) => {
     }));
   };
   const handleKeyDown = (event, field) => {
-    if (field === 'nombre') {
-      const regex = /^[a-zA-Z]*$/;
-      if (!regex.test(event.key) && event.key !== 'Backspace') {
+    if (field === "nombre" || field === "apellido") {
+      const regex = /^[a-zA-Z\s]*$/; // Permitir letras y espacios en blanco
+      if (
+        !regex.test(event.key) &&
+        event.key !== "Backspace" &&
+        event.key !== " "
+      ) {
         event.preventDefault();
       }
     }
-    if (field === 'apellido') {
-      const regex = /^[a-zA-Z]*$/;
-      if (!regex.test(event.key) && event.key !== 'Backspace') {
-        event.preventDefault();
-      }
-    }
-    if (field === 'telefono') {
-      // Validar si la tecla presionada es un signo menos
-      if (event.key === '-' && formData.telefono === '') {
-        event.preventDefault(); // Prevenir ingreso de número negativo
+    if (field === "telefono") {
+      // Validar si la tecla presionada es un dígito o la tecla de retroceso
+      if (!/\d/.test(event.key) && event.key !== "Backspace") {
+        event.preventDefault(); // Prevenir ingreso de caracteres no permitidos
       }
     }
   };
 
   const handleSubmit = async () => {
     try {
-      const emptyFields = Object.entries(formData)
-        .filter(([key, value]) => value === "")
-        .map(([key]) => key);
-
-      if (emptyFields.length > 0) {
-        const emptyField = emptyFields[0];
+      if (formData.rut === "") {
         setRutError(
-          `El campo ${emptyField} está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+          `El campo rut está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+      setRutError("");
+      if (!validarRutChileno(formData.rut)) {
+        setRutError("El RUT ingresado NO es válido.");
+        return;
+      } else {
+        setRutError(""); // Clear any previous error message
+      }
+      if (formData.nombre === "") {
+        setRutError(
+          `El campo nombre está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+      setRutError("");
+      if (formData.apellido === "") {
+        setRutError(
+          `El campo apellido está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+      setRutError("");
+      if (formData.direccion === "") {
+        setRutError(
+          `El campo dirección está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+      setRutError("");
+      if (formData.telefono === "") {
+        setRutError(
+          `El campo teléfono está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+        if (formData.region === "") {
+          setRutError(
+            `El campo región está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+          );
+          return;
+        } else {
+          setRutError("");
+        }
+        setRutError("");
+      }
+      setRutError("");
+      if (formData.comuna === "") {
+        setRutError(
+          `El campo comuna está vacío. Por favor completa todos los campos antes de enviar el formulario.`
         );
         return;
       } else {
@@ -395,21 +457,63 @@ const IngresoClientes = ({ onClose }) => {
       }
       setRutError("");
 
-      if (!formData.rut) {
-        setRutError("Por favor ingresa un RUT.");
+      if (formData.correo === "") {
+        setRutError(
+          `El campo correo está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
         return;
-      } else if (!validarRutChileno(formData.rut)) {
-        setRutError("El RUT ingresado NO es válido.");
+      } else {
+        setRutError("");
+      }
+      setRutError("");
+      if (!validateEmail(formData.correo)) {
+        setRutError("El correo electrónico ingresado no es válido.");
         return;
       } else {
         setRutError(""); // Clear any previous error message
       }
-      if (!validateEmail(formData.correo)) {
-        setCorreoError("El correo electrónico ingresado no es válido.");
+      if (formData.giro === "") {
+        setRutError(
+          `El campo giro está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
         return;
       } else {
-        setCorreoError(""); // Clear any previous error message
+        setRutError("");
       }
+      setRutError("");
+
+      if (formData.urlPagina === "") {
+        setRutError(
+          `El campo Url de página está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else if (!validateUrl(formData.urlPagina)) {
+        setRutError(
+          `El formato de la URL no es válido. Por favor ingresa una URL válida.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+  
+      if (formData.formaPago === "") {
+        setRutError(
+          `El campo forma de Pago está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+      setRutError("");
+      if (formData.razonSocial === "") {
+        setRutError(
+          `El campo razón social está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
+      } else {
+        setRutError("");
+      }
+      setRutError("");
 
       setLoading(true);
 
@@ -531,7 +635,6 @@ const IngresoClientes = ({ onClose }) => {
             {" "}
             <Grid item xs={12} sm={12} md={12}>
               {" "}
-              {correoError && <p style={{ color: "red" }}> {correoError}</p>}
               {rutError && <p style={{ color: "red" }}> {rutError}</p>}
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
@@ -563,7 +666,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.nombre}
                 onChange={handleInputChange}
-                onKeyDown={(event) => handleKeyDown(event, 'nombre')}
+                onKeyDown={(event) => handleKeyDown(event, "nombre")}
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
@@ -577,7 +680,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.apellido}
                 onChange={handleInputChange}
-                onKeyDown={(event) => handleKeyDown(event, 'apellido')}
+                onKeyDown={(event) => handleKeyDown(event, "apellido")}
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
@@ -603,7 +706,7 @@ const IngresoClientes = ({ onClose }) => {
                 fullWidth
                 value={formData.telefono}
                 onChange={handleInputChange}
-                onKeyDown={(event) => handleKeyDown(event, 'telefono')}
+                onKeyDown={(event) => handleKeyDown(event, "telefono")}
                 inputProps={{
                   inputMode: "numeric", // Establece el modo de entrada como numérico
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
@@ -689,7 +792,7 @@ const IngresoClientes = ({ onClose }) => {
               />
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
-              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Giro</InputLabel>
+              <InputLabel sx={{ marginBottom: "4%" }}>Ingresa URL </InputLabel>
               <TextField
                 label="URL Página"
                 name="urlPagina"

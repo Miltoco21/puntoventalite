@@ -167,9 +167,17 @@ const Step3Component = ({ data, onNext, stepData }) => {
       setEmptyFieldsMessage("Favor completar precio de costo.");
       return false;
     }
+    if (precioCosto === 0 ) {
+      setEmptyFieldsMessage(" Precio de costo no puede ser cero.");
+      return false;
+    }
   
     if (precioVenta === "") {
       setEmptyFieldsMessage("Favor completar precio de venta.");
+      return false;
+    }
+    if (precioVenta === 0 ) {
+      setEmptyFieldsMessage(" Precio de venta no puede ser cero.");
       return false;
     }
   

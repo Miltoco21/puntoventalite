@@ -274,7 +274,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                 // Puedes agregar más estilos aquí según tus necesidades
               }}
             >
-              Buscador de usuarios
+              Buscador de clientes
             </InputLabel>
             <Paper
               elevation={0} // Sin elevación para que el borde funcione

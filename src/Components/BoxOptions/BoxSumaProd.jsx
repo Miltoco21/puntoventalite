@@ -250,6 +250,7 @@ const BoxSumaProd = ({ venta }) => {
                   Buscador de productos
                 </InputLabel>
               </Grid>
+              ///PLU
               <Grid
                 item
                 xs={12}
