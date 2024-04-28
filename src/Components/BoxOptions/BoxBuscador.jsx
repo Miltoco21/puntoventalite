@@ -137,7 +137,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       ) {
         setSearchResults(response.data.clienteSucursal);
         updateSearchResults(response.data.clienteSucursal);
-        setSnackbarMessage(""); // Limpiar el mensaje del Snackbar si hay resultados
+        setSnackbarMessage("Resultados encontrados"); // Limpiar el mensaje del Snackbar si hay resultados
       } else {
         setSearchResults([]);
         updateSearchResults([]);
