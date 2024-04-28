@@ -213,7 +213,7 @@ const BoxSumaProd = ({ venta }) => {
   };
 
   return (
-    <Grid container item xs={12} md={12} lg={12}>
+    <Grid container item xs={12} md={5} lg={12}>
       <Paper
         elevation={13}
         sx={{
@@ -258,8 +258,8 @@ const BoxSumaProd = ({ venta }) => {
               <Grid
                 item
                 xs={12}
-                md={10}
-                lg={3}
+                md={12}
+                lg={12}
                 sx={{
                   margin: 1,
                   display: "flex",

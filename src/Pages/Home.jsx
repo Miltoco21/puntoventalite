@@ -27,16 +27,19 @@ const Home = () => {
           </Grid>
 
           {/* Main Content */}
-          <Grid item xs={12}>
+          <Grid item xs={12}
+          sm={12}
+          md={12}
+          lg={12}>
             <Grid container>
               {/* BoxDatosCaja */}
               <Grid
                 item
                 xs={12}
                 sm={12}
-                md={12}
-                lg={12}
-                style={{ position: "relative" }}
+                md={6}
+                lg={6}
+                // style={{ position: "relative" }}
               >
                 <BoxDatosCaja />
                 <BoxBuscador />

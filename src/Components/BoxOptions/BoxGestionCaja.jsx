@@ -461,7 +461,7 @@ const BoxGestionCaja = () => {
   const handleCloseStock = () => {
     setOpenStockDialog(false);
   };
- 
+
   const handleOpenPrecioCliente = () => {
     setOpenPreciosClienteDialog(true);
   };
@@ -510,22 +510,20 @@ const BoxGestionCaja = () => {
     setOpenDeudasDialog(false);
   };
   const handleOpenTicket = () => {
-
-
     if (Array.isArray(selectedUser)) {
       // Si no hay un usuario seleccionado, mostrar un mensaje de Snackbar
       setSnackbarMessage("No se puede emitir el documento TICKET sin cliente.");
       setSnackbarOpen(true);
     } else if (salesData.some((sale) => sale.quantity === 0)) {
       // Si hay al menos una cantidad igual a cero en salesData, mostrar un mensaje de Snackbar
-      setSnackbarMessage("La cantidad no puede ser igual a cero, favor revisar cantidad.");
+      setSnackbarMessage(
+        "La cantidad no puede ser igual a cero, favor revisar cantidad."
+      );
       setSnackbarOpen(true);
     } else {
       // Si todo está bien, abrir el modal
       setOpenBoletaDialog(true);
     }
-    
-    
   };
   const handleCloseTicket = () => {
     setOpenTicketDialog(false);
@@ -537,7 +535,9 @@ const BoxGestionCaja = () => {
       setSnackbarOpen(true);
     } else if (salesData.some((sale) => sale.quantity === 0)) {
       // Si hay al menos una cantidad igual a cero en salesData, mostrar un mensaje de Snackbar
-      setSnackbarMessage("La cantidad no puede ser igual a cero, favor revisar cantidad.");
+      setSnackbarMessage(
+        "La cantidad no puede ser igual a cero, favor revisar cantidad."
+      );
       setSnackbarOpen(true);
     } else {
       // Si todo está bien, abrir el modal
@@ -551,103 +551,110 @@ const BoxGestionCaja = () => {
   const handleOpenFacturaDialog = () => {
     if (Array.isArray(selectedUser)) {
       // Si no hay un usuario seleccionado, mostrar un mensaje de Snackbar
-      setSnackbarMessage("No se puede emitir el documento FACTURA sin cliente.");
+      setSnackbarMessage(
+        "No se puede emitir el documento FACTURA sin cliente."
+      );
       setSnackbarOpen(true);
     } else if (salesData.some((sale) => sale.quantity === 0)) {
       // Si hay al menos una cantidad igual a cero en salesData, mostrar un mensaje de Snackbar
-      setSnackbarMessage("La cantidad no puede ser igual a cero, favor revisar cantidad.");
+      setSnackbarMessage(
+        "La cantidad no puede ser igual a cero, favor revisar cantidad."
+      );
       setSnackbarOpen(true);
     } else {
       // Si todo está bien, abrir el modal
       setOpenBoletaDialog(true);
     }
-    
   };
   const handleCloseFacturaDialog = () => {
     setOpenFacturaDialog(false);
   };
 
   return (
-    <Paper
-      elevation={5}
-      sx={{
-        background: "#859398" /* fallback for old browsers */,
-        /* Chrome 10-25, Safari 5.1-6 */
+    <Grid container item xs={12} sm={12} md={11} lg={12} gap={1}>
+      <Paper
+        elevation={5}
+        sx={{
+          background: "#859398" /* fallback for old browsers */,
+          /* Chrome 10-25, Safari 5.1-6 */
 
-        display: "flex",
-        flexDirection: "column",
-        maxWidth: "1000px",
-        margin: "0 auto",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <Grid
-        container
-        spacing={2}
-        // sx={{ marginLeft: "5px", marginTop: "5px", }}
+          display: "flex",
+          flexDirection: "column",
+          margin: "1%",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={3}>
-          <Button
-            elevation={8}
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
-                color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleClearSalesData}
-          >
-            <Typography variant="h7">Borrar Ventas</Typography>
-          </Button>
-        </Grid>
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            disabled={true}
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
-                color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenStock}
-          >
-            {/* <EditIcon /> */}
-            <Typography variant="h7">Stock</Typography>
-          </Button>
-        </Grid>
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
-                color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenCategoria}
-          >
-            {/* <LockPersonIcon /> */}
-            <Typography variant="h7">Familias</Typography>
-          </Button>
-        </Grid>
+        <Grid
+          container
+          sx={{
+            margin: "1%",
+            justifyContent: "center",
+          }}
 
-        {/*  */}
-        {/* <Button
+          // sx={{ marginLeft: "5px", marginTop: "5px", }}
+        >
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={12}>
+            <Button
+              elevation={8}
+              sx={{
+                width: "97%",
+                height: "6rem",
+                backgroundColor: " #283048",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleClearSalesData}
+            >
+              <Typography variant="h7">Borrar Ventas</Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+            <Button
+              disabled={true}
+              sx={{
+                width: "97%",
+                height: "6rem",
+                backgroundColor: " #283048",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleOpenStock}
+            >
+              {/* <EditIcon /> */}
+              <Typography variant="h7">Stock</Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+            <Button
+              sx={{
+                width: "97%",
+                height: "6rem",
+                backgroundColor: " #283048",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleOpenCategoria}
+            >
+              {/* <LockPersonIcon /> */}
+              <Typography variant="h7">Familias</Typography>
+            </Button>
+          </Grid>
+
+          {/*  */}
+          {/* <Button
             sx={{
               width: "90%",
               height: "80px",
@@ -665,84 +672,84 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">Devolución</Typography>
           </Button> */}
 
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+            <Button
+              sx={{
+                width: "97%",
+                height: "7rem",
+                backgroundColor: " #283048",
                 color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenCrearProductoDialog}
-          >
-            <Typography variant="h7">Crear Producto</Typography>
-          </Button>
-        </Grid>
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleOpenCrearProductoDialog}
+            >
+              <Typography variant="h7">Crear Producto</Typography>
+            </Button>
+          </Grid>
 
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+            <Button
+              sx={{
+                width: "97%",
+                height: "7rem",
+                backgroundColor: " #283048",
                 color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenIngreso}
-          >
-            {/* <CoffeeIcon /> */}
-            <Typography variant="h7">Crear Cliente</Typography>
-          </Button>
-        </Grid>
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleOpenIngreso}
+            >
+              {/* <CoffeeIcon /> */}
+              <Typography variant="h7">Crear Cliente</Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+            <Button
+              sx={{
+                width: "97%",
+                height: "7rem",
+                backgroundColor: " #283048",
                 color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenDeudasDialog}
-          >
-            {/* <CoffeeIcon /> */}
-            <Typography variant="h7">Deudas</Typography>
-          </Button>
-        </Grid>
-        <Grid item xs={6} sm={4} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: " #283048",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "#1c1b17 ",
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleOpenDeudasDialog}
+            >
+              {/* <CoffeeIcon /> */}
+              <Typography variant="h7">Deudas</Typography>
+            </Button>
+          </Grid>
+          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+            <Button
+              sx={{
+                width: "97%",
+                height: "7rem",
+                backgroundColor: " #283048",
                 color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenPrecioCliente}
-          >
-            {/* <CoffeeIcon /> */}
-            <Typography variant="h7">Precios</Typography>
-          </Button>
-        </Grid>
+                "&:hover": {
+                  backgroundColor: "#1c1b17 ",
+                  color: "white",
+                },
+                margin:"1%"
+              }}
+              onClick={handleOpenPrecioCliente}
+            >
+              {/* <CoffeeIcon /> */}
+              <Typography variant="h7">Precios</Typography>
+            </Button>
+          </Grid>
 
-        {/* <Grid item xs={6} sm={6} md={4} lg={3} xl={2}>
+          {/* <Grid item xs={6} sm={6} md={4} lg={3} xl={2}>
           <Button
             sx={{
               width: "100px",
@@ -759,290 +766,290 @@ const BoxGestionCaja = () => {
             <Typography variant="h7">otro </Typography>
           </Button>
         </Grid> */}
-        <Grid item xs={12} sm={10} md={12} lg={12} xl={10}>
-          <Grid>
-            <Box
-              sx={{
-                borderRadius: "8px",
-                border: "4px solid #ccc",
-                display: "flex",
+          <Grid item xs={12} sm={10} md={12} lg={12} xl={10}>
+            <Grid>
+              <Box
+                sx={{
+                  borderRadius: "8px",
+                  border: "4px solid #ccc",
+                  display: "flex",
 
-                //   justifyContent: "center",
-                margin: "5px",
-              }}
-            >
-              <Grid container item xs={12}>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    margin: "6px",
-                    color: "#E1213B",
-                    backgroundColor: "#ffffff",
-
-                    borderRadius: "5px",
-                  }}
-                >
-                  <p
-                    style={{
+                  //   justifyContent: "center",
+                }}
+              >
+                <Grid container item xs={12}>
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{
                       margin: "6px",
-                      fontSize: "36px",
-                      fontWeight: "bold",
-                      fontFamily: "Victor Mono",
+                      color: "#E1213B",
+                      backgroundColor: "#ffffff",
+
+                      borderRadius: "5px",
                     }}
                   >
-                    TOTAL:$
-                    <span
+                    <p
                       style={{
-                        color: "#00878889",
-                        fontSize: "24px",
+                        margin: "6px",
+                        fontSize: "36px",
                         fontWeight: "bold",
+                        fontFamily: "Victor Mono",
                       }}
                     >
+                      TOTAL:$
                       <span
                         style={{
-                          height: "600%",
-                          color: "#E1213B",
-                          fontSize: "36px",
-                          fontFamily: "Victor Mono",
-
-                          fontWeight: "700",
+                          color: "#00878889",
+                          fontSize: "24px",
+                          fontWeight: "bold",
                         }}
                       >
-                        {" "}
-                        {grandTotal.toLocaleString("es-ES")}
+                        <span
+                          style={{
+                            height: "600%",
+                            color: "#E1213B",
+                            fontSize: "36px",
+                            fontFamily: "Victor Mono",
+
+                            fontWeight: "700",
+                          }}
+                        >
+                          {" "}
+                          {grandTotal.toLocaleString("es-ES")}
+                        </span>{" "}
                       </span>{" "}
-                    </span>{" "}
-                  </p>
-                </Grid>
+                    </p>
+                  </Grid>
 
-                <Grid
-                  item
-                  xs={4}
-                  sx={{ display: "flex", justifyContent: "center" }}
-                >
-                  <Button
-                    sx={{
-                      margin: "7px",
-                      width: "80%",
-                      height: "60px",
-                      background:
-                        "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                      color: "black",
-                      "&:hover": {
-                        backgroundColor: "red",
-                        color: "white",
-                      },
-                    }}
-                    onClick={handleOpenBoletaDialog}
-                    // onClick={() => handleNavigationChange(null, 12)}
+                  <Grid
+                    item
+                    xs={4}
+                    sx={{ display: "flex", justifyContent: "center" }}
                   >
-                    <Typography variant="h7"> Boleta</Typography>
-                  </Button>
-                </Grid>
-                <Grid item xs={4}>
-                  <Button
-                    sx={{
-                      margin: "7px",
-                      width: "80%",
-                      height: "60px",
-                      background:
-                        "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                      color: "black",
-                      "&:hover": {
-                        backgroundColor: "red",
-                        color: "white",
-                      },
-                    }}
-                    onClick={handleOpenFacturaDialog}
-                    // onClick={() => handleNavigationChange(null, 12)}
-                  >
-                    <Typography variant="h7">Factura</Typography>
-                  </Button>
-                </Grid>
-                <Grid item xs={4}>
-                  <Button
-                    sx={{
-                      margin: "7px",
-                      width: "80%",
-                      height: "60px",
-                      background:
-                        "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                      color: "black",
-                      "&:hover": {
-                        backgroundColor: "red",
-                        color: "white",
-                      },
-                    }}
-                    onClick={() => {
-                      console.log("Botón de Ticket presionado");
-                      handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
-                    }}
+                    <Button
+                      sx={{
+                        margin: "7px",
+                        width: "80%",
+                        height: "60px",
+                        background:
+                          "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                        color: "black",
+                        "&:hover": {
+                          backgroundColor: "red",
+                          color: "white",
+                        },
+                      }}
+                      onClick={handleOpenBoletaDialog}
+                      // onClick={() => handleNavigationChange(null, 12)}
+                    >
+                      <Typography variant="h7"> Boleta</Typography>
+                    </Button>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button
+                      sx={{
+                        margin: "7px",
+                        width: "80%",
+                        height: "60px",
+                        background:
+                          "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                        color: "black",
+                        "&:hover": {
+                          backgroundColor: "red",
+                          color: "white",
+                        },
+                      }}
+                      onClick={handleOpenFacturaDialog}
+                      // onClick={() => handleNavigationChange(null, 12)}
+                    >
+                      <Typography variant="h7">Factura</Typography>
+                    </Button>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Button
+                      sx={{
+                        margin: "7px",
+                        width: "80%",
+                        height: "60px",
+                        background:
+                          "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+                        color: "black",
+                        "&:hover": {
+                          backgroundColor: "red",
+                          color: "white",
+                        },
+                      }}
+                      onClick={() => {
+                        console.log("Botón de Ticket presionado");
+                        handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
+                      }}
 
-                    // onClick={() => handleNavigationChange(null, 12)}
-                  >
-                    <Typography variant="h7">Ticket</Typography>
-                  </Button>
+                      // onClick={() => handleNavigationChange(null, 12)}
+                    >
+                      <Typography variant="h7">Ticket</Typography>
+                    </Button>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Box>
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
           onClose={() => setSnackbarOpen(false)}
-          severity="error"
-          sx={{ width: "100%" }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
 
-      <Dialog open={openCategoria} onClose={handleCloseCategoria}>
-        <DialogContent>
-          <BotonesCategorias onClose={handleCloseCategoria} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseCategoria}>cerrar</Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={openCategoria} onClose={handleCloseCategoria}>
+          <DialogContent>
+            <BotonesCategorias onClose={handleCloseCategoria} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseCategoria}>cerrar</Button>
+          </DialogActions>
+        </Dialog>
 
-      <Dialog
-        sx={{ width: "100%" }}
-        open={openDialog}
-        onClose={handleCloseDialog}
-      >
-        <DialogContent sx={{ width: "100%" }}>
-          <BoxPago />
-        </DialogContent>
-      </Dialog>
+        <Dialog
+          sx={{ width: "100%" }}
+          open={openDialog}
+          onClose={handleCloseDialog}
+        >
+          <DialogContent sx={{ width: "100%" }}>
+            <BoxPago />
+          </DialogContent>
+        </Dialog>
 
-      <Dialog
-        sx={{ width: "100%" }}
-        open={openTicketDialog}
-        onCloseTicket={handleCloseTicket}
-      >
-        <DialogContent sx={{ width: "100%" }}>
-          <BoxPagoTicket onCloseTicket={handleCloseTicket} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseTicket}>cerrar</Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog
+          sx={{ width: "100%" }}
+          open={openTicketDialog}
+          onCloseTicket={handleCloseTicket}
+        >
+          <DialogContent sx={{ width: "100%" }}>
+            <BoxPagoTicket onCloseTicket={handleCloseTicket} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseTicket}>cerrar</Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Dialog for entering description */}
+        {/* Dialog for entering description */}
 
-      <Snackbar
-        open={openSuccessSnackbar}
-        autoHideDuration={5000}
-        onClose={handleCloseSuccessSnackbar}
-      >
-        <Alert onClose={handleCloseSuccessSnackbar} severity="success">
-          {successMessage}
-        </Alert>
-      </Snackbar>
+        <Snackbar
+          open={openSuccessSnackbar}
+          autoHideDuration={5000}
+          onClose={handleCloseSuccessSnackbar}
+        >
+          <Alert onClose={handleCloseSuccessSnackbar} severity="success">
+            {successMessage}
+          </Alert>
+        </Snackbar>
 
-      <Dialog open={openRecoveryDialog} onClose={handleCloseRecoveryDialog}>
-        <DialogTitle>Seleccionar Venta</DialogTitle>
-        <DialogContent>
-          <BoxRecuperarVenta onClose={handleCloseRecoveryDialog} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseRecoveryDialog}>cerrar</Button>
-          <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={openRecoveryDialog} onClose={handleCloseRecoveryDialog}>
+          <DialogTitle>Seleccionar Venta</DialogTitle>
+          <DialogContent>
+            <BoxRecuperarVenta onClose={handleCloseRecoveryDialog} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseRecoveryDialog}>cerrar</Button>
+            <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
+          </DialogActions>
+        </Dialog>
 
-      <Dialog
-        open={openPreciosClienteDialog}
-        onClose={handleClosePrecioCliente}
-      >
-        <DialogTitle>Precios Clientes</DialogTitle>
-        <DialogContent>
-          <BoxPreciosClientes
-            onClosePreciosClientes={handleClosePrecioCliente}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePrecioCliente}>cerrar</Button>
-          {/* <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button> */}
-        </DialogActions>
-      </Dialog>
+        <Dialog
+          open={openPreciosClienteDialog}
+          onClose={handleClosePrecioCliente}
+        >
+          <DialogTitle>Precios Clientes</DialogTitle>
+          <DialogContent>
+            <BoxPreciosClientes
+              onClosePreciosClientes={handleClosePrecioCliente}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClosePrecioCliente}>cerrar</Button>
+            {/* <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button> */}
+          </DialogActions>
+        </Dialog>
 
-      <Dialog open={openDevolucionDialog} onClose={handleCloseDevolucion}>
-        <DialogTitle>Devolución</DialogTitle>
-        <DialogContent>
-          <BoxDevolucion onClose={handleCloseDevolucion} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDevolucion}>cerrar</Button>
-          <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
-        <DialogTitle>Crear Cliente</DialogTitle>
-        <DialogContent>
-          <IngresoClientes onClose={handleCloseIngreso} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseIngreso}>cerrar</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openStockDialog} onClose={handleCloseStock}>
-        <DialogTitle>Stock</DialogTitle>
-        <DialogContent>
-          <BoxStock onClose={handleCloseStock} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseStock}>cerrar</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog
-        open={openCrearProductoDialog}
-        onClose={handleCloseCrearProductoDialog}
-      >
-        <DialogTitle>Crear Producto</DialogTitle>
-        <DialogContent>
-          <StepperSI onClose={handleCloseCrearProductoDialog} />
-          {/* Aquí puedes colocar el formulario para crear un nuevo producto */}
-          {/* Por ejemplo, campos para nombre, precio, descripción, etc. */}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseCrearProductoDialog}>Cerrar</Button>
-          {/* <Button onClick={handleCrearProducto}>Crear</Button> */}
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
-        <DialogContent onClose={handleCloseDeudasDialog}>
-          <BoxCtaCorriente onClose={handleCloseDeudasDialog} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={openDevolucionDialog} onClose={handleCloseDevolucion}>
+          <DialogTitle>Devolución</DialogTitle>
+          <DialogContent>
+            <BoxDevolucion onClose={handleCloseDevolucion} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDevolucion}>cerrar</Button>
+            <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
+          <DialogTitle>Crear Cliente</DialogTitle>
+          <DialogContent>
+            <IngresoClientes onClose={handleCloseIngreso} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseIngreso}>cerrar</Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={openStockDialog} onClose={handleCloseStock}>
+          <DialogTitle>Stock</DialogTitle>
+          <DialogContent>
+            <BoxStock onClose={handleCloseStock} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseStock}>cerrar</Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={openCrearProductoDialog}
+          onClose={handleCloseCrearProductoDialog}
+        >
+          <DialogTitle>Crear Producto</DialogTitle>
+          <DialogContent>
+            <StepperSI onClose={handleCloseCrearProductoDialog} />
+            {/* Aquí puedes colocar el formulario para crear un nuevo producto */}
+            {/* Por ejemplo, campos para nombre, precio, descripción, etc. */}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseCrearProductoDialog}>Cerrar</Button>
+            {/* <Button onClick={handleCrearProducto}>Crear</Button> */}
+          </DialogActions>
+        </Dialog>
+        <Dialog open={openDeudasDialog} onClose={handleCloseDeudasDialog}>
+          <DialogContent onClose={handleCloseDeudasDialog}>
+            <BoxCtaCorriente onClose={handleCloseDeudasDialog} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>
+          </DialogActions>
+        </Dialog>
 
-      <Dialog open={openBoletaDialog} onClose={handleCloseBoletaDialog}>
-        <DialogContent onClose={handleCloseBoletaDialog}>
-          <BoxBoleta onClose={handleCloseBoletaDialog} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseBoletaDialog}>Cerrar</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openFacturaDialog} onClose={handleCloseFacturaDialog}>
-        <DialogContent onClose={handleCloseFacturaDialog}>
-          <Boxfactura onClose={handleCloseFacturaDialog} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseFacturaDialog}>Cerrar</Button>
-        </DialogActions>
-      </Dialog>
-    </Paper>
+        <Dialog open={openBoletaDialog} onClose={handleCloseBoletaDialog}>
+          <DialogContent onClose={handleCloseBoletaDialog}>
+            <BoxBoleta onClose={handleCloseBoletaDialog} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseBoletaDialog}>Cerrar</Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={openFacturaDialog} onClose={handleCloseFacturaDialog}>
+          <DialogContent onClose={handleCloseFacturaDialog}>
+            <Boxfactura onClose={handleCloseFacturaDialog} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseFacturaDialog}>Cerrar</Button>
+          </DialogActions>
+        </Dialog>
+      </Paper>
+    </Grid>
   );
 };
 
