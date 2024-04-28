@@ -148,6 +148,7 @@ const BoxSumaProd = ({ venta }) => {
   const handleSearchSuccess = (response, searchType) => {
     if (response.data && response.data.cantidadRegistros > 0) {
       setSearchedProducts(response.data.productos);
+      console.log("Productos encontrados",response.data.productos)
       setSearchTerm("");
       setOpenSnackbar(true);
       setErrorMessage(`Productos encontrados (${searchType})`);
@@ -169,25 +170,28 @@ const BoxSumaProd = ({ venta }) => {
     }
   };
 
-  const handleAddSelectedProduct = (product) => {
-    addToSalesData(product, quantity);
-    setSearchedProducts([]); // Limpiar los productos buscados después de agregar uno
-  };
-
-  // const handleAddProductToSales = (product) => {
-  //   if (product) {
-  //     addToSalesData(product, quantity); // Agregar el producto seleccionado a salesData con la cantidad actual
-  //     setQuantity(1); // Restablecer la cantidad a 1 después de agregar el producto
-  //   }
+  // const handleAddSelectedProduct = (product) => {
+  //   addToSalesData(product);
+  //   setSearchedProducts([]); // Limpiar los productos buscados después de agregar uno
   // };
+
+  const handleAddProductToSales = (product,quantity) => {
+    console.log("Productos agregados", product);
+    if (product) {
+      // Agregar el producto seleccionado a salesData con la cantidad 1
+      addToSalesData(product, quantity);
+      // Restablecer la cantidad a 1 después de agregar el producto
+      
+    }
+    setSearchedProducts([]);
+  };
 
   const handleClearSalesData = () => clearSalesData();
   const handleKeyDown = (event, field) => {
     // Verificar en qué campo se está escribiendo
     if (
-      field === "precioCosto" ||
-      field === "precioVenta" ||
-      field === "stockInicial"
+      field === "cantidad" 
+  
     ) {
       // Permitir solo dígitos numéricos y la tecla de retroceso
       // Excluir caracteres no numéricos y caracteres especiales específicos
@@ -200,14 +204,14 @@ const BoxSumaProd = ({ venta }) => {
       }
     }
   };
-  const handleChange = (event, field) => {
-    // Asegurar que el valor solo contenga números
-    // Eliminar caracteres especiales específicos
-    const newValue = event.target.value.replace(/[^0-9]/g, "");
-    if (field === "precio") {
-      setPrecioCosto(newValue);
-    }
+
+  const handleQuantityChange = (event, index) => {
+    const newValue = event.target.value;
+    const updatedSalesData = [...salesData];
+    updatedSalesData[index].quantity = newValue === "" ? 0 : parseInt(newValue);
+    setSalesData(updatedSalesData);
   };
+
   return (
     <Grid container item xs={12} md={12} lg={12}>
       <Paper
@@ -250,7 +254,7 @@ const BoxSumaProd = ({ venta }) => {
                   Buscador de productos
                 </InputLabel>
               </Grid>
-              ///PLU
+              {/* ///PLU */}
               <Grid
                 item
                 xs={12}
@@ -389,15 +393,19 @@ const BoxSumaProd = ({ venta }) => {
                   <TableBody>
                     {searchedProducts.map((product) => (
                       <TableRow key={product.id}>
-                        <TableCell>{product.nombre}</TableCell>
+                        <TableCell sx={{ width: "21%" }}> {product.nombre}</TableCell>
                         <TableCell sx={{ width: "21%" }}>
                           Plu:{""}
                           {product.idProducto}
+                      
                         </TableCell>
+                        <TableCell sx={{ width: "21%" }}>  Precio:
+                          {product.precioVenta}</TableCell>
 
                         <TableCell>
                           <Button
-                            onClick={() => handleAddSelectedProduct(product)}
+                           
+                          onClick={() =>  handleAddProductToSales(product)}
                             variant="contained"
                             color="secondary"
                           >
@@ -439,19 +447,12 @@ const BoxSumaProd = ({ venta }) => {
                   {salesData.map((sale, index) => (
                     <TableRow key={index} sx={{ height: "20%" }}>
                       <TableCell sx={{ display: "flex", alignItems: "center" }}>
-                        <TextField
-                          name="precio"
-                          onKeyDown={(event) => handleKeyDown(event, "precio")}
-                          value={sale.precio}
-                          onChange={(event) => {
-                            const newValue = event.target.value;
-                            // Validar si el nuevo valor es un número positivo
-                            if (/^\d+$/.test(newValue) && newValue >= 0) {
-                              const updatedSalesData = [...salesData];
-                              updatedSalesData[index].precio = newValue;
-                              setSalesData(updatedSalesData);
-                            }
-                          }}
+                      <TextField
+                          name="cantidad"
+                          onKeyDown={(event) => handleKeyDown(event, "cantidad")}
+                          value={sale.quantity === 0 ? "" : sale.quantity}
+                          onChange={(event) => handleQuantityChange(event, index)}
+
                           style={{ width: 84 }}
                           inputProps={{
                             inputMode: "numeric", // Establece el modo de entrada como numérico

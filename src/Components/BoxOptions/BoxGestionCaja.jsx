@@ -513,13 +513,18 @@ const BoxGestionCaja = () => {
 
 
     if (Array.isArray(selectedUser)) {
-      setSnackbarMessage("No se puede emitir el documento TICKET  sin usuario.");
-      console.log("No se puede emitir el documento TICKET sin usuario.");
-      console.log(selectedUser);
+      // Si no hay un usuario seleccionado, mostrar un mensaje de Snackbar
+      setSnackbarMessage("No se puede emitir el documento TICKET sin cliente.");
+      setSnackbarOpen(true);
+    } else if (salesData.some((sale) => sale.quantity === 0)) {
+      // Si hay al menos una cantidad igual a cero en salesData, mostrar un mensaje de Snackbar
+      setSnackbarMessage("La cantidad no puede ser igual a cero, favor revisar cantidad.");
       setSnackbarOpen(true);
     } else {
-      setOpenTicketDialog(true);
+      // Si todo está bien, abrir el modal
+      setOpenBoletaDialog(true);
     }
+    
     
   };
   const handleCloseTicket = () => {
@@ -527,11 +532,15 @@ const BoxGestionCaja = () => {
   };
   const handleOpenBoletaDialog = () => {
     if (Array.isArray(selectedUser)) {
-      setSnackbarMessage("No se puede emitir el documento BOLETA sin usuario.");
-      console.log("No se puede emitir el documento BOLETA sin usuario.");
-      console.log(selectedUser);
+      // Si no hay un usuario seleccionado, mostrar un mensaje de Snackbar
+      setSnackbarMessage("No se puede emitir el documento BOLETA sin cliente.");
+      setSnackbarOpen(true);
+    } else if (salesData.some((sale) => sale.quantity === 0)) {
+      // Si hay al menos una cantidad igual a cero en salesData, mostrar un mensaje de Snackbar
+      setSnackbarMessage("La cantidad no puede ser igual a cero, favor revisar cantidad.");
       setSnackbarOpen(true);
     } else {
+      // Si todo está bien, abrir el modal
       setOpenBoletaDialog(true);
     }
   };
@@ -541,13 +550,18 @@ const BoxGestionCaja = () => {
 
   const handleOpenFacturaDialog = () => {
     if (Array.isArray(selectedUser)) {
-      setSnackbarMessage("No se puede emitir el documento FACTURA  sin usuario.");
-      console.log("No se puede emitir el documento FACTURA sin usuario.");
-      console.log(selectedUser);
+      // Si no hay un usuario seleccionado, mostrar un mensaje de Snackbar
+      setSnackbarMessage("No se puede emitir el documento FACTURA sin cliente.");
+      setSnackbarOpen(true);
+    } else if (salesData.some((sale) => sale.quantity === 0)) {
+      // Si hay al menos una cantidad igual a cero en salesData, mostrar un mensaje de Snackbar
+      setSnackbarMessage("La cantidad no puede ser igual a cero, favor revisar cantidad.");
       setSnackbarOpen(true);
     } else {
-      setOpenFacturaDialog(true);
+      // Si todo está bien, abrir el modal
+      setOpenBoletaDialog(true);
     }
+    
   };
   const handleCloseFacturaDialog = () => {
     setOpenFacturaDialog(false);
