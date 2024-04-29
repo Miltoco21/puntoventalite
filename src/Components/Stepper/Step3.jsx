@@ -36,7 +36,8 @@ const Step3Component = ({ data, onNext, stepData }) => {
   const [openDialog1, setOpenDialog1] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
 
   console.log("data:", data);
  
@@ -106,16 +107,16 @@ const Step3Component = ({ data, onNext, stepData }) => {
 
       // Manejar la respuesta de la API
       console.log("Response:", response);
-      if (response.data.statusCode === 201) {
-        setSnackbarMessage("Producto guardado exitosamente");
-        setSnackbarOpen(true);
+      if (response.status === 200) {
+        setEmptyFieldsMessage("Producto guardado exitosamente");
+        setOpenSnackbar(true);
       }
 
       // Llamar a la función onNext para continuar con el siguiente paso
       onNext(requestData, 3);
     } catch (error) {
       setSnackbarMessage("Error al guardar el producto");
-      setSnackbarOpen(true);
+      setOpenSnackbar(true);
       console.error("Error:", error);
     } finally {
       setLoading(false);
@@ -123,7 +124,7 @@ const Step3Component = ({ data, onNext, stepData }) => {
   };
 
   const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
+    setOpenSnackbar(false);
   };
   const handleOpenDialog1 = () => {
     setOpenDialog1(true);
@@ -167,8 +168,8 @@ const Step3Component = ({ data, onNext, stepData }) => {
       setEmptyFieldsMessage("Favor completar precio de costo.");
       return false;
     }
-    if (precioCosto === 0 ) {
-      setEmptyFieldsMessage(" Precio de costo no puede ser cero.");
+    if (isNaN(parseFloat(precioCosto)) || parseFloat(precioCosto) === 0) {
+      setEmptyFieldsMessage("El precio de costo no puede ser cero.");
       return false;
     }
   
@@ -176,13 +177,21 @@ const Step3Component = ({ data, onNext, stepData }) => {
       setEmptyFieldsMessage("Favor completar precio de venta.");
       return false;
     }
-    if (precioVenta === 0 ) {
-      setEmptyFieldsMessage(" Precio de venta no puede ser cero.");
+    if (isNaN(parseFloat(precioVenta)) || parseFloat(precioVenta) === 0) {
+      setEmptyFieldsMessage("El precio de venta no puede ser cero.");
+      return false;
+    }
+    if (parseFloat(precioVenta) < parseFloat(precioCosto)) {
+      setEmptyFieldsMessage("El precio de venta debe ser al menos igual al precio de costo.");
       return false;
     }
   
     if (stockInicial === "") {
       setEmptyFieldsMessage("Favor completar Stock Inicial.");
+      return false;
+    }
+    if (isNaN(parseFloat(stockInicial)) || parseFloat(stockInicial) === 0) {
+      setEmptyFieldsMessage("El stock inicial no puede ser cero.");
       return false;
     }
   
@@ -359,13 +368,14 @@ const Step3Component = ({ data, onNext, stepData }) => {
             </Box>
           </Grid>
         </Grid>
-      </form>
-      <Snackbar
-        open={snackbarOpen}
+        <Snackbar
+         open={openSnackbar}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        message={snackbarMessage}
+        message={emptyFieldsMessage}
       />
+      </form>
+     
       <Dialog open={openDialog1} onClose={handleCloseDialog1}>
         <DialogTitle>Crear Unidad de Compra</DialogTitle>
         <DialogContent sx={{ marginTop: "9px" }}>

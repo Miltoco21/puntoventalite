@@ -411,6 +411,11 @@ const IngresoClientes = ({ onClose }) => {
         setRutError("");
       }
       setRutError("");
+      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.nombre.trim()) || /^\s{1,}/.test(formData.nombre)) {
+        setRutError("Ingrese nombre válido.");
+        return false;
+      }
+
       if (formData.apellido === "") {
         setRutError(
           `El campo apellido está vacío. Por favor completa todos los campos antes de enviar el formulario.`
@@ -418,6 +423,10 @@ const IngresoClientes = ({ onClose }) => {
         return;
       } else {
         setRutError("");
+      }
+      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.apellido.trim()) || /^\s{1,}/.test(formData.apellido)) {
+        setRutError("Ingrese apellido válido.");
+        return false;
       }
       setRutError("");
       if (formData.direccion === "") {
@@ -429,23 +438,34 @@ const IngresoClientes = ({ onClose }) => {
         setRutError("");
       }
       setRutError("");
+
+      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.direccion.trim()) || /^\s{1,}/.test(formData.direccion)) {
+        setRutError("Ingrese dirección válida.");
+        return false;
+      }
+      setRutError("");
+
       if (formData.telefono === "") {
         setRutError(
           `El campo teléfono está vacío. Por favor completa todos los campos antes de enviar el formulario.`
         );
         return;
+      } 
+     
+       if (parseFloat(formData.telefono) === 0) {
+        setRutError("El telefono no puede ser cero.");
+      return false;
+    }
+      if (formData.region === "") {
+        setRutError(
+          `El campo region está vacío. Por favor completa todos los campos antes de enviar el formulario.`
+        );
+        return;
       } else {
         setRutError("");
-        if (formData.region === "") {
-          setRutError(
-            `El campo región está vacío. Por favor completa todos los campos antes de enviar el formulario.`
-          );
-          return;
-        } else {
-          setRutError("");
-        }
-        setRutError("");
       }
+      setRutError("");
+       
       setRutError("");
       if (formData.comuna === "") {
         setRutError(
@@ -482,6 +502,13 @@ const IngresoClientes = ({ onClose }) => {
       }
       setRutError("");
 
+      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.giro.trim()) || /^\s{1,}/.test(formData.direcc)) {
+        setRutError("Ingrese giro válido.");
+        return false;
+      }
+      setRutError("");
+      
+
       if (formData.urlPagina === "") {
         setRutError(
           `El campo Url de página está vacío. Por favor completa todos los campos antes de enviar el formulario.`
@@ -505,6 +532,12 @@ const IngresoClientes = ({ onClose }) => {
         setRutError("");
       }
       setRutError("");
+
+      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.formaPago.trim()) || /^\s{1,}/.test(formData.direcc)) {
+        setRutError("Ingrese forma de pago válida.");
+        return false;
+      }
+      setRutError("");
       if (formData.razonSocial === "") {
         setRutError(
           `El campo razón social está vacío. Por favor completa todos los campos antes de enviar el formulario.`
@@ -513,7 +546,10 @@ const IngresoClientes = ({ onClose }) => {
       } else {
         setRutError("");
       }
-      setRutError("");
+      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.razonSocial.trim()) || /^\s{1,}/.test(formData.direcc)) {
+        setRutError("Ingrese razón social válida.");
+        return false;
+      }
 
       setLoading(true);
 

@@ -522,7 +522,7 @@ const BoxGestionCaja = () => {
       setSnackbarOpen(true);
     } else {
       // Si todo está bien, abrir el modal
-      setOpenBoletaDialog(true);
+      setOpenTicketDialog(true);
     }
   };
   const handleCloseTicket = () => {

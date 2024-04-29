@@ -95,8 +95,18 @@ const Step1Component = ({ data, onNext, setStepData }) => {
       setEmptyFieldsMessage("Favor completar nombre.");
       return false;
     }
+    if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(nombre.trim()) || /^\s{1,}/.test(nombre)) {
+      setEmptyFieldsMessage("Ingrese nombre válido.");
+      return false;
+    }
+    
+    
     if (marca==="") {
       setEmptyFieldsMessage("Favor completar marca.");
+      return false;
+    }
+    if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(marca.trim()) || /^\s{1,}/.test(marca)) {
+      setEmptyFieldsMessage("Ingrese marca válida.");
       return false;
     }
 
@@ -109,19 +119,7 @@ const Step1Component = ({ data, onNext, setStepData }) => {
   };
   
 
-  // const validateFields = () => {
-  //   if (
-
-  //     !nombre ||
-  //     !marca
-  //   ) {
-  //     setEmptyFieldsMessage("Todos los campos son obligatorios.");
-  //   } else {
-  //     setEmptyFieldsMessage(""); // Si todos los campos están llenos, limpiar el mensaje de error
-  //   }
-  // };
-
-  // Llamamos a la función validateFields cada vez que cambie uno de los estados relevantes
+ 
 
   const handleNext = () => {
     const isValid = validateFields();
@@ -139,23 +137,8 @@ const Step1Component = ({ data, onNext, setStepData }) => {
       onNext();
     }
   };
-  // const handleNext = () => {
-  //   validateFields();
-  //   const step1Data = {
-  //     selectedCategoryId,
-  //     selectedSubCategoryId,
-  //     selectedFamilyId,
-  //     selectedSubFamilyId,
-  //     marca,
-  //     nombre,
-  //   };
-  //   setStepData((prevData) => ({ ...prevData, ...step1Data }));
-  //   onNext();
-  // };
-
-  // const handleOpenDialog1 = () => {
-  //   setOpenDialog1(true);
-  // };
+  
+  
   const handleCloseDialog1 = () => {
     setOpenDialog1(false);
   };
@@ -301,9 +284,41 @@ const Step1Component = ({ data, onNext, setStepData }) => {
   }, [selectedFamilyId, selectedCategoryId, selectedSubCategoryId]);
 
   const handleKeyDown = (event, field) => {
-
+    const handleKeyDown = (event, field) => {
+      if (field === "nombre" ) {
+        const regex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9\s]+$/;// Al menos un carácter alfanumérico
+        if (
+          !regex.test(event.key) &&
+          event.key !== "Backspace" &&
+          event.key !== " "
+        ) {
+          event.preventDefault();
+          setEmptyFieldsMessage("El nombre no puede consistir únicamente en espacios en blanco.");
+          setSnackbarOpen(true);
+        }
+      }
+      if ( field === "marca") {
+        const regex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9\s]*$/; // Al menos un carácter alfanumérico
+        if (
+          !regex.test(event.key) &&
+          event.key !== "Backspace" &&
+          event.key !== " "
+        ) {
+          event.preventDefault();
+          setEmptyFieldsMessage("La marca no puede consistir únicamente en espacios en blanco.");
+          setSnackbarOpen(true);
+        }
+      }
+      
+      if (field === "telefono") {
+        if (event.key === "-" && formData.telefono === "") {
+          event.preventDefault();
+        }
+      }
+    };
+  
     // if (field === "nombre" || field === "marca") {
-    //   const regex = /^[a-zA-Z\s]*$/; // Permitir letras y espacios en blanco
+    //   const regex = /^[a-zA-Z0-9\s]*$/; // Permitir letras, números y espacios en blanco
     //   if (
     //     !regex.test(event.key) &&
     //     event.key !== "Backspace" &&
@@ -312,28 +327,7 @@ const Step1Component = ({ data, onNext, setStepData }) => {
     //     event.preventDefault();
     //   }
     // }
-    if (field === "nombre" || field === "marca") {
-      const regex = /^[a-zA-Z0-9\s]*$/; // Permitir letras, números y espacios en blanco
-      if (
-        !regex.test(event.key) &&
-        event.key !== "Backspace" &&
-        event.key !== " "
-      ) {
-        event.preventDefault();
-      }
-    }
-    // if (field === "marca") {
-    //   const regex = /^[a-zA-Z]*$/;
-    //   if (!regex.test(event.key) && event.key !== "Backspace") {
-    //     event.preventDefault();
-    //   }
-    // }
-    // if (field === "nombre") {
-    //   const regex = /^[a-zA-Z]*$/;
-    //   if (!regex.test(event.key) && event.key !== "Backspace") {
-    //     event.preventDefault();
-    //   }
-    // }
+    
     if (field === "telefono") {
       // Validar si la tecla presionada es un signo menos
       if (event.key === "-" && formData.telefono === "") {
