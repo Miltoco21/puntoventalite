@@ -156,7 +156,7 @@ const BoxCtaCorriente = ({ onClose }) => {
   const handleTransferenciaModalOpen = () => {
     setMetodoPago("TRANSFERENCIA"); // Establece el método de pago como "Transferencia"
     setOpenTransferenciaModal(true);
-    setMontoPagado(getTotalSelected());
+    setCantidadPagada(getTotalSelected());
   };
 
   const handleTransferenciaModalClose = () => {
@@ -192,7 +192,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     setOpenDialog(true);
     setSelectedDebts(ventaData.filter((deuda) => deuda.selected));
 
-    setMontoPagado(getTotalSelected());
+    setCantidadPagada(getTotalSelected());
   };
   const handleCheckboxChange = (index) => {
     const updatedVentaData = [...ventaData];
@@ -209,7 +209,7 @@ const BoxCtaCorriente = ({ onClose }) => {
   const handleClosePaymentDialog = () => {
     setOpenDialog(false);
 
-    setMontoPagado(0); // Reiniciar el valor del monto a pagar al cerrar el diálogo
+    setCantidadPagada(0); // Reiniciar el valor del monto a pagar al cerrar el diálogo
     setMetodoPago("");
   };
   const validarRutChileno = (rut) => {
@@ -388,9 +388,10 @@ const BoxCtaCorriente = ({ onClose }) => {
     return fecha.toLocaleDateString("es-CL");
   };
   const calcularVuelto = () => {
-    const cambio = cantidadPagada - grandTotal;
+    const cambio = cantidadPagada - getTotalSelected();
     return cambio > 0 ? cambio : 0;
   };
+
   const handleKeyDown = (event, field) => {
     if (field === "marca") {
       const regex = /^[a-zA-Z]*$/;
@@ -531,8 +532,8 @@ const BoxCtaCorriente = ({ onClose }) => {
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda </DialogTitle>
         <DialogContent>
-          <Grid container spacing={2} item xs={12} md={12} lg={6}>
-            <Grid item xs={12} md={6} lg={6}>
+          <Grid container spacing={2} item xs={12} md={6} lg={12}>
+            <Grid item xs={12} md={12} lg={6}>
               {error && (
                 <Grid item xs={12}>
                   <Typography variant="body1" color="error">
@@ -545,13 +546,14 @@ const BoxCtaCorriente = ({ onClose }) => {
                 margin="dense"
                 label="Monto a Pagar"
                 variant="outlined"
-                value={grandTotal}
-                onChange={(e) => setMontoPagado(e.target.value)}
+                value={getTotalSelected()}
+                onChange={(e) => setCantidadPagada(e.target.value)}
                 fullWidth
                 inputProps={{
                   inputMode: "numeric",
                   pattern: "[0-9]*",
                 }}
+                InputProps={{ readOnly: true }}
               />
               <TextField
                 margin="dense"
@@ -566,9 +568,12 @@ const BoxCtaCorriente = ({ onClose }) => {
                     setCantidadPagada(parseFloat(value));
                   }
                 }}
+                disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
+
                 inputProps={{
                   inputMode: "numeric",
                   pattern: "[0-9]*",
+                  maxLength: 9,
                 }}
               />
               <TextField
@@ -576,7 +581,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                 fullWidth
                 type="number"
                 label="Por pagar"
-                value={Math.max(0, grandTotal - cantidadPagada)}
+                value={Math.max(0, getTotalSelected()- cantidadPagada)}
                 InputProps={{ readOnly: true }}
               />
               {calcularVuelto() > 0 && (
@@ -594,7 +599,7 @@ const BoxCtaCorriente = ({ onClose }) => {
             {/* <Typography variant="body1">Monto a Pagar:</Typography> */}
 
             <Grid
-              container
+             container
               spacing={2}
               item
               sm={12}
@@ -609,8 +614,10 @@ const BoxCtaCorriente = ({ onClose }) => {
               <Grid item  xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
-                  id="efectivo-btn"
+                  id={`${metodoPago}-btn`}
                   fullWidth
+                  disabled={loading || cantidadPagada <= 0} // Deshabilitar si hay una carga en progreso o la cantidad pagada es menor o igual a cero
+
                   variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
                   onClick={() => setMetodoPago("EFECTIVO")}
                 >
@@ -619,10 +626,14 @@ const BoxCtaCorriente = ({ onClose }) => {
               </Grid>
               <Grid item xs={12} sm={12} md={12}>
                 <Button
+                  id={`${metodoPago}-btn`}
                   sx={{ height: "100%" }}
-                  id="debito-btn"
+               
                   variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
-                  onClick={() => setMetodoPago("DEBITO")}
+                  onClick={() => {
+                    setMetodoPago("DEBITO");
+                    setCantidadPagada(getTotalSelected()); // Establecer el valor de cantidad pagada como grandTotal
+                  }}
                   fullWidth
                 >
                   Débito
@@ -631,9 +642,12 @@ const BoxCtaCorriente = ({ onClose }) => {
               <Grid item xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
-                  id="credito-btn"
+                  id={`${metodoPago}-btn`}
                   variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
-                  onClick={() => setMetodoPago("CREDITO")}
+                  onClick={() => {
+                    setMetodoPago("CREDITO");
+                    setCantidadPagada(getTotalSelected()); // Establecer el valor de cantidad pagada como grandTotal
+                  }}
                   fullWidth
                 >
                   Crédito
@@ -641,14 +655,17 @@ const BoxCtaCorriente = ({ onClose }) => {
               </Grid>
               <Grid item xs={12} sm={12} md={12}>
                 <Button
+                  id={`${metodoPago}-btn`}
                   fullWidth
                   sx={{ height: "100%" }}
-                  id="transferencia-btn"
+                 
                   variant={
                     metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
                   }
-                  onClick={() => handleTransferenciaModalOpen(selectedDebts)}
-                >
+                  onClick={() => {
+                    setMetodoPago("TRANSFERENCIA");
+                    handleTransferenciaModalOpen(selectedDebts);
+                  }}                >
                   Transferencia
                 </Button>
               </Grid>
@@ -658,7 +675,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                   variant="contained"
                   fullWidth
                   color="secondary"
-                  disabled={!metodoPago || montoPagado <= 0}
+                  disabled={!metodoPago || cantidadPagada <= 0}
                   onClick={handlePayment}
                 >
                   {loading ? (
