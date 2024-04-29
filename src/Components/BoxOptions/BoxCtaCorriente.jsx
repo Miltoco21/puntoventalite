@@ -28,7 +28,7 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 const BoxCtaCorriente = ({ onClose }) => {
@@ -82,7 +82,8 @@ const BoxCtaCorriente = ({ onClose }) => {
   const [montoPagado, setMontoPagado] = useState(0); // Estado para almacenar el monto a pagar
   const [metodoPago, setMetodoPago] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado para controlar la apertura del Snackbar
-  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Estado para almacenar el mensaje del Snackbar
+
   const [openTransferenciaModal, setOpenTransferenciaModal] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [nombre, setNombre] = useState(""); // Estado para almacenar el nombre
@@ -142,7 +143,6 @@ const BoxCtaCorriente = ({ onClose }) => {
     setFecha(date);
   };
 
-
   // Estado para el valor seleccionado del banco
   const [selectedBanco, setSelectedBanco] = useState("");
 
@@ -173,7 +173,7 @@ const BoxCtaCorriente = ({ onClose }) => {
     }));
     setVentaData(updatedVentaData);
   };
-  /////revisar si este codigo  
+  /////revisar si este codigo
   const getTotalSelected = () => {
     let totalSelected = 0;
     ventaData.forEach((deuda) => {
@@ -297,7 +297,7 @@ const BoxCtaCorriente = ({ onClose }) => {
       }
 
       // Validar el monto pagado
-      if (!montoPagado || montoPagado <= 0) {
+      if (!cantidadPagada || cantidadPagada <= 0) {
         setError("Por favor, ingresa un monto válido para el pago.");
         setLoading(false);
         return;
@@ -330,7 +330,7 @@ const BoxCtaCorriente = ({ onClose }) => {
           idCabecera: deuda.idCabecera,
           total: deuda.total,
         })),
-        montoPagado: grandTotal,
+        montoPagado: getTotalSelected(),
         metodoPago: metodoPago,
         idUsuario: userData.codigoUsuario,
         transferencias: {
@@ -350,25 +350,25 @@ const BoxCtaCorriente = ({ onClose }) => {
       const response = await axios.post(endpoint, requestBody);
 
       console.log("Response:", response.data);
+      console.log("ResponseStatus:", response.data.statusCode);
 
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
         // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
         setSnackbarOpen(true);
-        setSnackbarMessage(response.data.descripcion);
+        setSnackbarMessage(response.data.descripcion)
         clearSalesData();
         setSelectedUser(null);
         setSelectedChipIndex([]);
         setSearchResults([]);
         setSelectedCodigoCliente(0);
-         setSearchText(""), 
-         handleClosePaymentDialog();
-         handleTransferenciaModalClose();
-         onClose();
+        setSearchText(""), handleClosePaymentDialog();
+        handleTransferenciaModalClose();
+        
 
-        // setTimeout(() => {
-          
-        //   onClose();
-        // }, 1000);
+        setTimeout(() => {
+
+          onClose();
+        }, 2000);
       } else {
         console.error("Error al realizar el pago");
       }
@@ -455,79 +455,87 @@ const BoxCtaCorriente = ({ onClose }) => {
           </Grid>
         </Grid>
       )}
-     <Grid item xs={12}>
-  {ventaData && ventaData.length > 0 && (
-    <TableContainer>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <Checkbox
-                checked={selectAll}
-                onChange={handleSelectAll}
-                color="primary"
-              />
-            </TableCell>
-            <TableCell>Descripción</TableCell>
-            <TableCell>Folio</TableCell>
-            <TableCell>Pago Parcial</TableCell>
-            <TableCell>Fecha</TableCell>
-            <TableCell>Total</TableCell>
-            {/* <TableCell>Acciones</TableCell> */}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {/* Ordenar ventaData por fecha ascendente */}
-          {ventaData.sort((a, b) => new Date(a.fecha) - new Date(b.fecha)).map((deuda, index) => (
-            <TableRow key={deuda.id}>
-              <TableCell>
-                <Checkbox
-                  checked={deuda.selected || false}
-                  onChange={() => handleCheckboxChange(index)}
-                  color="primary"
-                />
-              </TableCell>
-              <TableCell>{deuda.descripcionComprobante}</TableCell>
-              <TableCell>{deuda.nroComprobante}</TableCell>
-              <TableCell>${deuda.totalPagadoParcial}</TableCell>
-              <TableCell sx={{ width: 1 }}>
-                {formatFecha(deuda.fecha)}
-              </TableCell>
+      <Grid item xs={12}>
+        {ventaData && ventaData.length > 0 && (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      color="primary"
+                    />
+                  </TableCell>
+                  <TableCell>Descripción</TableCell>
+                  <TableCell>Folio</TableCell>
+                  <TableCell>Pago Parcial</TableCell>
+                  <TableCell>Fecha</TableCell>
+                  <TableCell>Total</TableCell>
+                  {/* <TableCell>Acciones</TableCell> */}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {/* Ordenar ventaData por fecha ascendente */}
+                {ventaData
+                  .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
+                  .map((deuda, index) => (
+                    <TableRow key={deuda.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={deuda.selected || false}
+                          onChange={() => handleCheckboxChange(index)}
+                          color="primary"
+                        />
+                      </TableCell>
+                      <TableCell>{deuda.descripcionComprobante}</TableCell>
+                      <TableCell>{deuda.nroComprobante}</TableCell>
+                      <TableCell>${deuda.totalPagadoParcial}</TableCell>
+                      <TableCell sx={{ width: 1 }}>
+                        {formatFecha(deuda.fecha)}
+                      </TableCell>
 
-              <TableCell>${deuda.total}</TableCell>
-              <TableCell sx={{ display: "none" }}>
-                ${deuda.idCabecera}
-              </TableCell>
+                      <TableCell>${deuda.total}</TableCell>
+                      <TableCell sx={{ display: "none" }}>
+                        ${deuda.idCabecera}
+                      </TableCell>
 
-              <TableCell></TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+                      <TableCell></TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
 
-        <TableRow>
-          <TableCell colSpan={3} align="right">
-            <Typography> Total Deuda : ${totalDeuda}</Typography>
-          </TableCell>
-        </TableRow>
+              <TableRow>
+                <TableCell colSpan={3} align="right">
+                  <Typography> Total Deuda : ${totalDeuda}</Typography>
+                </TableCell>
+              </TableRow>
 
-        <TableRow>
-          <TableCell colSpan={3} align="right">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleOpenPaymentDialog}
-              disabled={getTotalSelected() === 0}
-            >
-              Pagar Total Seleccionado (${getTotalSelected()})
-            </Button>
-          </TableCell>
+              <TableRow>
+                <TableCell colSpan={3} align="right">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenPaymentDialog}
+                    disabled={getTotalSelected() === 0}
+                  >
+                    Pagar Total Seleccionado (${getTotalSelected()})
+                  </Button>
+                </TableCell>
 
-          <TableCell></TableCell>
-        </TableRow>
-      </Table>
-    </TableContainer>
-  )}
-</Grid>
+                <TableCell></TableCell>
+              </TableRow>
+            </Table>
+          </TableContainer>
+        )}
+      </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000} // Duración en milisegundos antes de que se cierre automáticamente
+        onClose={() => setSnackbarOpen(false)} // Función para cerrar el Snackbar
+        message={snackbarMessage} // Contenido del mensaje del Snackbar
+      />
 
       <Dialog open={openDialog} onClose={handleClosePaymentDialog}>
         <DialogTitle>Pagar Deuda </DialogTitle>
@@ -569,7 +577,6 @@ const BoxCtaCorriente = ({ onClose }) => {
                   }
                 }}
                 disabled={metodoPago !== "EFECTIVO"} // Deshabilitar la edición excepto para el método "EFECTIVO"
-
                 inputProps={{
                   inputMode: "numeric",
                   pattern: "[0-9]*",
@@ -581,7 +588,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                 fullWidth
                 type="number"
                 label="Por pagar"
-                value={Math.max(0, getTotalSelected()- cantidadPagada)}
+                value={Math.max(0, getTotalSelected() - cantidadPagada)}
                 InputProps={{ readOnly: true }}
               />
               {calcularVuelto() > 0 && (
@@ -599,7 +606,7 @@ const BoxCtaCorriente = ({ onClose }) => {
             {/* <Typography variant="body1">Monto a Pagar:</Typography> */}
 
             <Grid
-             container
+              container
               spacing={2}
               item
               sm={12}
@@ -611,13 +618,12 @@ const BoxCtaCorriente = ({ onClose }) => {
               <Typography sx={{ marginTop: "7%" }} variant="h6">
                 Selecciona Método de Pago:
               </Typography>
-              <Grid item  xs={12} sm={12} md={12}>
+              <Grid item xs={12} sm={12} md={12}>
                 <Button
                   sx={{ height: "100%" }}
                   id={`${metodoPago}-btn`}
                   fullWidth
                   disabled={loading || cantidadPagada <= 0} // Deshabilitar si hay una carga en progreso o la cantidad pagada es menor o igual a cero
-
                   variant={metodoPago === "EFECTIVO" ? "contained" : "outlined"}
                   onClick={() => setMetodoPago("EFECTIVO")}
                 >
@@ -628,7 +634,6 @@ const BoxCtaCorriente = ({ onClose }) => {
                 <Button
                   id={`${metodoPago}-btn`}
                   sx={{ height: "100%" }}
-               
                   variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
                   onClick={() => {
                     setMetodoPago("DEBITO");
@@ -658,14 +663,14 @@ const BoxCtaCorriente = ({ onClose }) => {
                   id={`${metodoPago}-btn`}
                   fullWidth
                   sx={{ height: "100%" }}
-                 
                   variant={
                     metodoPago === "TRANSFERENCIA" ? "contained" : "outlined"
                   }
                   onClick={() => {
                     setMetodoPago("TRANSFERENCIA");
                     handleTransferenciaModalOpen(selectedDebts);
-                  }}                >
+                  }}
+                >
                   Transferencia
                 </Button>
               </Grid>
@@ -702,12 +707,6 @@ const BoxCtaCorriente = ({ onClose }) => {
           </Button> */}
         </DialogActions>
       </Dialog>
-      <Snackbar
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={snackbarOpen}
-        onClose={handleSnackbarClose}
-        message={snackbarMessage}
-      />
 
       <Dialog
         open={openTransferenciaModal}
@@ -811,7 +810,7 @@ const BoxCtaCorriente = ({ onClose }) => {
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                    format="DD-MM-YYYY"
+                  format="DD-MM-YYYY"
                   label="Ingresa Fecha"
                   value={fecha}
                   onChange={handleDateChange}
