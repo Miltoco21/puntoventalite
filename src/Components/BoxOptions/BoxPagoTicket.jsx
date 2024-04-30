@@ -298,14 +298,14 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         idUsuario: userData.codigoUsuario,
         codigoClienteSucursal: selectedCodigoClienteSucursal, // Ajustar según la lógica de tu aplicación
         codigoCliente: selectedCodigoCliente, // Ajustar según la lógica de tu aplicación
-        total: grandTotal,
+        total: cantidadPagada,
         products: salesData.map((producto) => ({
           codProducto: producto.idProducto, // Ajustar la propiedad según el nombre real en tus datos
           cantidad: producto.quantity, // Ajustar la propiedad según el nombre real en tus datos
           precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
           descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
         })),
-        metodoPago: cantidadPagada,
+        metodoPago: metodoPago,
         transferencias: {
           idCuentaCorrientePago: 0,
           nombre: nombre,
@@ -607,7 +607,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12}>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
               {errorTransferenciaError && (
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}

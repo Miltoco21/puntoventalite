@@ -541,7 +541,7 @@ const BoxCtaCorriente = ({ onClose }) => {
         <DialogTitle>Pagar Deuda </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} item xs={12} md={6} lg={12}>
-            <Grid item xs={12} md={12} lg={6}>
+            <Grid item xs={12} md={12} lg={12}>
               {error && (
                 <Grid item xs={12}>
                   <Typography variant="body1" color="error">
@@ -603,14 +603,14 @@ const BoxCtaCorriente = ({ onClose }) => {
               )}
             </Grid>
 
-            {/* <Typography variant="body1">Monto a Pagar:</Typography> */}
+           
 
             <Grid
               container
               spacing={2}
               item
               sm={12}
-              md={6}
+              md={12}
               lg={12}
               sx={{ width: "100%", display: "flex", justifyContent: "center" }}
             >
