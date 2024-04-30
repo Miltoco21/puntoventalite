@@ -272,27 +272,70 @@ const BoxCtaCorriente = ({ onClose }) => {
 
         // Validar datos de transferencia
         if (
-          !nombre ||
-          !rut ||
-          !selectedBanco ||
-          !tipoCuenta ||
-          !nroCuenta ||
-          !fecha ||
-          !nroOperacion
+          nombre === "" &&
+          rut === "" &&
+          selectedBanco === "" &&
+          tipoCuenta === "" &&
+          nroCuenta === "" &&
+          fecha === "" &&
+          nroOperacion === ""
         ) {
-          setError(
+          setTransferenciaError(
             "Por favor, completa todos los campos necesarios para la transferencia."
           );
           setLoading(false);
           return;
+        } else {
+          // Limpiar el error relacionado con el RUT
+          setTransferenciaError("");
+        }
+        if (nombre === "") {
+          setTransferenciaError("Por favor, ingresa el nombre.");
+          setLoading(false);
+          return;
+        }
+        if (rut === "") {
+          setTransferenciaError("Por favor, ingresa el RUT.");
+          setLoading(false);
+          return;
         }
         if (!validarRutChileno(rut)) {
-          setError("El RUT ingresado NO es válido.");
+          setTransferenciaError("El RUT ingresado NO es válido.");
           setLoading(false);
           return;
         } else {
           // Limpiar el error relacionado con el RUT
-          setError("");
+          setTransferenciaError("");
+        }
+
+        if (selectedBanco === "") {
+          setTransferenciaError("Por favor, selecciona el banco.");
+          setLoading(false);
+          return;
+        }
+
+        if (tipoCuenta === "") {
+          setTransferenciaError("Por favor, selecciona el tipo de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroCuenta === "") {
+          setTransferenciaError("Por favor, ingresa el número de cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        if (fecha === "") {
+          setTransferenciaError("Por favor, selecciona la fecha.");
+          setLoading(false);
+          return;
+        }
+
+        if (nroOperacion === "") {
+          setTransferenciaError("Por favor, ingresa el número de operación.");
+          setLoading(false);
+          return;
         }
       }
 
@@ -399,16 +442,52 @@ const BoxCtaCorriente = ({ onClose }) => {
         event.preventDefault();
       }
     }
-    if (field === "nombre") {
-      const regex = /^[a-zA-Z]*$/;
-      if (!regex.test(event.key) && event.key !== "Backspace") {
+    if (field === "nombre" ) {
+      const regex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9\s]+$/;// Al menos un carácter alfanumérico
+      if (
+        !regex.test(event.key) &&
+        event.key !== "Backspace" &&
+        event.key !== " "
+      ) {
+        event.preventDefault();
+        setEmptyFieldsMessage("El nombre no puede consistir únicamente en espacios en blanco.");
+        setSnackbarOpen(true);
+      }
+    }
+    if (field === "numeroCuenta") {
+      // Permitir solo dígitos numéricos y la tecla de retroceso
+      if (!/^\d+$/.test(event.key) && event.key !== "Backspace") {
         event.preventDefault();
       }
     }
-    if (field === "telefono") {
-      // Validar si la tecla presionada es un signo menos
-      if (event.key === "-" && formData.telefono === "") {
-        event.preventDefault(); // Prevenir ingreso de número negativo
+    
+
+    if (field === "rut") {
+      // Validar si la tecla presionada es un signo menos, un número, la letra 'k' o 'K', el guion '-' o la tecla de retroceso
+      const allowedCharacters = /^[0-9kK-]+$/i; // Corregida para permitir el guion
+      if (!allowedCharacters.test(event.key)) {
+        // Verificar si la tecla presionada es el retroceso
+        if (event.key !== "Backspace") {
+          event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+        }
+      }
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+    }
+    if (field === "cantidadPagada") {
+      // Validar si la tecla presionada es un dígito o la tecla de retroceso
+      const isDigitOrBackspace = /^[0-9\b]+$/;
+      if (!isDigitOrBackspace.test(event.key)) {
+        event.preventDefault(); // Prevenir la entrada de caracteres no permitidos
+      }
+
+      // Obtener el valor actual del campo cantidadPagada
+      const currentValue = parseFloat(cantidadPagada);
+
+      // Validar si el nuevo valor sería menor que el grandTotal
+      if (currentValue * 10 + parseInt(event.key) < grandTotal * 10) {
+        event.preventDefault(); // Prevenir la entrada de un monto menor al grandTotal
       }
     }
   };
@@ -715,18 +794,11 @@ const BoxCtaCorriente = ({ onClose }) => {
         <DialogTitle>Transferencia</DialogTitle>
         <DialogContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={12}>
+            <Grid item xs={12} sm={12} md={12} lg={12}>
               {errorTransferenciaError && (
                 <p style={{ color: "red" }}> {errorTransferenciaError}</p>
               )}
             </Grid>
-            {error && (
-              <Grid item xs={12}>
-                <Typography variant="body1" color="error">
-                  {error}
-                </Typography>
-              </Grid>
-            )}
 
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
@@ -748,11 +820,13 @@ const BoxCtaCorriente = ({ onClose }) => {
                 Ingresa rut sin puntos y con guión
               </InputLabel>
               <TextField
+                name="rut"
                 label="ej: 11111111-1"
                 variant="outlined"
                 fullWidth
                 value={rut}
                 onChange={(e) => setRut(e.target.value)}
+                onKeyDown={(event) => handleKeyDown(event, "rut")}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -794,6 +868,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                 Ingresa Número de Cuenta{" "}
               </InputLabel>
               <TextField
+                name="numeroCuenta"
                 label="Número de cuenta"
                 variant="outlined"
                 fullWidth
@@ -804,13 +879,45 @@ const BoxCtaCorriente = ({ onClose }) => {
                 }}
                 value={nroCuenta}
                 onChange={(e) => setNroCuenta(e.target.value)}
+                onKeyDown={(event) => handleKeyDown(event, "numeroCuenta")}
+
               />
             </Grid>
             <Grid item xs={12} sm={6}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InputLabel sx={{ marginBottom: "4%" }}>
+                Selecciona Fecha {" "}
+              </InputLabel>
+          <DatePicker
+          format="DD-MM-YYYY"
+            value={fecha}
+            onChange={(newValue) => {
+              setFecha(newValue);
+            }}
+            
+           
+            minDate={inicioRango}
+            maxDate={hoy}
+            textField={(params) => (
+              <TextField
+                {...params}
+                label="Ingresa Fecha"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      {formatFecha(fecha)}
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
+          />
+        </LocalizationProvider>
+      </Grid>
+            {/* <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>Ingresa Fecha</InputLabel>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  format="DD-MM-YYYY"
                   label="Ingresa Fecha"
                   value={fecha}
                   onChange={handleDateChange}
@@ -818,18 +925,22 @@ const BoxCtaCorriente = ({ onClose }) => {
                   maxDate={hoy}
                 />
               </LocalizationProvider>
-            </Grid>
+            </Grid> */}
+
             <Grid item xs={12} sm={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>
                 Ingresa Numero Operación
               </InputLabel>
               <TextField
+                 name="numeroCuenta"
                 label="Numero Operación"
                 variant="outlined"
                 type="number"
                 fullWidth
                 value={nroOperacion}
                 onChange={(e) => setNroOperacion(e.target.value)}
+                onKeyDown={(event) => handleKeyDown(event, "numeroCuenta")}
+
                 inputProps={{
                   inputMode: "numeric",
                   pattern: "[0-9]*",
@@ -842,7 +953,7 @@ const BoxCtaCorriente = ({ onClose }) => {
                 variant="contained"
                 fullWidth
                 color="secondary"
-                disabled={!metodoPago || montoPagado <= 0 || loading}
+                disabled={!metodoPago || cantidadPagada <= 0}
                 onClick={handlePayment}
               >
                 {loading ? (
