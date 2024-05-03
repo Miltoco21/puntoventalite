@@ -383,10 +383,16 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         event.preventDefault();
       }
     }
-    if (field === "nombre") {
-      const regex = /^[a-zA-Z]*$/;
-      if (!regex.test(event.key) && event.key !== "Backspace") {
+    if (field === "nombre" ) {
+      const regex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9\s]+$/;// Al menos un carácter alfanumérico
+      if (
+        !regex.test(event.key) &&
+        event.key !== "Backspace" &&
+        event.key !== " "
+      ) {
         event.preventDefault();
+        setEmptyFieldsMessage("El nombre no puede consistir únicamente en espacios en blanco.");
+        setSnackbarOpen(true);
       }
     }
     if (field === "rut") {

@@ -338,7 +338,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                     sx={{
                       backgroundColor:
                         selectedChipIndex === index ? "#A8EB12" : "#2196f3",
-                      transition: "background-color 0.3s ease",
+                      transition: "none",
                     }}
                   />
                 </ListItem>
