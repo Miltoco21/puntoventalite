@@ -105,7 +105,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     { id: 15, nombre: "Banco Corpbanca" },
     { id: 16, nombre: "Banco BICE" },
 
-    // Agrega más bancos según sea necesario
+   
   ];
 
   const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual

@@ -599,7 +599,7 @@ const BoxGestionCaja = () => {
               elevation={8}
               sx={{
                 width: "97%",
-                height: "6rem",
+                height: "7rem",
                 backgroundColor: " #283048",
                 color: "white",
                 "&:hover": {
@@ -613,7 +613,7 @@ const BoxGestionCaja = () => {
               <Typography variant="h7">Borrar Ventas</Typography>
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
+          {/* <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
             <Button
               disabled={true}
               sx={{
@@ -629,15 +629,15 @@ const BoxGestionCaja = () => {
               }}
               onClick={handleOpenStock}
             >
-              {/* <EditIcon /> */}
+            
               <Typography variant="h7">Stock</Typography>
             </Button>
-          </Grid>
+          </Grid> */}
           <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
             <Button
               sx={{
                 width: "97%",
-                height: "6rem",
+                height: "7rem",
                 backgroundColor: " #283048",
                 color: "white",
                 "&:hover": {
