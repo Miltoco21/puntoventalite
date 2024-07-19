@@ -44,8 +44,7 @@ import MuiAlert from "@mui/material/Alert";
 
 import axios from "axios";
 
-const apiUrl = "https://www.easyposdev.somee.com/api/Clientes/AddCliente";
-
+const apiUrl = import.meta.env.VITE_URL_API2;
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
@@ -191,7 +190,7 @@ const IngresoClientes = ({ onClose }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+          `${import.meta.env.VITE_URL_API2}/Clientes/GetAllClientes`
         );
         setCustomers(response.data.cliente);
       } catch (error) {
@@ -243,7 +242,7 @@ const IngresoClientes = ({ onClose }) => {
 
       // Make API request to add branch using formattedBranchData
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Clientes/AddClienteSucursal",
+        `${import.meta.env.VITE_URL_API2}/Clientes/AddClienteSucursal`,
         formattedBranchData
       );
       console.log("Response:", response.data);
@@ -251,7 +250,7 @@ const IngresoClientes = ({ onClose }) => {
       // Close the modal and update data
       setOpenModal(false);
       const fetchResponse = await axios.get(
-        "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+        `${import.meta.env.VITE_URL_API2}Clientes/GetAllClientes`
       );
       setCustomers(fetchResponse.data.cliente);
     } catch (error) {
@@ -294,7 +293,7 @@ const IngresoClientes = ({ onClose }) => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/RegionComuna/GetAllRegiones"
+          `${import.meta.env.VITE_URL_API2}/RegionComuna/GetAllRegiones`
         );
         setRegionOptions(response.data.regiones);
       } catch (error) {
@@ -310,7 +309,9 @@ const IngresoClientes = ({ onClose }) => {
       if (selectedRegion) {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedRegion}`
+            `${
+              import.meta.env.VITE_URL_API2
+            }/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedRegion}`
           );
           setComunaOptions(
             response.data.comunas.map((comuna) => comuna.comunaNombre)
@@ -328,7 +329,7 @@ const IngresoClientes = ({ onClose }) => {
     const fetchSucursalRegions = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/RegionComuna/GetAllRegiones"
+          `${import.meta.env.VITE_URL_API2}/RegionComuna/GetAllRegiones`
         );
 
         setSucursalRegionOptions(response.data.regiones);
@@ -411,7 +412,12 @@ const IngresoClientes = ({ onClose }) => {
         setRutError("");
       }
       setRutError("");
-      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.nombre.trim()) || /^\s{1,}/.test(formData.nombre)) {
+      if (
+        !/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(
+          formData.nombre.trim()
+        ) ||
+        /^\s{1,}/.test(formData.nombre)
+      ) {
         setRutError("Ingrese nombre válido.");
         return false;
       }
@@ -424,7 +430,12 @@ const IngresoClientes = ({ onClose }) => {
       } else {
         setRutError("");
       }
-      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.apellido.trim()) || /^\s{1,}/.test(formData.apellido)) {
+      if (
+        !/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(
+          formData.apellido.trim()
+        ) ||
+        /^\s{1,}/.test(formData.apellido)
+      ) {
         setRutError("Ingrese apellido válido.");
         return false;
       }
@@ -439,7 +450,12 @@ const IngresoClientes = ({ onClose }) => {
       }
       setRutError("");
 
-      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.direccion.trim()) || /^\s{1,}/.test(formData.direccion)) {
+      if (
+        !/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(
+          formData.direccion.trim()
+        ) ||
+        /^\s{1,}/.test(formData.direccion)
+      ) {
         setRutError("Ingrese dirección válida.");
         return false;
       }
@@ -450,12 +466,12 @@ const IngresoClientes = ({ onClose }) => {
           `El campo teléfono está vacío. Por favor completa todos los campos antes de enviar el formulario.`
         );
         return;
-      } 
-     
-       if (parseFloat(formData.telefono) === 0) {
+      }
+
+      if (parseFloat(formData.telefono) === 0) {
         setRutError("El telefono no puede ser cero.");
-      return false;
-    }
+        return false;
+      }
       if (formData.region === "") {
         setRutError(
           `El campo region está vacío. Por favor completa todos los campos antes de enviar el formulario.`
@@ -465,7 +481,7 @@ const IngresoClientes = ({ onClose }) => {
         setRutError("");
       }
       setRutError("");
-       
+
       setRutError("");
       if (formData.comuna === "") {
         setRutError(
@@ -502,12 +518,16 @@ const IngresoClientes = ({ onClose }) => {
       }
       setRutError("");
 
-      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.giro.trim()) || /^\s{1,}/.test(formData.direcc)) {
+      if (
+        !/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(
+          formData.giro.trim()
+        ) ||
+        /^\s{1,}/.test(formData.direcc)
+      ) {
         setRutError("Ingrese giro válido.");
         return false;
       }
       setRutError("");
-      
 
       if (formData.urlPagina === "") {
         setRutError(
@@ -522,7 +542,7 @@ const IngresoClientes = ({ onClose }) => {
       } else {
         setRutError("");
       }
-  
+
       if (formData.formaPago === "") {
         setRutError(
           `El campo forma de Pago está vacío. Por favor completa todos los campos antes de enviar el formulario.`
@@ -533,7 +553,12 @@ const IngresoClientes = ({ onClose }) => {
       }
       setRutError("");
 
-      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.formaPago.trim()) || /^\s{1,}/.test(formData.direcc)) {
+      if (
+        !/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(
+          formData.formaPago.trim()
+        ) ||
+        /^\s{1,}/.test(formData.direcc)
+      ) {
         setRutError("Ingrese forma de pago válida.");
         return false;
       }
@@ -546,7 +571,12 @@ const IngresoClientes = ({ onClose }) => {
       } else {
         setRutError("");
       }
-      if (!/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(formData.razonSocial.trim()) || /^\s{1,}/.test(formData.direcc)) {
+      if (
+        !/^[a-zA-Z0-9\s]*[a-zA-Z0-9][a-zA-Z0-9\s]*$/.test(
+          formData.razonSocial.trim()
+        ) ||
+        /^\s{1,}/.test(formData.direcc)
+      ) {
         setRutError("Ingrese razón social válida.");
         return false;
       }

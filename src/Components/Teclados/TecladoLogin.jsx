@@ -16,6 +16,8 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
 const Login = () => {
+
+
   const [rutOrCode, setRutOrCode] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false); // 
@@ -29,6 +31,8 @@ const Login = () => {
   const saveSessionData = (userData) => {
     localStorage.setItem('userData', JSON.stringify(userData));
   };
+
+  const apiUrl = import.meta.env.VITE_URL_API2;
 
   const handleLogin = async () => {
     try {
@@ -45,7 +49,7 @@ const Login = () => {
       });
 
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Usuarios/LoginUsuario",
+        `${import.meta.env.VITE_URL_API2}/Usuarios/LoginUsuario`,
         {
           codigoUsuario: 0,
           rut: rutOrCode,

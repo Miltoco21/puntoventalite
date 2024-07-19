@@ -25,6 +25,7 @@ import {
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const Step5Component = ({ data, onNext }) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [newStock, setNewStock] = useState("");
   const [newImpuesto, setNewImpuesto] = useState("");
   const [nota, setNota] = useState(data.nota||"");
@@ -63,7 +64,7 @@ const Step5Component = ({ data, onNext }) => {
     try {
       const allData = { ...data, step5: { stockCritico, selectedImpuestoId, selectedFile, nota } };
       console.log("All Data:", allData); // Log all data before sending to server
-      const response = await axios.post( "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto", allData);
+      const response = await axios.post( `${import.meta.env.VITE_URL_API2}/ProductosTmp/AddProducto`, allData);
       console.log("Server Response:", response.data);
       // Optionally, reset the state or perform other actions upon successful submission
     } catch (error) {

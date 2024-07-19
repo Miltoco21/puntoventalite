@@ -79,7 +79,7 @@ const Step6Component = () => {
   //   async function fetchBodegas() {
   //     try {
   //       const response = await axios.get(
-  //         "https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetAllBodegas"
+  //       `${import.meta.env.VITE_URL_API2}/NivelMercadoLogicos/GetAllBodegas`
   //       );
   //       setBodegas(response.data.categorias);
   //     } catch (error) {

@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 
 const Step2Component = ({ data, onNext }) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [selectedBodegaId, setSelectedBodegaId] = useState(data.selectedBodegaId||"");
   const [selectedProveedorId, setSelectedProveedorId] = useState(data.selectedProveedorId||"");
 

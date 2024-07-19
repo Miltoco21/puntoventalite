@@ -18,7 +18,8 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 const RegistroCompra = () => {
   const { grandTotal,userData,salesData,addToSalesData } = useContext(SelectedOptionsContext);
-
+ 
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [totalCompra, setTotalCompra] = useState(grandTotal);
   const [cantidadPagada, setCantidadPagada] = useState(0);
   const [metodoPago, setMetodoPago] = useState("");
@@ -82,7 +83,7 @@ const RegistroCompra = () => {
       console.log("Datos enviados por Axios:", boletaElectronica);
       // Realizar la solicitud POST a la API para generar la boleta electrónica
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/GenerarBoletaElectronica",
+        `${import.meta.env.VITE_URL_API2}/Ventas/GenerarBoletaElectronica`,
         boletaElectronica
       );
   

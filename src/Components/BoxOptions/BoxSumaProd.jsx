@@ -46,6 +46,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const BoxSumaProd = ({ venta }) => {
+
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const {
     salesData,
     selectedUser,
@@ -124,13 +126,13 @@ const BoxSumaProd = ({ venta }) => {
       if (isNumeric) {
         // Realizar la búsqueda por PLU
         const response = await axios.get(
-          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}&codigoCliente=${codigoCliente}`
+          `${import.meta.env.VITE_URL_API2}/ProductosTmp/GetProductosByCodigo?idproducto=${searchTerm}&codigoCliente=${codigoCliente}`
         );
         handleSearchSuccess(response, "PLU");
       } else {
         // Realizar la búsqueda por descripción
         const response = await axios.get(
-          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}&codigoCliente=${codigoCliente}`
+          `${import.meta.env.VITE_URL_API2}/ProductosTmp/GetProductosByDescripcion?descripcion=${searchTerm}&codigoCliente=${codigoCliente}`
         );
         handleSearchSuccess(response, "Descripción");
       }

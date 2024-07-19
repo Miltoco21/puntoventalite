@@ -32,6 +32,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
 const BoxCtaCorriente = ({ onClose }) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const {
     userData,
     precioData,
@@ -263,12 +264,12 @@ const BoxCtaCorriente = ({ onClose }) => {
       setLoading(true);
 
       let endpoint =
-        "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaByIdCliente";
+      `${import.meta.env.VITE_URL_API2}Clientes/PostClientePagarDeudaByIdCliente`;
 
       // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
       if (metodoPago === "TRANSFERENCIA") {
         endpoint =
-          "https://www.easyposdev.somee.com/api/Clientes/PostClientePagarDeudaTransferenciaByIdCliente";
+        `${import.meta.env.VITE_URL_API2}/Clientes/PostClientePagarDeudaTransferenciaByIdCliente`;
 
         // Validar datos de transferencia
         if (

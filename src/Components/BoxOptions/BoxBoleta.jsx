@@ -33,6 +33,7 @@ import {
 } from "@mui/material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 const BoxBoleta = ({ onClose }) => {
+  
   const {
     userData,
     salesData,
@@ -61,6 +62,7 @@ const BoxBoleta = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   console.log("salesData:", salesData);
+  const apiUrl = import.meta.env.VITE_URL_API2;
 
   const navigate = useNavigate();
   const [metodoPago, setMetodoPago] = useState("");
@@ -190,12 +192,12 @@ const BoxBoleta = ({ onClose }) => {
       setLoading(true);
 
       let endpoint =
-        "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+      `${import.meta.env.VITE_URL_API2}/GestionDTE/GenerarBoletaDTE`;
 
       // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
       if (metodoPago === "TRANSFERENCIA") {
         endpoint =
-          "https://www.easyposdev.somee.com/api/GestionDTE/GenerarBoletaDTE";
+        `${import.meta.env.VITE_URL_API2}/GestionDTE/GenerarBoletaDTE`;
 
         // Validar datos de transferencia
         if (

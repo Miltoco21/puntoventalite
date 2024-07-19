@@ -24,6 +24,8 @@ import {
 } from "@mui/material";
 
 const Step3Component = ({ data, onNext, stepData }) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
+
   const [newUnidad, setNewUnidad] = useState("");
   const [stockInicial, setStockInicial] = useState(data.stockInicial);
   const [precioCosto, setPrecioCosto] = useState(data.precioCosto);
@@ -101,7 +103,7 @@ const Step3Component = ({ data, onNext, stepData }) => {
     try {
       // Enviar la petición POST al endpoint con los datos combinados
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
+        `${import.meta.env.VITE_URL_API2}/ProductosTmp/AddProducto`,
         requestData
       );
 

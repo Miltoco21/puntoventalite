@@ -42,6 +42,7 @@ import MuiAlert from "@mui/material/Alert";
 import axios from "axios";
 
 const IngresoClienteSucursal = () => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [rutError, setRutError] = useState("");
   const [correoError, setCorreoError] = useState("");
 
@@ -201,7 +202,7 @@ const IngresoClienteSucursal = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+          `${import.meta.env.VITE_URL_API2}/Clientes/GetAllClientes`
         );
         setCustomers(response.data.cliente);
       } catch (error) {
@@ -254,7 +255,7 @@ const IngresoClienteSucursal = () => {
 
       // Make API request to add branch using formattedBranchData
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Clientes/AddClienteSucursal",
+        `${import.meta.env.VITE_URL_API2}/Clientes/AddClienteSucursal`,
         formattedBranchData
       );
       console.log("Response:", response.data);
@@ -262,7 +263,7 @@ const IngresoClienteSucursal = () => {
       // Close the modal and update data
       setOpenModal(false);
       const fetchResponse = await axios.get(
-        "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+        `${import.meta.env.VITE_URL_API2}Clientes/GetAllClientes`
       );
       setCustomers(fetchResponse.data.cliente);
     } catch (error) {
@@ -305,7 +306,7 @@ const IngresoClienteSucursal = () => {
     const fetchRegions = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/RegionComuna/GetAllRegiones"
+          `${import.meta.env.VITE_URL_API2}/RegionComuna/GetAllRegiones`
         );
         setRegionOptions(response.data.regiones);
       } catch (error) {
@@ -321,7 +322,7 @@ const IngresoClienteSucursal = () => {
       if (selectedRegion) {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedRegion}`
+            `${import.meta.env.VITE_URL_API2}/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedRegion}`
           );
           setComunaOptions(
             response.data.comunas.map((comuna) => comuna.comunaNombre)
@@ -339,7 +340,7 @@ const IngresoClienteSucursal = () => {
     const fetchSucursalRegions = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/RegionComuna/GetAllRegiones"
+          `${import.meta.env.VITE_URL_API2}/RegionComuna/GetAllRegiones`
         );
 
         setSucursalRegionOptions(response.data.regiones);
@@ -356,7 +357,7 @@ const IngresoClienteSucursal = () => {
       if (selectedSucursalRegion) {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedSucursalRegion}`
+            `${import.meta.env.VITE_URL_API2}/RegionComuna/GetComunaByIDRegion?IdRegion=${selectedSucursalRegion}`
           );
           setSucursalComunaOptions(
             response.data.comunas.map((comuna) => comuna.comunaNombre)
@@ -463,7 +464,7 @@ const IngresoClienteSucursal = () => {
   const handleShowBranch = async (codigoCliente) => {
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesSucursalByCodigoCliente?codigocliente=${codigoCliente}`
+        `${import.meta.env.VITE_URL_API2}/Clientes/GetClientesSucursalByCodigoCliente?codigocliente=${codigoCliente}`
       );
 
       const sucursales = response.data.clienteSucursal;

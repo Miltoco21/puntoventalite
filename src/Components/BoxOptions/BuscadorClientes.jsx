@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Grid, Card, CardContent, Typography, CardActions, Button } from '@mui/material';
 
 const BuscadorClientes = ({ setFilteredCustomers }) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [clientes, setClientes] = useState([]);
   const [busqueda, setBusqueda] = useState('');
 
@@ -10,7 +11,7 @@ const BuscadorClientes = ({ setFilteredCustomers }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+          `${import.meta.env.VITE_URL_API2}//Clientes/GetAllClientes`
         );
         setClientes(response.data.cliente);
       } catch (error) {
@@ -56,7 +57,7 @@ const CustomerGrid = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/Clientes/GetAllClientes"
+          `${import.meta.env.VITE_URL_API2}/Clientes/GetAllClientes`
         );
         setCustomers(response.data.cliente);
         setFilteredCustomers(response.data.cliente);

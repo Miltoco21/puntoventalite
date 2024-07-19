@@ -56,6 +56,9 @@ const BoxGestionCaja = () => {
     addToSalesData,
   } = useContext(SelectedOptionsContext);
 
+  const apiUrl = import.meta.env.VITE_URL_API2;
+
+
   const [openCrearProductoDialog, setOpenCrearProductoDialog] = useState(false);
   const [clickedDigits, setClickedDigits] = useState([]);
   const [totalAPagar, setTotalAPagar] = useState(0);
@@ -111,7 +114,7 @@ const BoxGestionCaja = () => {
 
   const fetchDataProducts = () => {
     axios
-      .get("https://www.easyposdev.somee.com/api/ProductosTmp/GetProductos")
+      .get( `${import.meta.env.VITE_URL_API2}/ProductosTmp/GetProductos`)
       .then((response) => {
         setProducts(response.data.productos);
 
@@ -125,11 +128,11 @@ const BoxGestionCaja = () => {
   const fetchData = async () => {
     try {
       const ventaSuspenderResponse = await axios.get(
-        "https://www.easyposdev.somee.com/api/Ventas/GetAllSuspenderVenta"
+        `${import.meta.env.VITE_URL_API2}/Ventas/GetAllSuspenderVenta`
       );
 
       const productsResponse = await axios.get(
-        "https://www.easyposdev.somee.com/api/ProductosTmp/GetProductos"
+        `${import.meta.env.VITE_URL_API2}/ProductosTmp/GetProductos`
       );
 
       const ventaSuspenderCabeceras =
@@ -307,7 +310,7 @@ const BoxGestionCaja = () => {
       // Make a POST request to the API endpoint using Axios
       console.log("posted", data);
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/SuspenderVenta",
+        `${import.meta.env.VITE_URL_API2}/Ventas/SuspenderVenta`,
         data
       );
       if (response.data.descripcion === "Venta suspendida grabada con exito.") {

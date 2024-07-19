@@ -18,6 +18,9 @@ import Step6 from "./Step6";
 const steps = ["Paso 1", "Paso 2"];
 
 const StepperSI = () => {
+
+  const apiUrl = import.meta.env.VITE_URL_API2;
+
   const [activeStep, setActiveStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
@@ -61,12 +64,7 @@ const StepperSI = () => {
   };
   
 
-  // const handleNext = (stepData) => {
-  //   const updatedData = { ...data, [`step${activeStep + 1}`]: stepData };
-  //   setData(updatedData);
-  //   localStorage.setItem("stepperData", JSON.stringify(updatedData));
-  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  // };
+
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -80,7 +78,7 @@ const StepperSI = () => {
       };
 
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
+          `${import.meta.env.VITE_URL_API2}/ProductosTmp/AddProducto`,
         postData
       );
 

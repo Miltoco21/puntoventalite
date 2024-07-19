@@ -23,6 +23,8 @@ import {
 } from "@mui/material";
 
 const Step1Component = ({ data, onNext, setStepData }) => {
+    const apiUrl = import.meta.env.VITE_URL_API2;
+
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     data.selectedCategoryId
   );
@@ -217,7 +219,7 @@ const Step1Component = ({ data, onNext, setStepData }) => {
     async function fetchCategories() {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetAllCategorias"
+          `${import.meta.env.VITE_URL_API2}/NivelMercadoLogicos/GetAllCategorias`
         );
         setCategories(response.data.categorias);
       } catch (error) {
@@ -233,7 +235,7 @@ const Step1Component = ({ data, onNext, setStepData }) => {
       if (selectedCategoryId !== "") {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${selectedCategoryId}`
+            `${import.meta.env.VITE_URL_API2}/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${selectedCategoryId}`
           );
           setSubCategories(response.data.subCategorias);
         } catch (error) {
@@ -250,7 +252,7 @@ const Step1Component = ({ data, onNext, setStepData }) => {
       if (selectedSubCategoryId !== "" && selectedCategoryId !== "") {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${selectedSubCategoryId}`
+            `${import.meta.env.VITE_URL_API2}/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${selectedSubCategoryId}`
           );
           setFamilies(response.data.familias);
         } catch (error) {
@@ -271,7 +273,7 @@ const Step1Component = ({ data, onNext, setStepData }) => {
       ) {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetSubFamiliaByIdFamilia?FamiliaID=${selectedFamilyId}`
+            `${import.meta.env.VITE_URL_API2}/NivelMercadoLogicos/GetSubFamiliaByIdFamilia?FamiliaID=${selectedFamilyId}`
           );
           setSubFamilies(response.data.subFamilias);
         } catch (error) {

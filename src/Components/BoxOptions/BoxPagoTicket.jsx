@@ -32,6 +32,10 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
 const BoxPagoTicket = ({ onCloseTicket }) => {
+
+
+  const apiUrl = import.meta.env.VITE_URL_API2;
+
   const {
     userData,
     salesData,
@@ -212,12 +216,12 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       setLoading(true);
 
       let endpoint =
-        "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket";
+        `${import.meta.env.VITE_URL_API2}Ventas/RedelcomImprimirTicket`;
 
       // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
       if (metodoPago === "TRANSFERENCIA") {
         endpoint =
-          "https://www.easyposdev.somee.com/api/Ventas/RedelcomImprimirTicket";
+        `${import.meta.env.VITE_URL_API2}/Ventas/RedelcomImprimirTicket`;
 
         // Validar datos de transferencia
         if (

@@ -230,7 +230,7 @@ export const SelectedOptionsProvider = ({ children }) => {
 
       // Send the request to the API
       const response = await axios.post(
-        "https://www.easyposdev.somee.com/api/Ventas/SuspenderVenta",
+        "https://www.easypos.somee.com/api/Ventas/SuspenderVenta",
         data
       );
 

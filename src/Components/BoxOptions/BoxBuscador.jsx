@@ -33,6 +33,7 @@ import { Visibility } from "@mui/icons-material";
 import BoxCtaCorriente from "./BoxCtaCorriente";
 
 const BoxBuscador = (handleClosePreciosClientes) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const {
     salesData,
     addToSalesData,
@@ -129,7 +130,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       handleOpenDeudasClientesDialog(0, 0);
 
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
+        `${import.meta.env.VITE_URL_API2}/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );
       if (
         Array.isArray(response.data.clienteSucursal) &&
@@ -196,7 +197,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   ) => {
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
+        `${import.meta.env.VITE_URL_API2}/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
       );
 
       console.log("Respuesta Ultima Compra :", response.data); // Console log de los datos enviados por el chip

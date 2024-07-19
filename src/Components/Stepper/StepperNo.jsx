@@ -25,6 +25,7 @@ import Step5Component from "./Step5Component";
 const steps = ["Paso 1", "Paso 2", "Paso 3", "Paso 4", "Paso 5"];
 
 const StepperComponent = () => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [activeStep, setActiveStep] = useState(0);
   const [open, setOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState("");
@@ -52,7 +53,7 @@ const StepperComponent = () => {
       console.log("Complete data submitted:", updatedData);
       axios
         .post(
-          "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
+          `${import.meta.env.VITE_URL_API2}/ProductosTmp/AddProducto`,
           updatedData
         )
         .then((response) => {
@@ -103,7 +104,7 @@ const StepperComponent = () => {
     // Send the data to the server using Axios (replace with your API endpoint)
     axios
       .post(
-        "https://www.easyposdev.somee.com/api/ProductosTmp/AddProducto",
+        `${import.meta.env.VITE_URL_API2}/ProductosTmp/AddProducto`,
         data
       )
       .then((response) => {
