@@ -5,7 +5,6 @@ import {
   Container,
   Typography,
   Box,
-  Grid,
   CircularProgress,
   IconButton,
   InputAdornment,
@@ -16,11 +15,9 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
 const Login = () => {
-
-
   const [rutOrCode, setRutOrCode] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [activeInput, setActiveInput] = useState("rutOrCode");
   const [loading, setLoading] = useState(false);
@@ -28,8 +25,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { updateUserData } = useContext(SelectedOptionsContext);
+
   const saveSessionData = (userData) => {
-    localStorage.setItem('userData', JSON.stringify(userData));
+    sessionStorage.setItem('userData', JSON.stringify(userData));
   };
 
   const apiUrl = import.meta.env.VITE_URL_API2;
@@ -42,14 +40,10 @@ const Login = () => {
       }
       setLoading(true);
 
-      // Console log para imprimir los datos antes de enviar el formulario
-      console.log("Datos antes de enviar el formulario:", {
-        rutOrCode,
-        password,
-      });
+      console.log("Datos antes de enviar el formulario:", { rutOrCode, password });
 
       const response = await axios.post(
-        `${import.meta.env.VITE_URL_API2}/Usuarios/LoginUsuario`,
+        `${apiUrl}/Usuarios/LoginUsuario`,
         {
           codigoUsuario: 0,
           rut: rutOrCode,
@@ -57,12 +51,16 @@ const Login = () => {
         }
       );
 
-      // Console log para imprimir la respuesta del servidor
       console.log("Respuesta del servidor:", response.data);
 
       if (response.data.responseUsuario) {
+        const userData = response.data.responseUsuario;
+
+        // Guardar los datos del usuario en sessionStorage
+        saveSessionData(userData);
+
         // Actualizar userData después del inicio de sesión exitoso
-        updateUserData(response.data.responseUsuario);
+        updateUserData(userData);
 
         // Redirigir a la página de inicio
         navigate("/home");
@@ -73,26 +71,22 @@ const Login = () => {
       console.error("Error al intentar iniciar sesión:", error);
       if (error.response) {
         setError(
-          "Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña." +
-            error.message
+          "Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña." + error.message
         );
       } else if (error.response && error.response.status === 500) {
-        setError(
-          "Error interno del servidor. Por favor, inténtalo de nuevo más tarde."
-        );
+        setError("Error interno del servidor. Por favor, inténtalo de nuevo más tarde.");
       } else {
-        setError(
-          "Error al intentar iniciar sesión. Por favor, inténtalo de nuevo más tarde."
-        );
+        setError("Error al intentar iniciar sesión. Por favor, inténtalo de nuevo más tarde.");
       }
     } finally {
-      setLoading(false); // Asegúrate de que setLoading se restablezca incluso si hay un error
+      setLoading(false);
     }
   };
 
   const handleTogglePasswordVisibility = () => {
-    setShowPassword(!showPassword); // Alternar entre mostrar y ocultar la contraseña
+    setShowPassword(!showPassword);
   };
+
   const handleNumberClick = (number) => {
     if (activeInput === "rutOrCode") {
       setRutOrCode((prevRutOrCode) => prevRutOrCode + number);
@@ -143,76 +137,43 @@ const Login = () => {
             onFocus={() => setActiveInput("rutOrCode")}
             onChange={(e) => setRutOrCode(e.target.value)}
             inputProps={{
-              inputMode: "decimal", // Establece el modo de entrada como numérico
-              pattern: "[0-9]*" // Asegura que solo se puedan ingresar números
+              inputMode: "decimal",
+              pattern: "[0-9]*"
             }}
           />
-         <TextField
+          <TextField
             margin="normal"
             required
             fullWidth
             label="Clave"
-            type={showPassword ? "text" : "password"} // Cambia dinámicamente el tipo del campo de contraseña
+            type={showPassword ? "text" : "password"}
             value={password}
             onFocus={() => setActiveInput("password")}
             onChange={(e) => setPassword(e.target.value)}
-            InputProps={{ // Componente de entrada personalizada para agregar el botón de visualización de contraseña
+            InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton
-                    onClick={handleTogglePasswordVisibility}
-                    edge="end"
-                  >
+                  <IconButton onClick={handleTogglePasswordVisibility} edge="end">
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
             inputProps={{
-              inputMode: "numeric", // Establece el modo de entrada como numérico
-              pattern: "[0-9]*" // Asegura que solo se puedan ingresar números
+              inputMode: "numeric",
+              pattern: "[0-9]*"
             }}
           />
-
-          <Grid container justifyContent="center" spacing={1} sx={{ mt: 2 }}>
-            {/* {numbers.map((number) => (
-              <Grid item xs={4} lg={4} key={number}>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  onClick={() => handleNumberClick(number)}
-                >
-                  {number}
-                </Button>
-              </Grid>
-            ))} */}
-            <Grid container justifyContent="space-between" sx={{ mt: 2 }}>
-              {/* Botón para eliminar todos los datos */}
-              {/* <Button variant="outlined" onClick={handleClearAll}>
-                Limpiar todo
-              </Button> */}
-              {/* Botón para eliminar el último carácter */}
-              {/* <Button variant="outlined" onClick={handleDeleteLastCharacter}>
-                Borrar último
-              </Button> */}
-            </Grid>
-          </Grid>
           <Button
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
             onClick={handleLogin}
-            disabled={loading} // Deshabilitar el botón durante la carga
+            disabled={loading}
           >
-            {/* Texto del botón */}
-            {/* {loading ? <CircularProgress sx={{color:"red"}} size={24} /> : "Iniciar sesión"} */}
             {loading ? (
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <CircularProgress
-                  color="inherit"
-                  size={20}
-                  sx={{ marginRight: 1 }}
-                />
+                <CircularProgress color="inherit" size={20} sx={{ marginRight: 1 }} />
                 Ingresando
               </Box>
             ) : (

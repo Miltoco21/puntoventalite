@@ -65,6 +65,7 @@ const NavBar = () => {
     
     // Clear userData from localStorage
     localStorage.removeItem("userData");
+    sessionStorage.removeItem("userData");
     // Clear userData from context
     clearSessionData();
     
