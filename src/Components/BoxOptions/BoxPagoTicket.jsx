@@ -216,7 +216,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
       setLoading(true);
 
       let endpoint =
-        `${import.meta.env.VITE_URL_API2}Ventas/RedelcomImprimirTicket`;
+        `${import.meta.env.VITE_URL_API2}/Ventas/RedelcomImprimirTicket`;
 
       // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
       if (metodoPago === "TRANSFERENCIA") {
