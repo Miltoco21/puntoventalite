@@ -68,7 +68,7 @@ const BoxPreciosClientes = ({
   const fetchPrecioData = async () => {
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${selectedCodigoCliente}&codigoClienteSucursal=${selectedCodigoClienteSucursal}`
+        `https://www.easypos.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${selectedCodigoCliente}&codigoClienteSucursal=${selectedCodigoClienteSucursal}`
       );
 
       console.log("Nuevos precios:", response.data);
@@ -126,7 +126,7 @@ const BoxPreciosClientes = ({
       console.log("Datos antes de la solicitud:", requestBody);
 
       const response = await axios.put(
-        "https://www.easyposdev.somee.com/api/Clientes/PutClientesProductoActualizarPrecioByIdCliente",
+        "https://www.easypos.somee.com/api/Clientes/PutClientesProductoActualizarPrecioByIdCliente",
         requestBody
       );
 
@@ -135,7 +135,7 @@ const BoxPreciosClientes = ({
 
       if (response.status === 200) {
         const updatePrecios = await axios.get(
-          `https://www.easyposdev.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
+          `https://www.easypos.somee.com/api/Clientes/GetClientesProductoPrecioByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
         );
 
         setSnackbarMessage(response.data.descripcion);
@@ -143,7 +143,7 @@ const BoxPreciosClientes = ({
 
         // Realizar la segunda llamada a la API para obtener las deudas del cliente
         const deudasResponse = await axios.get(
-          `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
+          `https://www.easypos.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoCliente=${codigoCliente}&codigoClienteSucursal=${codigoClienteSucursal}`
         );
 
         console.log("Respuesta de la API de deudas:", deudasResponse.data);
