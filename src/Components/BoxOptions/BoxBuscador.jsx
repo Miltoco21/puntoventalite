@@ -7,12 +7,8 @@ import {
   ListItem,
   IconButton,
   Table,
-  TableBody,
-  TableCell,
   TableContainer,
-  Container,
-  TableHead,
-  TableRow,
+  Collapse,
   InputLabel,
   Chip,
   Typography,
@@ -31,7 +27,7 @@ import axios from "axios";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import { Visibility } from "@mui/icons-material";
 import BoxCtaCorriente from "./BoxCtaCorriente";
-
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 const BoxBuscador = (handleClosePreciosClientes) => {
   const apiUrl = import.meta.env.VITE_URL_API2;
   const {
@@ -55,6 +51,8 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     searchText,
     setSearchText,
   } = useContext(SelectedOptionsContext);
+
+  const [openCollapse, setOpenCollapse] = useState(false);
 
   const [ultimaVenta, setUltimaVenta] = useState(null); // Estado para los datos de la última venta
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -130,7 +128,9 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       handleOpenDeudasClientesDialog(0, 0);
 
       const response = await axios.get(
-        `${import.meta.env.VITE_URL_API2}/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
+        `${
+          import.meta.env.VITE_URL_API2
+        }/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
       );
       if (
         Array.isArray(response.data.clienteSucursal) &&
@@ -153,36 +153,6 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     setSnackbarOpen(true); // Mostrar el Snackbar
   };
 
-  // const handleSearch = async () => {
-  //   try {
-  //     clearSalesData(); // Limpia los datos de ventas
-  //     setSelectedUser(null); // Desmarca el usuario seleccionado
-  //     setSelectedChipIndex([]); // Limpia el índice del chip seleccionado
-  //     setSearchResults([]); // Limpia los resultados de búsqueda
-  //     setSelectedCodigoCliente(0); // Establece el código de cliente seleccionado como 0
-  //     handleOpenPreciosClientesDialog(0, 0); // Limpia los datos del diálogo de precios
-  //     handleOpenDeudasClientesDialog(0, 0);
-
-  //     const response = await axios.get(
-  //       `https://www.easyposdev.somee.com/api/Clientes/GetClientesByNombreApellido?nombreApellido=${searchText}`
-  //     );
-  //     if (Array.isArray(response.data.clienteSucursal)) {
-  //       setSearchResults(response.data.clienteSucursal);
-  //       // También actualiza el contexto con los resultados de la búsqueda
-  //       updateSearchResults(response.data.clienteSucursal);
-  //     } else {
-  //       setSearchResults([]);
-  //       // También actualiza el contexto con los resultados de la búsqueda vacíos
-  //       updateSearchResults([]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     setSearchResults([]);
-  //     // También actualiza el contexto con los resultados de la búsqueda vacíos en caso de error
-  //     updateSearchResults([]);
-  //   }
-  // };
-
   const handleInputChange = (e) => {
     const inputValue = e.target.value;
     setSearchText(inputValue);
@@ -197,7 +167,9 @@ const BoxBuscador = (handleClosePreciosClientes) => {
   ) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_URL_API2}/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
+        `${
+          import.meta.env.VITE_URL_API2
+        }/Clientes/GetClienteUltimaVentaByIdCliente?codigoClienteSucursal=${codigoClienteSucursal}&codigoCliente=${codigoCliente}`
       );
 
       console.log("Respuesta Ultima Compra :", response.data); // Console log de los datos enviados por el chip
@@ -247,46 +219,46 @@ const BoxBuscador = (handleClosePreciosClientes) => {
     setSelectedCodigoCliente(codigoCliente);
     setSelectedCodigoClienteSucursal(codigoClienteSucursal);
   };
+  const handleToggleCollapse = () => {
+    setOpenCollapse((prevOpen) => !prevOpen);
+  };
 
   return (
-    <Grid container item xs={12} md={12} lg={12}>
+    <Grid container item xs={12}>
       <Paper
-        elevation={13}
+      
         sx={{
           background: "#859398",
           width: "100%",
           margin: "0 auto",
+          padding: 1,
+          marginBottom: 1,
         }}
       >
+        {/* Título y botón de colapso */}
         <Grid
           container
-          sx={{ minWidth: 200, width: "100%", display: "flex" }}
+          justifyContent="space-between"
           alignItems="center"
+          sx={{ marginBottom: 1 }}
         >
-          <Grid item xs={12} md={12} lg={12}>
-            <InputLabel
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                margin: 1,
-               // Cambiar el color del texto a azul
-                fontSize: "1.2rem", // Cambiar el tamaño del texto
-                fontWeight: "bold", // Hacer el texto en negrita
-                // Puedes agregar más estilos aquí según tus necesidades
-              }}
-            >
-              Buscador de clientes
-            </InputLabel>
-            <Paper
-              elevation={0} // Sin elevación para que el borde funcione
-              sx={{
-                background: "#859398", // Color de fondo blanco para el Paper interior
-                borderRadius: "5px", // Bordes redondeados
-                display: "flex",
-                alignItems: "center",
-                margin: 1,
-              }}
-            >
+          <InputLabel
+            sx={{
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+            }}
+          >
+            Buscador de clientes
+          </InputLabel>
+          <IconButton onClick={handleToggleCollapse} sx={{ color: "black" }}>
+            {openCollapse ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Grid>
+
+        {/* Contenido colapsable */}
+        <Collapse in={openCollapse} timeout="auto" unmountOnExit>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={9} md={9}>
               <TextField
                 fullWidth
                 placeholder="Ingrese Nombre Apellido"
@@ -295,59 +267,61 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                 sx={{
                   backgroundColor: "white",
                   borderRadius: "5px",
-                  margin: "1px",
                 }}
               />
+            </Grid>
+            <Grid item xs={2} md={3}>
               <Button
                 variant="contained"
                 onClick={handleSearch}
                 startIcon={<SearchIcon />}
                 sx={{
-                  margin: "1px",
                   height: "3.4rem",
                   backgroundColor: "#283048",
                   color: "white",
                   "&:hover": {
                     backgroundColor: "#1c1b17",
                   },
-                  marginLeft: "8px", // Margen izquierdo para separar el TextField del Button
                 }}
               >
                 Buscar
               </Button>
-            </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-        {searchResults && searchResults.length > 0 && (
-          <TableContainer>
-            <ul
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                gap: "5px",
-                padding: 0,
-              }}
-            >
-              {searchResults.map((result, index) => (
-                <ListItem key={result.codigoCliente}>
-                  <Chip
-                    label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
-                    icon={
-                      selectedChipIndex === index ? <CheckCircleIcon /> : null
-                    }
-                    onClick={() => handleChipClick(index, result)}
-                    sx={{
-                      backgroundColor:
-                        selectedChipIndex === index ? "#A8EB12" : "#2196f3",
-                      transition: "none",
-                    }}
-                  />
-                </ListItem>
-              ))}
-            </ul>
-          </TableContainer>
-        )}
 
+          {/* Resultados de búsqueda */}
+          {searchResults && searchResults.length > 0 && (
+            <TableContainer>
+              <ul
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "5px",
+                  padding: 0,
+                  listStyle: "none",
+                }}
+              >
+                {searchResults.map((result, index) => (
+                  <ListItem key={result.codigoCliente}>
+                    <Chip
+                      label={`${result.nombreResponsable} ${result.apellidoResponsable}`}
+                      icon={
+                        selectedChipIndex === index ? <CheckCircleIcon /> : null
+                      }
+                      onClick={() => handleChipClick(index, result)}
+                      sx={{
+                        backgroundColor:
+                          selectedChipIndex === index ? "#A8EB12" : "#2196f3",
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </ul>
+            </TableContainer>
+          )}
+        </Collapse>
+
+        {/* Snackbar para mensajes */}
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={6000}
@@ -364,6 +338,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
       </Paper>
     </Grid>
   );
+
 };
 
 export default BoxBuscador;

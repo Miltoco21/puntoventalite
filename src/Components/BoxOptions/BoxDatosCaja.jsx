@@ -13,7 +13,7 @@ import {
   Collapse,
   Grid, // Importamos Grid de Material UI
 } from "@mui/material";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, Grid3x3Outlined } from "@mui/icons-material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const UserProfileCard = () => {
@@ -44,8 +44,8 @@ const UserProfileCard = () => {
   };
 
   return (
-    <Paper sx={{ background: "#859398", padding: 1 }}>
-      <Box
+    <Paper sx={{ background: "#859398", padding: 1, margin: "0 auto" }}>
+      <Grid
         sx={{
           display: "flex",
           alignItems: "center",
@@ -63,7 +63,7 @@ const UserProfileCard = () => {
         <IconButton onClick={handleToggle} sx={{ color: "black" }}>
           {open ? <ExpandLess /> : <ExpandMore />}
         </IconButton>
-      </Box>
+      </Grid>
 
       <Collapse in={open} timeout="auto" unmountOnExit>
         <TableContainer>

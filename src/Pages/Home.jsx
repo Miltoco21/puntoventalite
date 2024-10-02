@@ -21,7 +21,7 @@ const Home = () => {
           background: "rgb(146, 181, 176)",
         }}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
             <Navbar />
             <BoxDatosCaja />
