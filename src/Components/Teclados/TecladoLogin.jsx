@@ -136,10 +136,15 @@ const Login = () => {
             value={rutOrCode}
             onFocus={() => setActiveInput("rutOrCode")}
             onChange={(e) => setRutOrCode(e.target.value)}
+            // inputProps={{
+            //   inputMode: "decimal",
+            //   pattern: "[0-9]*"
+            // }}
             inputProps={{
-              inputMode: "decimal",
-              pattern: "[0-9]*"
+              inputMode: "text", //  "text" para permitir el guion
+              pattern: "[0-9kK\\-]*" // Elimina restricciones fuertes o ajusta según sea necesario
             }}
+          
           />
           <TextField
             margin="normal"
