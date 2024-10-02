@@ -24,6 +24,7 @@ const Home = () => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Navbar />
+            <BoxDatosCaja />
           </Grid>
 
           {/* Main Content */}
@@ -41,7 +42,7 @@ const Home = () => {
                 lg={6}
                 // style={{ position: "relative" }}
               >
-                <BoxDatosCaja />
+              
                 <BoxBuscador />
 
                 <BoxSumaProd />

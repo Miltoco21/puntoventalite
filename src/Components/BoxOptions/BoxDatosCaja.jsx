@@ -1,31 +1,26 @@
 import React, { useState, useContext, useEffect } from "react";
 import {
   Paper,
-  Card,
-  CardContent,
-  Typography,
   Table,
   TableHead,
   TableBody,
   TableCell,
   TableRow,
-  Avatar,
   TableContainer,
-  Grid,
-  useTheme,
-  useMediaQuery,
-  InputLabel
+  InputLabel,
+  Box,
+  IconButton,
+  Collapse,
 } from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
 const UserProfileCard = () => {
   const { userData } = useContext(SelectedOptionsContext);
   const [vendedor, setVendedor] = useState(null);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // Simulación de obtención de datos del usuario después de un tiempo de espera
     const fetchData = () => {
       setTimeout(() => {
         setVendedor({
@@ -43,107 +38,163 @@ const UserProfileCard = () => {
     fetchData();
   }, [userData]);
 
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
   return (
-    <Paper sx={{ background: "#859398" }}>
-      <InputLabel
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                margin: 1,
-               // Cambiar el color del texto a azul
-                fontSize: "1.2rem", // Cambiar el tamaño del texto
-                fontWeight: "bold", // Hacer el texto en negrita
-                // Puedes agregar más estilos aquí según tus necesidades
-              }}
-            >
-              Información Vendedor
-            </InputLabel>
-            
-      <TableContainer>
-        <Table aria-label="simple table" sx={{ minWidth: 140 }}>
-          <TableBody>
+    <Paper sx={{ background: "#859398", padding: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <InputLabel
+          sx={{
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+          }}
+        >
+          Información Vendedor
+        </InputLabel>
+        <IconButton onClick={handleToggle} sx={{ color: "black" }}>
+          {open ? <ExpandLess /> : <ExpandMore />}
+        </IconButton>
+      </Box>
+
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <TableContainer>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap", // Permite ajuste en pantallas más pequeñas
+              justifyContent: "space-between", // Espacio entre tablas
+              gap: 1, // Espaciado entre tablas
+            }}
+          >
             {vendedor && (
               <>
-                <TableRow>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    component="th"
-                    scope="row"
-                  >
-                    Nombre y Apellidos
-                  </TableCell>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    align="right"
-                  >
-                    {vendedor.nombre}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    component="th"
-                    scope="row"
-                  >
-                    Código
-                  </TableCell>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    align="right"
-                  >
-                    {vendedor.codigo}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    component="th"
-                    scope="row"
-                  >
-                    Caja
-                  </TableCell>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    align="right"
-                  >
-                    {vendedor.caja}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    component="th"
-                    scope="row"
-                  >
-                    Nº Última Operación
-                  </TableCell>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    align="right"
-                  >
-                    {vendedor.operacion}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    component="th"
-                    scope="row"
-                  >
-                    Última Boleta
-                  </TableCell>
-                  <TableCell
-                    sx={{ padding: "4px 8px", fontSize: "0.8rem" }}
-                    align="right"
-                  >
-                    {vendedor.boleta}
-                  </TableCell>
-                </TableRow>
+                <Table sx={{ width: "18%", minWidth: 100 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                      >
+                        <strong>Nombre</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ fontSize: "0.85rem", padding: "4px" }}
+                      >
+                        {vendedor.nombre}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+
+                <Table sx={{ width: "18%", minWidth: 100 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                      >
+                        <strong>Código</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ fontSize: "0.85rem", padding: "4px" }}
+                      >
+                        {vendedor.codigo}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+
+                <Table sx={{ width: "18%", minWidth: 100 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                      >
+                        <strong>Caja</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ fontSize: "0.85rem", padding: "4px" }}
+                      >
+                        {vendedor.caja}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+
+                <Table sx={{ width: "18%", minWidth: 100 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                      >
+                        <strong>Nº Última Operación</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ fontSize: "0.85rem", padding: "4px" }}
+                      >
+                        {vendedor.operacion}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+
+                <Table sx={{ width: "18%", minWidth: 100 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                      >
+                        <strong>Última Boleta</strong>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        sx={{ fontSize: "0.85rem", padding: "4px" }}
+                      >
+                        {vendedor.boleta}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
               </>
             )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          </Box>
+        </TableContainer>
+      </Collapse>
     </Paper>
   );
 };
