@@ -102,7 +102,7 @@ const UserProfileCard = () => {
                   </Table>
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={2}>
+                <Grid item xs={6} sm={6} md={2}>
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -127,7 +127,7 @@ const UserProfileCard = () => {
                   </Table>
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={2}>
+                <Grid item xs={6} sm={6} md={2}>
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -152,7 +152,7 @@ const UserProfileCard = () => {
                   </Table>
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={2}>
+                <Grid item xs={6} sm={6} md={2}>
                   <Table>
                     <TableHead>
                       <TableRow>
@@ -177,7 +177,7 @@ const UserProfileCard = () => {
                   </Table>
                 </Grid>
 
-                <Grid item xs={12} sm={6} md={2}>
+                <Grid item xs={6} sm={6} md={2}>
                   <Table>
                     <TableHead>
                       <TableRow>
