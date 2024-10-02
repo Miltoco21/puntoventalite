@@ -11,6 +11,7 @@ import {
   Box,
   IconButton,
   Collapse,
+  Grid, // Importamos Grid de Material UI
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
@@ -66,133 +67,143 @@ const UserProfileCard = () => {
 
       <Collapse in={open} timeout="auto" unmountOnExit>
         <TableContainer>
-          <Box
+          <Grid
+            container
+            spacing={2} // Añadimos espaciado entre los elementos
             sx={{
               display: "flex",
-              flexWrap: "wrap", // Permite ajuste en pantallas más pequeñas
-              justifyContent: "space-between", // Espacio entre tablas
-              gap: 1, // Espaciado entre tablas
+              justifyContent: "space-between",
             }}
           >
             {vendedor && (
               <>
-                <Table sx={{ width: "18%", minWidth: 100 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
-                      >
-                        <strong>Nombre</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ fontSize: "0.85rem", padding: "4px" }}
-                      >
-                        {vendedor.nombre}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <Grid item xs={12} sm={6} md={2}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                        >
+                          <strong>Nombre</strong>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ fontSize: "0.85rem", padding: "4px" }}
+                        >
+                          {vendedor.nombre}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Grid>
 
-                <Table sx={{ width: "18%", minWidth: 100 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
-                      >
-                        <strong>Código</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ fontSize: "0.85rem", padding: "4px" }}
-                      >
-                        {vendedor.codigo}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <Grid item xs={12} sm={6} md={2}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                        >
+                          <strong>Código</strong>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ fontSize: "0.85rem", padding: "4px" }}
+                        >
+                          {vendedor.codigo}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Grid>
 
-                <Table sx={{ width: "18%", minWidth: 100 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
-                      >
-                        <strong>Caja</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ fontSize: "0.85rem", padding: "4px" }}
-                      >
-                        {vendedor.caja}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <Grid item xs={12} sm={6} md={2}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                        >
+                          <strong>Caja</strong>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ fontSize: "0.85rem", padding: "4px" }}
+                        >
+                          {vendedor.caja}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Grid>
 
-                <Table sx={{ width: "18%", minWidth: 100 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
-                      >
-                        <strong>Nº Última Operación</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ fontSize: "0.85rem", padding: "4px" }}
-                      >
-                        {vendedor.operacion}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <Grid item xs={12} sm={6} md={2}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                        >
+                          <strong>Nº Última Operación</strong>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ fontSize: "0.85rem", padding: "4px" }}
+                        >
+                          {vendedor.operacion}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Grid>
 
-                <Table sx={{ width: "18%", minWidth: 100 }}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ backgroundColor: "gainsboro", padding: "4px" }}
-                      >
-                        <strong>Última Boleta</strong>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell
-                        align="center"
-                        sx={{ fontSize: "0.85rem", padding: "4px" }}
-                      >
-                        {vendedor.boleta}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <Grid item xs={12} sm={6} md={2}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ backgroundColor: "gainsboro", padding: "4px" }}
+                        >
+                          <strong>Última Boleta</strong>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          sx={{ fontSize: "0.85rem", padding: "4px" }}
+                        >
+                          {vendedor.boleta}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </Grid>
               </>
             )}
-          </Box>
+          </Grid>
         </TableContainer>
       </Collapse>
     </Paper>
