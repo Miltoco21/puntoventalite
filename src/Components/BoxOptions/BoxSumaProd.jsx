@@ -244,7 +244,7 @@ const BoxSumaProd = ({ venta }) => {
       {/* Collapsible Search Section */}
       <Collapse in={openCollapse} timeout="auto" unmountOnExit>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={9}>
+          <Grid item xs={8}>
             <TextField
               fullWidth
               sx={{ backgroundColor: "white", borderRadius: "5px" }}
@@ -257,8 +257,8 @@ const BoxSumaProd = ({ venta }) => {
           </Grid>
           <Grid item xs={3}>
             <Button
-              fullWidth
-              startIcon={<SearchIcon />}
+         
+             
               sx={{
                 height: "3.4rem",
                 backgroundColor: "#283048",
@@ -269,7 +269,7 @@ const BoxSumaProd = ({ venta }) => {
               }}
               onClick={handleSearchButtonClick}
             >
-              Buscar
+               {<SearchIcon />} Buscar
             </Button>
           </Grid>
         </Grid>

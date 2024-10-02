@@ -120,6 +120,9 @@ const Login = () => {
           alignItems: "center",
         }}
       >
+         <Typography component="h1" variant="h5">
+          EasyPOS Panaderias 
+        </Typography>
         <Typography component="h1" variant="h5">
           Iniciar sesión
         </Typography>

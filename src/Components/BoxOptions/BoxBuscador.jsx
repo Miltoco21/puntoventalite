@@ -258,10 +258,10 @@ const BoxBuscador = (handleClosePreciosClientes) => {
         {/* Contenido colapsable */}
         <Collapse in={openCollapse} timeout="auto" unmountOnExit>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={9} md={9}>
+            <Grid item xs={7} md={9}>
               <TextField
                 fullWidth
-                placeholder="Ingrese Nombre Apellido"
+                placeholder="Ingrese Nombre "
                 value={searchText}
                 onChange={handleInputChange}
                 sx={{
@@ -270,11 +270,11 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                 }}
               />
             </Grid>
-            <Grid item xs={2} md={3}>
+            <Grid item xs={1} md={3}>
               <Button
                 variant="contained"
                 onClick={handleSearch}
-                startIcon={<SearchIcon />}
+        
                 sx={{
                   height: "3.4rem",
                   backgroundColor: "#283048",
@@ -284,7 +284,7 @@ const BoxBuscador = (handleClosePreciosClientes) => {
                   },
                 }}
               >
-                Buscar
+                {<SearchIcon />} Buscar
               </Button>
             </Grid>
           </Grid>
