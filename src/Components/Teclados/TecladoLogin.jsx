@@ -13,6 +13,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
+import CONSTANTS from "../Definitions/Constants";
 
 const Login = () => {
   const [rutOrCode, setRutOrCode] = useState("");
@@ -121,7 +122,10 @@ const Login = () => {
         }}
       >
          <Typography component="h1" variant="h5">
-          EasyPOS Panaderias 
+        {CONSTANTS.appName}
+        </Typography>
+        <Typography component="h1" variant="h5">
+        {CONSTANTS.appVersion}
         </Typography>
         <Typography component="h1" variant="h5">
           Iniciar sesión
