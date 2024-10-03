@@ -59,8 +59,6 @@ const BoxGestionCaja = () => {
   const apiUrl = import.meta.env.VITE_URL_API2;
 
   const buttonStyles = {
-    width: "97%",
-    height: "7rem",
     backgroundColor: "#283078",
     color: "white",
     "&:hover": {
@@ -607,40 +605,58 @@ const BoxGestionCaja = () => {
           marginTop: 1,
         }}
       >
-        {/* Botones  */}
-        <Grid sx={{ display: "flex" }} item xs={12}>
-          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
-            <Button sx={buttonStyles} onClick={handleClearSalesData}>
+        {/* Botones */}
+        <Grid
+          container
+          spacing={2}
+          justifyContent="center"
+          sx={{ marginBottom: 2 }}
+        >
+          <Grid item xs={6} sm={6} md={4} lg={2}>
+            <Button fullWidth sx={buttonStyles} onClick={handleClearSalesData}>
               Borrar Ventas
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
-            <Button sx={buttonStyles} onClick={handleOpenCategoria}>
-              <Typography variant="h7">Familias</Typography>
+          <Grid item xs={6} sm={6} md={4} lg={2}>
+            <Button fullWidth sx={buttonStyles} onClick={handleOpenCategoria}>
+              Familias
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
-            <Button sx={buttonStyles} onClick={handleOpenCrearProductoDialog}>
+          <Grid item xs={6} sm={6} md={4} lg={2}>
+            <Button
+              fullWidth
+              sx={buttonStyles}
+              onClick={handleOpenCrearProductoDialog}
+            >
               Crear Producto
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
-            <Button sx={buttonStyles} onClick={handleOpenIngreso}>
+          <Grid item xs={6} sm={6} md={4} lg={2}>
+            <Button fullWidth sx={buttonStyles} onClick={handleOpenIngreso}>
               Crear Cliente
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
-            <Button sx={buttonStyles} onClick={handleOpenDeudasDialog}>
+          <Grid item xs={6} sm={6} md={4} lg={2}>
+            <Button
+              fullWidth
+              sx={buttonStyles}
+              onClick={handleOpenDeudasDialog}
+            >
               Deudas
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={6} lg={12} xl={2}>
-            <Button sx={buttonStyles} onClick={handleOpenPrecioCliente}>
+          <Grid item xs={6} sm={6} md={4} lg={2}>
+            <Button
+              fullWidth
+              sx={buttonStyles}
+              onClick={handleOpenPrecioCliente}
+            >
               Precios
             </Button>
           </Grid>
         </Grid>
 
+        {/* Total */}
         <Grid
           item
           sx={{
@@ -662,8 +678,6 @@ const BoxGestionCaja = () => {
                 borderRadius: "8px",
                 border: "4px solid #ccc",
                 display: "flex",
-
-                //   justifyContent: "center",
               }}
             >
               <Grid container item xs={12}>
@@ -674,7 +688,6 @@ const BoxGestionCaja = () => {
                     margin: "6px",
                     color: "#E1213B",
                     backgroundColor: "#ffffff",
-
                     borderRadius: "5px",
                   }}
                 >
@@ -700,14 +713,12 @@ const BoxGestionCaja = () => {
                           color: "#E1213B",
                           fontSize: "36px",
                           fontFamily: "Victor Mono",
-
                           fontWeight: "700",
                         }}
                       >
-                        {" "}
                         {grandTotal.toLocaleString("es-ES")}
-                      </span>{" "}
-                    </span>{" "}
+                      </span>
+                    </span>
                   </p>
                 </Grid>
 
@@ -720,7 +731,7 @@ const BoxGestionCaja = () => {
                     sx={buttonStylesYellow}
                     onClick={handleOpenBoletaDialog}
                   >
-                    <Typography variant="h7"> Boleta</Typography>
+                    <Typography variant="h7">Boleta</Typography>
                   </Button>
                 </Grid>
                 <Grid item xs={4}>
@@ -746,6 +757,8 @@ const BoxGestionCaja = () => {
             </Grid>
           </Grid>
         </Grid>
+        {/* 
+        Seccion Dialog y snackbar */}
 
         <Snackbar
           open={snackbarOpen}
@@ -894,6 +907,163 @@ const BoxGestionCaja = () => {
       </Paper>
     </Grid>
   );
+
+  // return (
+  //   <Grid container item xs={12} lg={12}>
+  //     <Paper
+  //       sx={{
+  //         background: "#859398",
+  //         width: "100%",
+  //         margin: "0 auto",
+  //         padding: 1,
+  //         marginTop: 1,
+  //       }}
+  //     >
+  //       {/* Botones  */}
+  //       <Grid sx={{ display: "flex" }} item xs={12}
+  //        >
+  //         <Grid item xs={6} sm={12} md={12} lg={4} xl={2}>
+  //           <Button fullWidth sx={buttonStyles} onClick={handleClearSalesData}>
+  //             Borrar Ventas
+  //           </Button>
+  //         </Grid>
+  //         <Grid item xs={6} sm={6} md={6} lg={4} xl={2}>
+  //           <Button fullWidth sx={buttonStyles} onClick={handleOpenCategoria}>
+  //            Familias
+  //           </Button>
+  //         </Grid>
+  //         <Grid item xs={6} sm={6} md={6} lg={4} xl={2}>
+  //           <Button fullWidth sx={buttonStyles} onClick={handleOpenCrearProductoDialog}>
+  //             Crear Producto
+  //           </Button>
+  //         </Grid>
+  //         <Grid fullWidth item xs={6} sm={6} md={6} lg={4} xl={2}>
+  //           <Button sx={buttonStyles} onClick={handleOpenIngreso}>
+  //             Crear Cliente
+  //           </Button>
+  //         </Grid>
+  //         <Grid fullWidth item xs={6} sm={6} md={6} lg={4} xl={2}>
+  //           <Button sx={buttonStyles} onClick={handleOpenDeudasDialog}>
+  //             Deudas
+  //           </Button>
+  //         </Grid>
+  //         <Grid fullWidth item xs={6} sm={6} md={6} lg={12} xl={2}>
+  //           <Button sx={buttonStyles} onClick={handleOpenPrecioCliente}>
+  //             Precios
+  //           </Button>
+  //         </Grid>
+  //       </Grid>
+
+  //       <Grid
+  //         item
+  //         sx={{
+  //           background: "#859398",
+  //           width: "100%",
+  //           margin: "0 auto",
+  //           padding: 1,
+  //           marginTop: 1,
+  //         }}
+  //         xs={12}
+  //         sm={12}
+  //         md={12}
+  //         lg={12}
+  //         xl={2}
+  //       >
+  //         <Grid>
+  //           <Grid
+  //             sx={{
+  //               borderRadius: "8px",
+  //               border: "4px solid #ccc",
+  //               display: "flex",
+
+  //               //   justifyContent: "center",
+  //             }}
+  //           >
+  //             <Grid container item xs={12}>
+  //               <Grid
+  //                 item
+  //                 xs={12}
+  //                 sx={{
+  //                   margin: "6px",
+  //                   color: "#E1213B",
+  //                   backgroundColor: "#ffffff",
+
+  //                   borderRadius: "5px",
+  //                 }}
+  //               >
+  //                 <p
+  //                   style={{
+  //                     margin: "6px",
+  //                     fontSize: "36px",
+  //                     fontWeight: "bold",
+  //                     fontFamily: "Victor Mono",
+  //                   }}
+  //                 >
+  //                   TOTAL:$
+  //                   <span
+  //                     style={{
+  //                       color: "#00878889",
+  //                       fontSize: "24px",
+  //                       fontWeight: "bold",
+  //                     }}
+  //                   >
+  //                     <span
+  //                       style={{
+  //                         height: "600%",
+  //                         color: "#E1213B",
+  //                         fontSize: "36px",
+  //                         fontFamily: "Victor Mono",
+
+  //                         fontWeight: "700",
+  //                       }}
+  //                     >
+  //                       {" "}
+  //                       {grandTotal.toLocaleString("es-ES")}
+  //                     </span>{" "}
+  //                   </span>{" "}
+  //                 </p>
+  //               </Grid>
+
+  //               <Grid
+  //                 item
+  //                 xs={4}
+  //                 sx={{ display: "flex", justifyContent: "center" }}
+  //               >
+  //                 <Button
+  //                   sx={buttonStylesYellow}
+  //                   onClick={handleOpenBoletaDialog}
+  //                 >
+  //                   <Typography variant="h7"> Boleta</Typography>
+  //                 </Button>
+  //               </Grid>
+  //               <Grid item xs={4}>
+  //                 <Button
+  //                   sx={buttonStylesYellow}
+  //                   onClick={handleOpenFacturaDialog}
+  //                 >
+  //                   <Typography variant="h7">Factura</Typography>
+  //                 </Button>
+  //               </Grid>
+  //               <Grid item xs={4}>
+  //                 <Button
+  //                   sx={buttonStylesYellow}
+  //                   onClick={() => {
+  //                     console.log("Botón de Ticket presionado");
+  //                     handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
+  //                   }}
+  //                 >
+  //                   <Typography variant="h7">Ticket</Typography>
+  //                 </Button>
+  //               </Grid>
+  //             </Grid>
+  //           </Grid>
+  //         </Grid>
+  //       </Grid>
+
+  //
+  //     </Paper>
+  //   </Grid>
+  // );
 };
 
 export default BoxGestionCaja;
