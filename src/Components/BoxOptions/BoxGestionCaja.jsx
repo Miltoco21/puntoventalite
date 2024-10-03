@@ -58,6 +58,29 @@ const BoxGestionCaja = () => {
 
   const apiUrl = import.meta.env.VITE_URL_API2;
 
+  const buttonStyles = {
+    width: "97%",
+    height: "7rem",
+    backgroundColor: "#283078",
+    color: "white",
+    "&:hover": {
+      backgroundColor: "#1c1b17",
+      color: "white",
+    },
+    margin: "1%",
+  };
+  const buttonStylesYellow = {
+    margin: "7px",
+    width: "80%",
+    height: "60px",
+    background:
+      "radial-gradient(circle farthest-corner at 10% 20%, rgba(879, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
+    color: "black",
+    "&:hover": {
+      backgroundColor: "red",
+      color: "white",
+    },
+  };
 
   const [openCrearProductoDialog, setOpenCrearProductoDialog] = useState(false);
   const [clickedDigits, setClickedDigits] = useState([]);
@@ -114,7 +137,7 @@ const BoxGestionCaja = () => {
 
   const fetchDataProducts = () => {
     axios
-      .get( `${import.meta.env.VITE_URL_API2}/ProductosTmp/GetProductos`)
+      .get(`${import.meta.env.VITE_URL_API2}/ProductosTmp/GetProductos`)
       .then((response) => {
         setProducts(response.data.productos);
 
@@ -574,330 +597,156 @@ const BoxGestionCaja = () => {
   };
 
   return (
-    <Grid container item xs={12} sm={12} md={11} lg={12} gap={1}>
+    <Grid container item xs={12} lg={12}>
       <Paper
-        elevation={5}
         sx={{
-          background: "#859398" /* fallback for old browsers */,
-          /* Chrome 10-25, Safari 5.1-6 */
-
-          display: "flex",
-          flexDirection: "column",
-          margin: "1%",
-          alignItems: "center",
-          justifyContent: "center",
+          background: "#859398",
+          width: "100%",
+          margin: "0 auto",
+          padding: 1,
+          marginTop: 1,
         }}
       >
-        <Grid
-          container
-          sx={{
-            margin: "1%",
-            justifyContent: "center",
-          }}
-
-          // sx={{ marginLeft: "5px", marginTop: "5px", }}
-        >
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={12}>
-            <Button
-              elevation={8}
-              sx={{
-                width: "97%",
-                height: "7rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleClearSalesData}
-            >
-              <Typography variant="h7">Borrar Ventas</Typography>
+        {/* Botones  */}
+        <Grid sx={{ display: "flex" }} item xs={12}>
+          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
+            <Button sx={buttonStyles} onClick={handleClearSalesData}>
+              Borrar Ventas
             </Button>
           </Grid>
-          {/* <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
-            <Button
-              disabled={true}
-              sx={{
-                width: "97%",
-                height: "6rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleOpenStock}
-            >
-            
-              <Typography variant="h7">Stock</Typography>
-            </Button>
-          </Grid> */}
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
-            <Button
-              sx={{
-                width: "97%",
-                height: "7rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleOpenCategoria}
-            >
-              {/* <LockPersonIcon /> */}
+          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
+            <Button sx={buttonStyles} onClick={handleOpenCategoria}>
               <Typography variant="h7">Familias</Typography>
             </Button>
           </Grid>
-
-          {/*  */}
-          {/* <Button
-            sx={{
-              width: "90%",
-              height: "80px",
-              backgroundColor: "lightSalmon",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
-                color: "white",
-              },
-              margin: "5px",
-            }}
-            onClick={handleOpenDevolucion}
-          >
-          
-            <Typography variant="h7">Devolución</Typography>
-          </Button> */}
-
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
-            <Button
-              sx={{
-                width: "97%",
-                height: "7rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleOpenCrearProductoDialog}
-            >
-              <Typography variant="h7">Crear Producto</Typography>
+          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
+            <Button sx={buttonStyles} onClick={handleOpenCrearProductoDialog}>
+              Crear Producto
             </Button>
           </Grid>
-
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
-            <Button
-              sx={{
-                width: "97%",
-                height: "7rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleOpenIngreso}
-            >
-              {/* <CoffeeIcon /> */}
-              <Typography variant="h7">Crear Cliente</Typography>
+          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
+            <Button sx={buttonStyles} onClick={handleOpenIngreso}>
+              Crear Cliente
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
-            <Button
-              sx={{
-                width: "97%",
-                height: "7rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleOpenDeudasDialog}
-            >
-              {/* <CoffeeIcon /> */}
-              <Typography variant="h7">Deudas</Typography>
+          <Grid item xs={6} sm={4} md={6} lg={4} xl={2}>
+            <Button sx={buttonStyles} onClick={handleOpenDeudasDialog}>
+              Deudas
             </Button>
           </Grid>
-          <Grid item xs={6} sm={4} md={4} lg={4} xl={2}>
-            <Button
-              sx={{
-                width: "97%",
-                height: "7rem",
-                backgroundColor: " #283048",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "#1c1b17 ",
-                  color: "white",
-                },
-                margin:"1%"
-              }}
-              onClick={handleOpenPrecioCliente}
-            >
-              {/* <CoffeeIcon /> */}
-              <Typography variant="h7">Precios</Typography>
+          <Grid item xs={6} sm={4} md={6} lg={12} xl={2}>
+            <Button sx={buttonStyles} onClick={handleOpenPrecioCliente}>
+              Precios
             </Button>
           </Grid>
+        </Grid>
 
-          {/* <Grid item xs={6} sm={6} md={4} lg={3} xl={2}>
-          <Button
-            sx={{
-              width: "100px",
-              height: "100px",
-              backgroundColor: "lightSalmon",
-              color: "white",
-              "&:hover": {
-                backgroundColor: "coral",
-                color: "white",
-              },
-            }}
-            onClick={() => handleNavigationChange(null, 11)}
-          >
-            <Typography variant="h7">otro </Typography>
-          </Button>
-        </Grid> */}
-          <Grid item xs={12} sm={10} md={12} lg={12} xl={10}>
-            <Grid>
-              <Box
-                sx={{
-                  borderRadius: "8px",
-                  border: "4px solid #ccc",
-                  display: "flex",
+        <Grid
+          item
+          sx={{
+            background: "#859398",
+            width: "100%",
+            margin: "0 auto",
+            padding: 1,
+            marginTop: 1,
+          }}
+          xs={12}
+          sm={12}
+          md={12}
+          lg={12}
+          xl={2}
+        >
+          <Grid>
+            <Grid
+              sx={{
+                borderRadius: "8px",
+                border: "4px solid #ccc",
+                display: "flex",
 
-                  //   justifyContent: "center",
-                }}
-              >
-                <Grid container item xs={12}>
-                  <Grid
-                    item
-                    xs={12}
-                    sx={{
+                //   justifyContent: "center",
+              }}
+            >
+              <Grid container item xs={12}>
+                <Grid
+                  item
+                  xs={12}
+                  sx={{
+                    margin: "6px",
+                    color: "#E1213B",
+                    backgroundColor: "#ffffff",
+
+                    borderRadius: "5px",
+                  }}
+                >
+                  <p
+                    style={{
                       margin: "6px",
-                      color: "#E1213B",
-                      backgroundColor: "#ffffff",
-
-                      borderRadius: "5px",
+                      fontSize: "36px",
+                      fontWeight: "bold",
+                      fontFamily: "Victor Mono",
                     }}
                   >
-                    <p
+                    TOTAL:$
+                    <span
                       style={{
-                        margin: "6px",
-                        fontSize: "36px",
+                        color: "#00878889",
+                        fontSize: "24px",
                         fontWeight: "bold",
-                        fontFamily: "Victor Mono",
                       }}
                     >
-                      TOTAL:$
                       <span
                         style={{
-                          color: "#00878889",
-                          fontSize: "24px",
-                          fontWeight: "bold",
+                          height: "600%",
+                          color: "#E1213B",
+                          fontSize: "36px",
+                          fontFamily: "Victor Mono",
+
+                          fontWeight: "700",
                         }}
                       >
-                        <span
-                          style={{
-                            height: "600%",
-                            color: "#E1213B",
-                            fontSize: "36px",
-                            fontFamily: "Victor Mono",
-
-                            fontWeight: "700",
-                          }}
-                        >
-                          {" "}
-                          {grandTotal.toLocaleString("es-ES")}
-                        </span>{" "}
+                        {" "}
+                        {grandTotal.toLocaleString("es-ES")}
                       </span>{" "}
-                    </p>
-                  </Grid>
-
-                  <Grid
-                    item
-                    xs={4}
-                    sx={{ display: "flex", justifyContent: "center" }}
-                  >
-                    <Button
-                      sx={{
-                        margin: "7px",
-                        width: "80%",
-                        height: "60px",
-                        background:
-                          "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                        color: "black",
-                        "&:hover": {
-                          backgroundColor: "red",
-                          color: "white",
-                        },
-                      }}
-                      onClick={handleOpenBoletaDialog}
-                      // onClick={() => handleNavigationChange(null, 12)}
-                    >
-                      <Typography variant="h7"> Boleta</Typography>
-                    </Button>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Button
-                      sx={{
-                        margin: "7px",
-                        width: "80%",
-                        height: "60px",
-                        background:
-                          "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                        color: "black",
-                        "&:hover": {
-                          backgroundColor: "red",
-                          color: "white",
-                        },
-                      }}
-                      onClick={handleOpenFacturaDialog}
-                      // onClick={() => handleNavigationChange(null, 12)}
-                    >
-                      <Typography variant="h7">Factura</Typography>
-                    </Button>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Button
-                      sx={{
-                        margin: "7px",
-                        width: "80%",
-                        height: "60px",
-                        background:
-                          "radial-gradient(circle farthest-corner at 10% 20%, rgba(249, 232, 51, 1) 0%, rgba(250, 196, 59, 1) 100.2%)",
-                        color: "black",
-                        "&:hover": {
-                          backgroundColor: "red",
-                          color: "white",
-                        },
-                      }}
-                      onClick={() => {
-                        console.log("Botón de Ticket presionado");
-                        handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
-                      }}
-
-                      // onClick={() => handleNavigationChange(null, 12)}
-                    >
-                      <Typography variant="h7">Ticket</Typography>
-                    </Button>
-                  </Grid>
+                    </span>{" "}
+                  </p>
                 </Grid>
-              </Box>
+
+                <Grid
+                  item
+                  xs={4}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  <Button
+                    sx={buttonStylesYellow}
+                    onClick={handleOpenBoletaDialog}
+                  >
+                    <Typography variant="h7"> Boleta</Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    sx={buttonStylesYellow}
+                    onClick={handleOpenFacturaDialog}
+                  >
+                    <Typography variant="h7">Factura</Typography>
+                  </Button>
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    sx={buttonStylesYellow}
+                    onClick={() => {
+                      console.log("Botón de Ticket presionado");
+                      handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
+                    }}
+                  >
+                    <Typography variant="h7">Ticket</Typography>
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
+
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={6000}
@@ -911,7 +760,6 @@ const BoxGestionCaja = () => {
             {snackbarMessage}
           </Alert>
         </Snackbar>
-
         <Dialog open={openCategoria} onClose={handleCloseCategoria}>
           <DialogContent>
             <BotonesCategorias onClose={handleCloseCategoria} />
@@ -920,7 +768,6 @@ const BoxGestionCaja = () => {
             <Button onClick={handleCloseCategoria}>cerrar</Button>
           </DialogActions>
         </Dialog>
-
         <Dialog
           sx={{ width: "100%" }}
           open={openDialog}
@@ -930,7 +777,6 @@ const BoxGestionCaja = () => {
             <BoxPago />
           </DialogContent>
         </Dialog>
-
         <Dialog
           sx={{ width: "100%" }}
           open={openTicketDialog}
@@ -943,9 +789,7 @@ const BoxGestionCaja = () => {
             <Button onClick={handleCloseTicket}>cerrar</Button>
           </DialogActions>
         </Dialog>
-
         {/* Dialog for entering description */}
-
         <Snackbar
           open={openSuccessSnackbar}
           autoHideDuration={5000}
@@ -955,7 +799,6 @@ const BoxGestionCaja = () => {
             {successMessage}
           </Alert>
         </Snackbar>
-
         <Dialog open={openRecoveryDialog} onClose={handleCloseRecoveryDialog}>
           <DialogTitle>Seleccionar Venta</DialogTitle>
           <DialogContent>
@@ -966,7 +809,6 @@ const BoxGestionCaja = () => {
             <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button>
           </DialogActions>
         </Dialog>
-
         <Dialog
           open={openPreciosClienteDialog}
           onClose={handleClosePrecioCliente}
@@ -982,7 +824,6 @@ const BoxGestionCaja = () => {
             {/* <Button onClick={handleButtonRecuperarVenta}>Seleccionar</Button> */}
           </DialogActions>
         </Dialog>
-
         <Dialog open={openDevolucionDialog} onClose={handleCloseDevolucion}>
           <DialogTitle>Devolución</DialogTitle>
           <DialogContent>
@@ -1034,7 +875,6 @@ const BoxGestionCaja = () => {
             <Button onClick={handleCloseDeudasDialog}>Cerrar</Button>
           </DialogActions>
         </Dialog>
-
         <Dialog open={openBoletaDialog} onClose={handleCloseBoletaDialog}>
           <DialogContent onClose={handleCloseBoletaDialog}>
             <BoxBoleta onClose={handleCloseBoletaDialog} />
