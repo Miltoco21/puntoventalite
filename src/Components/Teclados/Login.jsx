@@ -12,10 +12,16 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
+import ModelConfig from "../Models/ModelConfig";
 import axios from "axios";
 import CONSTANTS from "../Definitions/Constants";
 
+
 const Login = () => {
+
+  const apiUrl = ModelConfig.get().urlBase ?? "https://www.easypos.somee.com/api";
+  const { setUserData } = useContext(SelectedOptionsContext);
+
   const [rutOrCode, setRutOrCode] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +37,6 @@ const Login = () => {
     sessionStorage.setItem('userData', JSON.stringify(userData));
   };
 
-  const apiUrl = import.meta.env.VITE_URL_API2;
 
   const handleLogin = async () => {
     try {
@@ -109,7 +114,7 @@ const Login = () => {
     }
   };
 
-  const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0, "-"];
+
 
   return (
     <Container component="main" maxWidth="xs">

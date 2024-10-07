@@ -1,9 +1,9 @@
 import React from 'react'
-import TecladoLogin from "../Components/Teclados/TecladoLogin"
+import Inicio from "../Components/Teclados/Login"
 
 const Login = () => {
   return (
-    <div><TecladoLogin/></div>
+    <div><Inicio/></div>
   )
 }
 
