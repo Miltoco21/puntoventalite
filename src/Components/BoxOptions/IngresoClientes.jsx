@@ -39,6 +39,7 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import BuscadorClientes from "./BuscadorClientes";
 import IngresoClienteSucursal from "./IngresoClienteSucursal";
+import InputRutCliente from "../Elements/Compuestos/InputRutCliente"
 
 import MuiAlert from "@mui/material/Alert";
 
@@ -707,7 +708,15 @@ const IngresoClientes = ({ onClose }) => {
               <InputLabel sx={{ marginBottom: "4%" }}>
                 Ingresa rut sin puntos y con guión
               </InputLabel>
-              <TextField
+              <InputRutCliente
+              inputState={states.rut}
+              validationState={validatorStates.rut}
+              required={true}
+              autoFocus={true}
+            />
+
+
+              {/* <TextField
                 label="ej: 11111111-1"
                 name="rut"
                 placeholder="Ingrese rut con puntos y con guión"
@@ -719,7 +728,7 @@ const IngresoClientes = ({ onClose }) => {
                   pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
                 }}
                 required
-              />
+              /> */}
             </Grid>
             <Grid item xs={12} sm={12} md={6}>
               <InputLabel sx={{ marginBottom: "4%" }}>

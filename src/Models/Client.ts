@@ -1,5 +1,5 @@
 import StorageSesion from '../Helpers/StorageSesion.ts';
-import BaseConfig from "../definitions/BaseConfig.ts";
+import BaseConfig from "../Components/Definitions/BaseConfig.ts";
 import axios from "axios";
 import Model from './Model.ts';
 import { useState } from 'react';

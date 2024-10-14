@@ -4,6 +4,8 @@
 /* eslint-disable no-unused-vars */
 
 import React, { useState, useEffect, useMemo } from "react";
+import ModelConfig from '../../Models/ModelConfig'
+import User from '../../Models/User'
 
 export const SelectedOptionsContext = React.createContext();
 
@@ -40,10 +42,10 @@ export const SelectedOptionsProvider = ({ children }) => {
     setSearchResults(results);
   };
 
-  const [userData, setUserData] = useState([]);
-  const updateUserData = (data) => {
-    setUserData(data);
-  };
+  // const [userData, setUserData] = useState([]);
+  // const updateUserData = (data) => {
+  //   setUserData(data);
+  // };
 
   const calculateTotalPrice = (quantity, price) => {
     return quantity * price;
@@ -110,48 +112,10 @@ export const SelectedOptionsProvider = ({ children }) => {
     }
   };
 
-  //   const addToSalesData = (product, quantity) => {
-  //     const precioVenta = product.precioVenta || 0;
-  //     const cantidad = quantity !== undefined ? quantity : (product.cantidad || 1); // Usar la cantidad del producto si está disponible
-
-  //     const newSale = {
-  //         quantity: cantidad, // Cambiar 'cantidad' a 'quantity'
-  //         descripcion: product.nombre,
-  //         precio: precioVenta,
-  //         total: calculateTotalPrice(cantidad, precioVenta),
-  //         idProducto: product.idProducto,
-  //     };
-
-  //     setSalesData((prevSalesData) => {
-  //         const updatedSalesData = [...prevSalesData, newSale];
-  //         setGrandTotal((prevTotal) => prevTotal + newSale.total);
-  //         return updatedSalesData; // Asegúrate de que el retorno esté fuera de la función de setSalesData
-  //     });
-  // };
-
-  // const addToSalesData = (product, quantity=1 ) => {
-  //   const precioVenta = product.precioVenta || 0;
-
-  //   const newSale = {
-  //     quantity:quantity, // Cambiar 'cantidad' a 'quantity'
-  //     descripcion: product.nombre,
-  //     precio: precioVenta,
-  //     total: calculateTotalPrice(quantity, precioVenta),
-  //     idProducto: product.idProducto,
-  //   };
-
-  //   setSalesData((prevSalesData) => {
-  //     const updatedSalesData = [...prevSalesData, newSale];
-  //     return updatedSalesData;
-  //     setGrandTotal((prevTotal) => prevTotal + newSale.total);
-  //   });
-  // };
+  
 
   //////LOGIN//////
-  const clearSessionData = () => {
-    localStorage.removeItem("userData");
-    // Limpia cualquier otro dato de sesión que puedas tener
-  };
+
 
   const clearSalesData = () => {
     setSalesData([]);
@@ -247,6 +211,113 @@ export const SelectedOptionsProvider = ({ children }) => {
     }
   };
 
+  ////////contextos proyecto poslite////////
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  
+  const [snackMessage, setSnackMessage] = useState(null)
+  
+  //set general dialog variables
+  const [showLoadingDialog, setShowLoadingDialogx] = useState(false)
+  const [loadingDialogText, setLoadingDialogText] = useState("")
+  
+  
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+  const [textConfirm, setTextConfirm] = useState("")
+  const [handleConfirm, setHandleConfirm] = useState(null)
+  const [handleNotConfirm, setHandleNotConfirm] = useState(null)
+  const [userData, setUserData] = useState(null);
+  const [CONFIG, setCONFIG] = useState(null)
+  
+  const showMessage = (message)=>{
+    setSnackMessage(message)
+    setOpenSnackbar(true)
+  }
+
+  const init = ()=>{
+    // console.log("init de SelectedOptionsProvider");
+    if(!CONFIG)
+      setCONFIG(ModelConfig.getInstance().getFirst())
+    if(!userData)
+      getUserData()
+  }
+  
+  useEffect(()=>{
+    init();
+  },[]);
+  
+
+  //mostrar un dialog con la animacion del cargando
+  const setShowLoadingDialog = (value)=>{
+    setShowLoadingDialogx(value);
+  }
+  
+  const setShowLoadingDialogWithTitle = (textToShow = "", value)=>{
+    setLoadingDialogText(textToShow)
+    setShowLoadingDialogx(value);
+  }
+
+  const showLoading = (textToShow = "")=>{
+    setLoadingDialogText(textToShow)
+    setShowLoadingDialogx(true);
+  }
+  
+  //ocultar el dialog en x milisegundos
+  const hideLoadingDialog = (timeOut = 200)=>{
+    setTimeout(function(){
+      setShowLoadingDialog(false);
+    },timeOut);
+  }
+
+  const hideLoading = (timeOut = 200)=>{
+    setTimeout(function(){
+      setShowLoadingDialog(false);
+    },timeOut);
+  }
+
+
+  const showConfirm = (text, callbackYes, callbackNo)=>{
+    setTextConfirm(text)
+    setHandleConfirm(()=>callbackYes)
+    setHandleNotConfirm(()=>callbackNo)
+    setShowConfirmDialog(true)
+  }
+
+  const updateUserData = (data) => {
+    setUserData(User.getInstance().saveInSesion(data));
+  };
+
+  const getUserData = () => {
+    if(User.getInstance().sesion.hasOne())
+      setUserData(User.getInstance().getFromSesion());
+  };
+
+  const clearSessionData = () => {
+    User.getInstance().sesion.truncate();
+    setUserData([])
+    setUserData([])
+  };
+
+  const GeneralElements = ()=>{
+    return (
+      <>
+      <Snackbar
+        open={openSnackbar}
+        message={snackMessage}
+        autoHideDuration={3000}
+        onClose={()=>{ setOpenSnackbar(false) }}
+      />
+      <LoadingDialog openDialog = {showLoadingDialog} text={loadingDialogText} />
+      <Confirm 
+        openDialog={showConfirmDialog}
+        setOpenDialog={setShowConfirmDialog}
+        textConfirm={textConfirm}
+        handleConfirm={handleConfirm}
+        handleNotConfirm={handleNotConfirm}
+      />
+      </>
+    )
+  }
+
   return (
     <SelectedOptionsContext.Provider
       value={{
@@ -292,7 +363,20 @@ export const SelectedOptionsProvider = ({ children }) => {
         searchText,
         setSearchText,
         searchedProducts,
-         setSearchedProducts
+         setSearchedProducts,
+         showConfirm,
+         showMessage,
+         showLoading,
+         showLoadingDialog,
+         hideLoading,
+         loadingDialogText,
+         setLoadingDialogText,
+         hideLoadingDialog,
+         setShowLoadingDialog,
+         setShowLoadingDialogWithTitle,
+         GeneralElements,
+         init,
+         snackMessage,
       }}
     >
       {children}

@@ -43,6 +43,7 @@ import StepperNo from "../Stepper/StepperNo";
 import BoxCtaCorriente from "../BoxOptions/BoxCtaCorriente";
 import BoxBoleta from "./BoxBoleta";
 import Boxfactura from "./Boxfactura";
+import IngresoClientesModel from '../BoxOptions/IngresoClientesModel'
 
 const BoxGestionCaja = () => {
   const {
@@ -850,7 +851,9 @@ const BoxGestionCaja = () => {
         <Dialog open={openClienteDialog} onClose={handleCloseIngreso}>
           <DialogTitle>Crear Cliente</DialogTitle>
           <DialogContent>
-            <IngresoClientes onClose={handleCloseIngreso} />
+            <IngresoClientesModel onClose={handleCloseIngreso} 
+            openDialog={openClienteDialog}/>
+            
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseIngreso}>cerrar</Button>
@@ -908,162 +911,7 @@ const BoxGestionCaja = () => {
     </Grid>
   );
 
-  // return (
-  //   <Grid container item xs={12} lg={12}>
-  //     <Paper
-  //       sx={{
-  //         background: "#859398",
-  //         width: "100%",
-  //         margin: "0 auto",
-  //         padding: 1,
-  //         marginTop: 1,
-  //       }}
-  //     >
-  //       {/* Botones  */}
-  //       <Grid sx={{ display: "flex" }} item xs={12}
-  //        >
-  //         <Grid item xs={6} sm={12} md={12} lg={4} xl={2}>
-  //           <Button fullWidth sx={buttonStyles} onClick={handleClearSalesData}>
-  //             Borrar Ventas
-  //           </Button>
-  //         </Grid>
-  //         <Grid item xs={6} sm={6} md={6} lg={4} xl={2}>
-  //           <Button fullWidth sx={buttonStyles} onClick={handleOpenCategoria}>
-  //            Familias
-  //           </Button>
-  //         </Grid>
-  //         <Grid item xs={6} sm={6} md={6} lg={4} xl={2}>
-  //           <Button fullWidth sx={buttonStyles} onClick={handleOpenCrearProductoDialog}>
-  //             Crear Producto
-  //           </Button>
-  //         </Grid>
-  //         <Grid fullWidth item xs={6} sm={6} md={6} lg={4} xl={2}>
-  //           <Button sx={buttonStyles} onClick={handleOpenIngreso}>
-  //             Crear Cliente
-  //           </Button>
-  //         </Grid>
-  //         <Grid fullWidth item xs={6} sm={6} md={6} lg={4} xl={2}>
-  //           <Button sx={buttonStyles} onClick={handleOpenDeudasDialog}>
-  //             Deudas
-  //           </Button>
-  //         </Grid>
-  //         <Grid fullWidth item xs={6} sm={6} md={6} lg={12} xl={2}>
-  //           <Button sx={buttonStyles} onClick={handleOpenPrecioCliente}>
-  //             Precios
-  //           </Button>
-  //         </Grid>
-  //       </Grid>
-
-  //       <Grid
-  //         item
-  //         sx={{
-  //           background: "#859398",
-  //           width: "100%",
-  //           margin: "0 auto",
-  //           padding: 1,
-  //           marginTop: 1,
-  //         }}
-  //         xs={12}
-  //         sm={12}
-  //         md={12}
-  //         lg={12}
-  //         xl={2}
-  //       >
-  //         <Grid>
-  //           <Grid
-  //             sx={{
-  //               borderRadius: "8px",
-  //               border: "4px solid #ccc",
-  //               display: "flex",
-
-  //               //   justifyContent: "center",
-  //             }}
-  //           >
-  //             <Grid container item xs={12}>
-  //               <Grid
-  //                 item
-  //                 xs={12}
-  //                 sx={{
-  //                   margin: "6px",
-  //                   color: "#E1213B",
-  //                   backgroundColor: "#ffffff",
-
-  //                   borderRadius: "5px",
-  //                 }}
-  //               >
-  //                 <p
-  //                   style={{
-  //                     margin: "6px",
-  //                     fontSize: "36px",
-  //                     fontWeight: "bold",
-  //                     fontFamily: "Victor Mono",
-  //                   }}
-  //                 >
-  //                   TOTAL:$
-  //                   <span
-  //                     style={{
-  //                       color: "#00878889",
-  //                       fontSize: "24px",
-  //                       fontWeight: "bold",
-  //                     }}
-  //                   >
-  //                     <span
-  //                       style={{
-  //                         height: "600%",
-  //                         color: "#E1213B",
-  //                         fontSize: "36px",
-  //                         fontFamily: "Victor Mono",
-
-  //                         fontWeight: "700",
-  //                       }}
-  //                     >
-  //                       {" "}
-  //                       {grandTotal.toLocaleString("es-ES")}
-  //                     </span>{" "}
-  //                   </span>{" "}
-  //                 </p>
-  //               </Grid>
-
-  //               <Grid
-  //                 item
-  //                 xs={4}
-  //                 sx={{ display: "flex", justifyContent: "center" }}
-  //               >
-  //                 <Button
-  //                   sx={buttonStylesYellow}
-  //                   onClick={handleOpenBoletaDialog}
-  //                 >
-  //                   <Typography variant="h7"> Boleta</Typography>
-  //                 </Button>
-  //               </Grid>
-  //               <Grid item xs={4}>
-  //                 <Button
-  //                   sx={buttonStylesYellow}
-  //                   onClick={handleOpenFacturaDialog}
-  //                 >
-  //                   <Typography variant="h7">Factura</Typography>
-  //                 </Button>
-  //               </Grid>
-  //               <Grid item xs={4}>
-  //                 <Button
-  //                   sx={buttonStylesYellow}
-  //                   onClick={() => {
-  //                     console.log("Botón de Ticket presionado");
-  //                     handleOpenTicket(); // También puedes llamar a la función handleOpenTicket aquí si es necesario
-  //                   }}
-  //                 >
-  //                   <Typography variant="h7">Ticket</Typography>
-  //                 </Button>
-  //               </Grid>
-  //             </Grid>
-  //           </Grid>
-  //         </Grid>
-  //       </Grid>
-
-  //
-  //     </Paper>
-  //   </Grid>
-  // );
+ 
 };
 
 export default BoxGestionCaja;

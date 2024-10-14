@@ -15,9 +15,11 @@ import {
 } from "@mui/material";
 import { ExpandLess, ExpandMore, Grid3x3Outlined } from "@mui/icons-material";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
-
+import ModelConfig from "../../Models/ModelConfig"
 const UserProfileCard = () => {
   const { userData } = useContext(SelectedOptionsContext);
+  console.log("userdata model ",userData );
+  
   const [vendedor, setVendedor] = useState(null);
   const [open, setOpen] = useState(false);
 

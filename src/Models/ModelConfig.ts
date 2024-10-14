@@ -1,5 +1,5 @@
 import StorageSesion from '../Helpers/StorageSesion.ts';
-import BaseConfig from "../definitions/BaseConfig";
+import BaseConfig from "../Components/Definitions/Constants.ts";
 
 
 class ModelConfig {

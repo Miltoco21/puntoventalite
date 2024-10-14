@@ -12,14 +12,13 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
-import ModelConfig from "../Models/ModelConfig";
+
 import axios from "axios";
 import CONSTANTS from "../Definitions/Constants";
 
 
 const Login = () => {
-
-  const apiUrl = ModelConfig.get().urlBase ?? "https://www.easypos.somee.com/api";
+  const apiUrl = import.meta.env.VITE_URL_API2;  // const apiUrl = ModelConfig.get().urlBase ?? "https://www.easypos.somee.com/api";
   const { setUserData } = useContext(SelectedOptionsContext);
 
   const [rutOrCode, setRutOrCode] = useState("");
