@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Box,
@@ -25,79 +25,66 @@ import {
 } from "@mui/material";
 
 import ModelConfig from "../../Models/ModelConfig";
-import { AttachMoney, Percent } from "@mui/icons-material";
+import { AttachMoney, CheckBox, DraftsOutlined, Money, Percent } from "@mui/icons-material";
 import Product from "../../Models/Product";
-import System from "../../Helpers/System";
-import { SelectedOptionsContext } from "./../Context/SelectedOptionsProvider";
 
 
-const Step3Component = ({ 
+const Step3CC = ({ 
   data, 
   onNext, 
-  stepData,
   onSuccessAdd
 }) => {
-
-  const {
-    showLoading,
-    hideLoading,
-    showMessage,
-    showConfirm
-  } = useContext(SelectedOptionsContext);
-
-
   const apiUrl =  ModelConfig.get().urlBase;
 ;
 
   const [newUnidad, setNewUnidad] = useState("");
-  const [stockCritico, setStockCritico] = useState("");
-  const [stockInicial, setStockInicial] = useState("");
-  const [precioCosto, setPrecioCosto] = useState("");
-  const [precioNeto, setPrecioNeto] = useState(0);
-  
-  const [selectedUnidadId, setSelectedUnidadId] = useState(
-    data.selectedUnidadId || ""
-  );
-
-  var ivas = [
-    { idUnidad: 0, descripcion: "Sin iva" },
-    { idUnidad: ModelConfig.get().iva, descripcion: ModelConfig.get().iva + "%" }
-  ];
-
+  const [stockInicial, setStockInicial] = useState(1);
+  const [stockCritico, setStockCritico] = useState(1);
+  const [precioCosto, setPrecioCosto] = useState(0);
+  const [selectedUnidadId, setSelectedUnidadId] = useState(0);
   const [selectedUnidadVentaId, setSelectedUnidadVentaId] = useState(0);
+  
+  const [precioVenta, setPrecioVenta] = useState(0);
+  const [precioNeto, setPrecioNeto] = useState(0);
   const [ultimoFoco, setUltimoFoco] = useState("");
   const [iva, setIva] = useState(ModelConfig.get().iva)
   const [margenGanancia, setMargenGanancia] = useState(ModelConfig.get().margenGanancia);
   
   const [valorIva, setValorIva] = useState(0)
   const [valorMargenGanancia, setValorMargenGanancia] = useState(0);
+  
+  const [product, setProduct] = useState([]);
 
-  const [precioVenta, setPrecioVenta] = useState("");
+
   const [emptyFieldsMessage, setEmptyFieldsMessage] = useState("");
-  const [openDialog1, setOpenDialog1] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [product, setProduct] = useState([]);
-  
-  const [esPesable, setEsPesable] = useState(false);
+
+  const [esPesable, setEsPesable] = useState( (data.esPesable == "SI") );
   const [fijarCosto, setFijarCosto] = useState(false);
   const [fijarVenta, setFijarVenta] = useState(false);
 
-  const handleUnidadVentaSelect = (selectedUnidadId) => {
-    setSelectedUnidadVentaId(selectedUnidadId === "" ? 0 : selectedUnidadId);
-    console.log("Unidad seleccionada:", selectedUnidadId);
-  };
+  const unidades = [
+    { idUnidad: 0, descripcion: "Sin unidad" },
+    { idUnidad: 1, descripcion: "KG" },
+    { idUnidad: 2, descripcion: "UNI" },
+    { idUnidad: 3, descripcion: "MM" },
+    { idUnidad: 4, descripcion: "CM" },
+    { idUnidad: 5, descripcion: "LT" },
+    { idUnidad: 6, descripcion: "OZ" },
+    { idUnidad: 7, descripcion: "CAJON" },
+    { idUnidad: 8, descripcion: "DISPLAY" },
+    { idUnidad: 9, descripcion: "PALLET" },
+    { idUnidad: 10, descripcion: "MALLA" },
+  ];
 
-  useEffect(()=>{
-    console.log("cambio unidad de venta")
-    console.log(selectedUnidadVentaId)
-    if(selectedUnidadVentaId == 1 || selectedUnidadVentaId == 5){
-      setEsPesable(true)
-    }else{
-      setEsPesable(false)
-    }
-  },[selectedUnidadVentaId])
+  var ivas = [
+    { idUnidad: 0, descripcion: "Sin iva" },
+    { idUnidad: ModelConfig.get().iva, descripcion: ModelConfig.get().iva + "%" }
+  ];
 
+
+  // console.log("data:", data);
 
   const handleNext = async () => {
     const isValid = validateFields();
@@ -107,25 +94,26 @@ const Step3Component = ({
       return;
     }
 
-    // setLoading(true);
+    setLoading(true);
 
     // Crear objeto con los datos del paso 1
     const step1Data = {
-      respuestaSINO: "",
+      codBarra: data.codBarra,
+      respuestaSINO:"NO",
       pesoSINO: (esPesable ? "SI" : "NO"),
       marca: data.marca,
-      categoriaID: data.selectedCategoryId || 0, // Utilizamos 0 si el valor es undefined
-      subCategoriaID: data.selectedSubCategoryId || 0,
-      familiaID: data.selectedFamilyId || 0,
-      subFamilia: data.selectedSubFamilyId || 0,
+      categoriaID: data.categoryId || 0, // Utilizamos 0 si el valor es undefined
+      subCategoriaID: data.subCategoryId || 0,
+      familiaID: data.familyId || 0,
+      subFamilia: data.subFamilyId || 0,
       nombre: data.nombre, // Debes proporcionar un valor adecuado aquí
     };
 
     // Crear objeto con los datos del paso 3
     const step3Data = {
       unidad: selectedUnidadId, // Debes proporcionar un valor adecuado aquí
-      precioCosto: parseFloat(precioCosto) || 0, // Convertir a número y usar 0 si no hay valor
       unidadVenta: selectedUnidadVentaId, // Debes proporcionar un valor adecuado aquí
+      precioCosto: parseFloat(precioCosto) || 0, // Convertir a número y usar 0 si no hay valor
       stockInicial: parseInt(stockInicial) || 0, // Convertir a número entero y usar 0 si no hay valor
     };
 
@@ -135,28 +123,27 @@ const Step3Component = ({
       precioVenta: parseFloat(precioVenta) || 0, // Convertir a número y usar 0 si no hay valor
       precioNeto: parseFloat(precioNeto) || 0, // Convertir a número y usar 0 si no hay valor
       margen: parseFloat(margenGanancia)
-
     };
 
     // Combinar todos los pasos en un solo objeto
     const requestData = {
-      name: "string", // Debes proporcionar un valor adecuado aquí
+      name: "", // Debes proporcionar un valor adecuado aquí
       step1: step1Data,
       step2: {
-        bodega: "string", // Debes proporcionar un valor adecuado aquí
-        proveedor: "string", // Debes proporcionar un valor adecuado aquí
+        bodega: "", // Debes proporcionar un valor adecuado aquí
+        proveedor: "", // Debes proporcionar un valor adecuado aquí
       },
       step3: step3Data,
       step4: step4Data,
       step5: {
-        stockCritico: parseInt(stockCritico) || 0, // Convertir a número entero y usar 0 si no hay valor
+        stockCritico: parseInt(stockCritico), // Debes proporcionar un valor adecuado aquí
         impuesto: (iva == 0 ? "EXENTO" : "IVA " + iva + "%"), // Debes proporcionar un valor adecuado aquí
         selectedFile: {}, // Debes proporcionar un valor adecuado aquí
-        nota: "string", // Debes proporcionar un valor adecuado aquí
+        nota: "", // Debes proporcionar un valor adecuado aquí
+      
       },
     };
 
-    console.log("Datos objeto productos", requestData);
     const prodNuevo = {
       ...requestData.step1,
       ...requestData.step2,
@@ -164,7 +151,11 @@ const Step3Component = ({
       ...requestData.step4,
       ...requestData.step5,
     }
+    
 
+
+
+    console.log("Datos objeto productos", requestData);
     try {
       // Enviar la petición POST al endpoint con los datos combinados
       const response = await axios.post(
@@ -177,8 +168,10 @@ const Step3Component = ({
       if (response.status === 201) {
         setEmptyFieldsMessage("Producto guardado exitosamente");
         setOpenSnackbar(true);
-        prodNuevo.idProducto = response.data.codigoProducto
-        prodNuevo.codigoProducto = response.data.codigoProducto
+
+        prodNuevo.idProducto = prodNuevo.codBarra
+        prodNuevo.codigoProducto = prodNuevo.codBarra
+        prodNuevo.codigoProductoInterno = response.data.codigoProducto
         onSuccessAdd(prodNuevo,response)
         console.log("Productos",product)
       }
@@ -186,7 +179,7 @@ const Step3Component = ({
       // Llamar a la función onNext para continuar con el siguiente paso
       onNext(requestData, 3);
     } catch (error) {
-      showMessage("Error al guardar el producto");
+      setSnackbarMessage("Error al guardar el producto");
       setOpenSnackbar(true);
       console.error("Error:", error);
     } finally {
@@ -197,40 +190,35 @@ const Step3Component = ({
   const handleSnackbarClose = () => {
     setOpenSnackbar(false);
   };
-  const handleOpenDialog1 = () => {
-    setOpenDialog1(true);
-  };
-  const handleCloseDialog1 = () => {
-    setOpenDialog1(false);
-  };
-
+ 
   const handleUnidadSelect = (selectedUnidadId) => {
     setSelectedUnidadId(selectedUnidadId === "" ? 0 : selectedUnidadId);
     console.log("Unidad seleccionada:", selectedUnidadId);
   };
-  const handleCreateUnidad = () => {
-    // Implement the logic to create a new category here.
-    // You can use the newCategory state to get the input value.
 
-    // After creating the category, you can close the dialog.
-    setOpenDialog1(false);
+  const handleUnidadVentaSelect = (selectedUnidadId) => {
+    setSelectedUnidadVentaId(selectedUnidadId === "" ? 0 : selectedUnidadId);
+    console.log("Unidad seleccionada:", selectedUnidadId);
   };
+
+
+  const handleIvaSelect = (selectedUnidadId) => {
+    setIva(selectedUnidadId === "" ? 0 : selectedUnidadId);
+    console.log("Unidad seleccionada:", selectedUnidadId);
+  };
+
 
   const validateFields = () => {
     // Verificar si todos los campos están vacíos
-    if (
-      selectedUnidadId === "" &&
-      precioCosto === "" &&
-      precioVenta === "" &&
-      stockCritico === ""
-    ) {
-      setEmptyFieldsMessage("Todos los campos son obligatorios.");
-      return false;
-    }
 
     // Verificar cada campo individualmente y mostrar el primer campo vacío
     if (selectedUnidadId === "") {
-      setEmptyFieldsMessage("Debe seleccionar una unidad.");
+      setEmptyFieldsMessage("Debe seleccionar una unidad de compra.");
+      return false;
+    }
+
+    if (selectedUnidadVentaId === "") {
+      setEmptyFieldsMessage("Debe seleccionar una unidad de venta.");
       return false;
     }
 
@@ -247,12 +235,6 @@ const Step3Component = ({
       setEmptyFieldsMessage("Favor completar precio de venta.");
       return false;
     }
-
-    if (selectedUnidadVentaId === "") {
-      setEmptyFieldsMessage("Debe seleccionar una unidad de venta.");
-      return false;
-    }
-
     if (isNaN(parseFloat(precioVenta)) || parseFloat(precioVenta) === 0) {
       setEmptyFieldsMessage("El precio de venta no puede ser cero.");
       return false;
@@ -264,12 +246,21 @@ const Step3Component = ({
       return false;
     }
 
-    if (stockCritico === "") {
+    if (stockInicial === "") {
       setEmptyFieldsMessage("Favor completar Stock Inicial.");
       return false;
     }
-    if (isNaN(parseFloat(stockCritico)) || parseFloat(stockCritico) === 0) {
+    if (isNaN(parseFloat(stockInicial)) || parseFloat(stockInicial) === 0) {
       setEmptyFieldsMessage("El stock inicial no puede ser cero.");
+      return false;
+    }
+
+    if (stockCritico === "") {
+      setEmptyFieldsMessage("Favor completar Stock critico.");
+      return false;
+    }
+    if (isNaN(parseFloat(stockCritico)) || parseFloat(stockCritico) === 0) {
+      setEmptyFieldsMessage("El stock critico no puede ser cero.");
       return false;
     }
 
@@ -278,34 +269,6 @@ const Step3Component = ({
     return true;
   };
 
-  // useEffect(() => {
-  //   async function fetchBodegas() {
-  //     try {
-  //       const response = await axios.get(
-  //         "https://www.easypos.somee.com/api/NivelMercadoLogicos/GetAllBodegas"
-  //       );
-  //       setBodegas(response.data.categorias);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-
-  //   fetchBodegas();
-  // }, []);
-
-  const unidades = [
-    { idUnidad: 0, descripcion: "Sin unidad" },
-    { idUnidad: 1, descripcion: "KG" },
-    { idUnidad: 2, descripcion: "UNI" },
-    { idUnidad: 3, descripcion: "MM" },
-    { idUnidad: 4, descripcion: "CM" },
-    { idUnidad: 5, descripcion: "LT" },
-    { idUnidad: 6, descripcion: "OZ" },
-    { idUnidad: 7, descripcion: "CAJON" },
-    { idUnidad: 8, descripcion: "DISPLAY" },
-    { idUnidad: 9, descripcion: "PALLET" },
-    { idUnidad: 10, descripcion: "MALLA" },
-  ];
   const handleKeyDown = (event, field) => {
     // Verificar en qué campo se está escribiendo
     if (field === "precio") {
@@ -316,8 +279,8 @@ const Step3Component = ({
     }
   };
 
-
   const logicaPrecios = ()=>{
+    console.log("logicaPrecios")
     if(ultimoFoco != "precioVenta" &&  precioCosto > 0){
 
       if(fijarVenta || fijarCosto){
@@ -334,23 +297,22 @@ const Step3Component = ({
         return
       }
 
-
       const tmpProduct = {}
       tmpProduct.precioVenta = 0
-      tmpProduct.precioCosto = parseFloat(precioCosto)
-      tmpProduct.gananciaPorcentaje = parseFloat(margenGanancia)
-      tmpProduct.ivaPorcentaje = parseFloat(iva)
+      tmpProduct.precioCosto = precioCosto
+      tmpProduct.gananciaPorcentaje = margenGanancia
+      tmpProduct.ivaPorcentaje = iva
       tmpProduct.gananciaValor = 0
       tmpProduct.ivaValor = 0
-      // tmpProduct.precioNeto = 0
-      Product.logicaPrecios(tmpProduct, "final")
+      tmpProduct.precioNeto = 0
+      
+      Product.logicaPrecios(tmpProduct)
+      
       setPrecioNeto(tmpProduct.precioNeto.toFixed(0))
       setPrecioVenta(tmpProduct.precioVenta.toFixed(0))
       
       setValorIva(tmpProduct.ivaValor.toFixed(0))
       setValorMargenGanancia(tmpProduct.gananciaValor.toFixed(0))
-      setMargenGanancia((tmpProduct.gananciaPorcentaje).toFixed(0))
-
     }else if(ultimoFoco != "precioCosto" && precioVenta>0){
 
       if(fijarVenta || fijarCosto){
@@ -366,34 +328,30 @@ const Step3Component = ({
         setMargenGanancia((tmpProduct.gananciaPorcentaje).toFixed(0))
         return
       }
+
       const tmpProduct = {}
-      tmpProduct.precioVenta = parseFloat(precioVenta)
+      tmpProduct.precioVenta = precioVenta
       tmpProduct.precioCosto = 0
-      tmpProduct.gananciaPorcentaje = parseFloat(margenGanancia)
+      tmpProduct.gananciaPorcentaje = margenGanancia
       tmpProduct.ivaPorcentaje = iva
       tmpProduct.gananciaValor = 0
       tmpProduct.ivaValor = 0
       tmpProduct.precioNeto = 0
 
-      console.log("caso 2..envia logica 2:", System.clone(tmpProduct))
       Product.logicaPrecios(tmpProduct, "costo")
-      console.log("caso 2..devuelve logica 2:", System.clone(tmpProduct))
+
+
       setPrecioNeto(tmpProduct.precioNeto.toFixed(0))
       setPrecioCosto(tmpProduct.precioCosto.toFixed(0))
       
       setValorIva(tmpProduct.ivaValor.toFixed(0))
       setValorMargenGanancia(tmpProduct.gananciaValor.toFixed(0))
-      setMargenGanancia((tmpProduct.gananciaPorcentaje).toFixed(0))
     }
 
   }
   const setFocus = (field) => {
     setUltimoFoco(field)
   }
-
-  useEffect(()=>{
-    logicaPrecios()
-  },[precioCosto, precioVenta, margenGanancia, iva])
 
 
   const handleChange = (event, field) => {
@@ -418,6 +376,24 @@ const Step3Component = ({
     }
   };
 
+  useEffect(()=>{
+    logicaPrecios()
+  },[precioCosto, precioVenta, margenGanancia, iva])
+
+
+  useEffect(()=>{
+    console.log("cambio unidad de venta")
+    console.log(selectedUnidadVentaId)
+    if(selectedUnidadVentaId == 1 || selectedUnidadVentaId == 5){
+      setEsPesable(true)
+    }else{
+      setEsPesable(false)
+    }
+  },[selectedUnidadVentaId])
+
+
+
+
   const checkEsPesable = (e)=>{
     setEsPesable(!esPesable)
   }
@@ -436,12 +412,6 @@ const Step3Component = ({
     setFijarVenta(!fijarVenta)
   }
 
-
-  const handleIvaSelect = (selectedUnidadId) => {
-    setIva(selectedUnidadId === "" ? 0 : selectedUnidadId);
-    console.log("Unidad seleccionada:", selectedUnidadId);
-  };
-
   return (
     <Paper
       elevation={3}
@@ -452,7 +422,7 @@ const Step3Component = ({
     >
       {" "}
       <form onSubmit={handleNext}>
-        <Grid container spacing={1} item xs={12} md={12}>
+        <Grid container spacing={2} item xs={12} md={12}>
           <Grid item xs={12} md={6}>
             <InputLabel sx={{ marginBottom: "2%" }}>
               Unidad de Compra
@@ -464,7 +434,7 @@ const Step3Component = ({
                 sx={{ width: "100%" }}
                 value={selectedUnidadId}
                 onChange={(e) => handleUnidadSelect(e.target.value)}
-                label="Selecciona Unidad"
+                label="Seleccionar Unidad"
               >
                 {unidades.map((unidad) => (
                   <MenuItem key={unidad.idUnidad} value={unidad.idUnidad}>
@@ -496,13 +466,12 @@ const Step3Component = ({
               </Select>
             </Grid>
           </Grid>
-          
 
-            <Grid item xs={12} md={12}>
+
+          <Grid item xs={12} md={12}>
             <Grid display="flex" alignItems="center">
               <label onClick={checkEsPesable}
                style={{
-                marginTop:"0px",
                 userSelect:"none"
                }}>
                 Es Pesable
@@ -510,10 +479,9 @@ const Step3Component = ({
               <input
                 type="checkbox"
                 checked={esPesable}
-                onChange={()=>{}}
                 onClick={checkEsPesable}
+                onChange={()=>{}}
                 style={{
-                  marginTop:"0px",
                   width:"50px",
                   height:"20px"
                 }}
@@ -521,8 +489,7 @@ const Step3Component = ({
               </Grid>
             </Grid>
 
-
-            <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6}>
             <Box>
                 <InputLabel sx={{ marginBottom: "4%" }}>
               Margen ganancia
@@ -613,6 +580,7 @@ const Step3Component = ({
             </Box>
           </Grid>
 
+          
           <Grid item xs={8} sm={8} md={3} lg={3}>
             <Box>
               <TextField
@@ -723,20 +691,14 @@ const Step3Component = ({
             </Box>
             </Grid>
 
-
           
 
-
-         
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel sx={{ marginBottom: "4%" }}>
-                Ingresa Stock Inicial
-              </InputLabel>
               <TextField
                 required
                 sx={{ width: "100%" }}
-                label="Stock Inicial"
+                label="Stock Actual"
                 fullWidth
                 value={stockInicial}
                 onChange={(event) => handleChange(event, "stockInicial")}
@@ -751,33 +713,31 @@ const Step3Component = ({
 
           <Grid item xs={12} md={6}>
             <Box>
-              <InputLabel sx={{ marginBottom: "4%" }}>
-                Ingresa Stock critico
-              </InputLabel>
               <TextField
                 required
                 sx={{ width: "100%" }}
-                label="Stock Critico"
+                label="Stock critico"
                 fullWidth
                 value={stockCritico}
                 onChange={(event) => handleChange(event, "stockCritico")}
                 onKeyDown={(event) => handleKeyDown(event, "stockCritico")}
-                inputProps={{
-                  inputMode: "numeric", // Establece el modo de entrada como numérico
-                  pattern: "[0-9]*", // Asegura que solo se puedan ingresar números
-                }}
               />
             </Box>
           </Grid>
 
-
           <Grid item xs={12}>
             <Button
-              fullWidth
+              // fullWidth
               variant="contained"
               color="secondary"
               onClick={handleNext}
               disabled={loading}
+
+              sx={{
+                width:"50%",
+                height:"55px",
+                margin: "0 25%"
+              }}
             >
               {loading ? "Guardando..." : "Guardar Producto"}
             </Button>
@@ -799,27 +759,8 @@ const Step3Component = ({
           message={emptyFieldsMessage}
         />
       </form>
-      <Dialog open={openDialog1} onClose={handleCloseDialog1}>
-        <DialogTitle>Crear Unidad de Compra</DialogTitle>
-        <DialogContent sx={{ marginTop: "9px" }}>
-          <TextField
-            label="Ingresa Unidad de Compra"
-            fullWidth
-            value={newUnidad}
-            onChange={(e) => setNewUnidad(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog1} color="primary">
-            Cancelar
-          </Button>
-          <Button onClick={handleCreateUnidad} color="primary">
-            Crear
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Paper>
   );
 };
 
-export default Step3Component;
+export default Step3CC;

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Box,
-  Grid,
   Select,
   MenuItem,
   InputLabel,
@@ -97,31 +96,31 @@ const Step6Component = () => {
   ];
 
   return (
-    <Paper elevation={3}>
+    <Paper
+      elevation={3}
+      style={{
+        padding: "16px",
+        width: "700px",
+      }}
+    >
       <Box>
         <Box>
-          <Grid item xs={12} sm={12} md={12}>
-            <Typography
-              variant="h6"
-              sx={{
-                display:"flex",
-                justifyContent:"center",
-                marginBottom: "8px",
-              }}
-            >
-             
-              
-            </Typography>
-            {/* <InputLabel>Código del Producto :</InputLabel> */}
-            <Grid item md={12}>
-              {/* <TextField
-                sx={{ marginTop: "7px" }}
-                fullWidth
-                value={stockCritico}
-                onChange={(e) => setStockCritico(e.target.value)}
-              /> */}
-            </Grid>
-          </Grid>
+          <Typography
+            variant="h4"
+            style={{
+              marginBottom: "8px",
+            }}
+          >
+            {" "}
+            Código de producto creado con éxito{" "}
+          </Typography>
+          <InputLabel>Código del Producto :</InputLabel>
+          <TextField
+            sx={{ marginTop: "7px", width: "670px", marginBottom: "11px" }}
+            fullWidth
+            value={stockCritico}
+            onChange={(e) => setStockCritico(e.target.value)}
+          />
         </Box>
       </Box>
 

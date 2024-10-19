@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 
 const Step4Component = ({ data, onNext }) => {
+  const apiUrl = import.meta.env.VITE_URL_API2;
   const [newUnidad, setNewUnidad] = useState("");
   const [stockInicial, setStockInical] = useState(data.stockInicial || "");
   const [precioVenta, setPrecioVenta] = useState(data.precioVenta || "");
@@ -76,7 +77,7 @@ const Step4Component = ({ data, onNext }) => {
   //   async function fetchBodegas() {
   //     try {
   //       const response = await axios.get(
-  //         "https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetAllBodegas"
+  //        `${import.meta.env.VITE_URL_API2}/NivelMercadoLogicos/GetAllBodegas`
   //       );
   //       setBodegas(response.data.categorias);
   //     } catch (error) {
