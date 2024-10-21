@@ -32,15 +32,11 @@ import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import axios from "axios";
 
 const BoxPagoTicket = ({ onCloseTicket }) => {
-
-
   const apiUrl = import.meta.env.VITE_URL_API2;
 
   const {
     userData,
     salesData,
-    addToSalesData,
-    setPrecioData,
     grandTotal,
     ventaData,
     setVentaData,
@@ -54,9 +50,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     selectedCodigoClienteSucursal,
     setSelectedCodigoClienteSucursal,
     clearSalesData,
-    selectedChipIndex,
     setSelectedChipIndex,
-    searchText,
     setSearchText,
   } = useContext(SelectedOptionsContext);
 
@@ -78,6 +72,8 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
   const [selectedDebts, setSelectedDebts] = useState([]);
   const [tipoCuenta, setTipoCuenta] = useState("");
   const [errorTransferenciaError, setTransferenciaError] = useState("");
+
+  const nfolio = "1";
   const tiposDeCuenta = {
     "Cuenta Corriente": "Cuenta Corriente",
     "Cuenta de Ahorro": "Cuenta de Ahorro",
@@ -108,8 +104,6 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     { id: 14, nombre: "Banco Paris" },
     { id: 15, nombre: "Banco Corpbanca" },
     { id: 16, nombre: "Banco BICE" },
-
-   
   ];
 
   const [fecha, setFecha] = useState(dayjs()); // Estado para almacenar la fecha actual
@@ -148,45 +142,46 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
     setLoading(false); // Establecer el estado de loading en false cuando se selecciona un método de pago
   };
 
+  
+  
   const handleGenerarTicket = async () => {
     try {
+      // Validaciones para el código de usuario
       if (!userData.codigoUsuario) {
         setError("Por favor, ingresa el código de vendedor para continuar.");
         return;
       }
+  
       if (cantidadPagada < grandTotal) {
-        setError("Cantidad pagada no puede ser menor que el monto a pagar .");
+        setError("Cantidad pagada no puede ser menor que el monto a pagar.");
         return;
       }
+  
       if (grandTotal - cantidadPagada > 0) {
-        setError("Cantidad pagada no puede ser menor que 0, ni estar vacia .");
+        setError("Cantidad pagada no puede ser menor que 0, ni estar vacía.");
         return;
-      } else {
-        setError("");
       }
+  
       if (cantidadPagada <= 0) {
-        setError("No se puede generar la boleta de pago porque el total cero.");
+        setError(
+          "No se puede generar la boleta de pago porque el total es cero."
+        );
         return;
       }
+  
       if (!metodoPago || cantidadPagada <= 0) {
         setError("Por favor, ingresa un monto válido para el pago.");
         setLoading(false);
         return;
       }
-
-      // Validar el método de pago
+  
       if (!metodoPago) {
         setError("Por favor, selecciona un método de pago.");
         setLoading(false);
         return;
       }
-      if (!metodoPago || cantidadPagada <= 0) {
-        setError("Por favor, ingresa un monto válido para el pago.");
-        setLoading(false);
-        return;
-      }
-
-      // Validar el código de usuario
+  
+      // Validaciones adicionales para el código de usuario
       if (
         typeof userData.codigoUsuario !== "number" ||
         userData.codigoUsuario <= 0
@@ -195,42 +190,21 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         setLoading(false);
         return;
       }
-      if (!metodoPago) {
-        setError("Por favor, selecciona un método de pago.");
-        setLoading(false);
-        return;
-      }
-
-      // Validar el código de usuario
-      if (
-        typeof userData.codigoUsuario !== "number" ||
-        userData.codigoUsuario <= 0
-      ) {
-        setError("El código de usuario no es válido.");
-        setLoading(false);
-        return;
-      }
-
-      // Validar que se haya seleccionado al menos una deuda
-
+  
       setLoading(true);
-
+  
       let endpoint =
-        `${import.meta.env.VITE_URL_API2}/Ventas/RedelcomImprimirTicket`;
-
-      // Si el método de pago es TRANSFERENCIA, cambiar el endpoint y agregar datos de transferencia
+        "https://www.easypos.somee.com/api/Imprimir/RedelcomImprimirTicket?nfolio=1";
+  
+      // Si el método de pago es TRANSFERENCIA, validar los datos de la transferencia
       if (metodoPago === "TRANSFERENCIA") {
-        endpoint =
-        `${import.meta.env.VITE_URL_API2}/Ventas/RedelcomImprimirTicket`;
-
-        // Validar datos de transferencia
         if (
-          nombre === "" &&
-          rut === "" &&
-          selectedBanco === "" &&
-          tipoCuenta === "" &&
-          nroCuenta === "" &&
-          fecha === "" &&
+          nombre === "" ||
+          rut === "" ||
+          selectedBanco === "" ||
+          tipoCuenta === "" ||
+          nroCuenta === "" ||
+          fecha === "" ||
           nroOperacion === ""
         ) {
           setTransferenciaError(
@@ -238,118 +212,235 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
           );
           setLoading(false);
           return;
-        } else {
-          // Limpiar el error relacionado con el RUT
-          setTransferenciaError("");
         }
-        if (nombre === "") {
-          setTransferenciaError("Por favor, ingresa el nombre.");
-          setLoading(false);
-          return;
-        }
-        if (rut === "") {
-          setTransferenciaError("Por favor, ingresa el RUT.");
-          setLoading(false);
-          return;
-        }
+  
         if (!validarRutChileno(rut)) {
           setTransferenciaError("El RUT ingresado NO es válido.");
           setLoading(false);
           return;
-        } else {
-          // Limpiar el error relacionado con el RUT
-          setTransferenciaError("");
-        }
-
-        if (selectedBanco === "") {
-          setTransferenciaError("Por favor, selecciona el banco.");
-          setLoading(false);
-          return;
-        }
-
-        if (tipoCuenta === "") {
-          setTransferenciaError("Por favor, selecciona el tipo de cuenta.");
-          setLoading(false);
-          return;
-        }
-
-        if (nroCuenta === "") {
-          setTransferenciaError("Por favor, ingresa el número de cuenta.");
-          setLoading(false);
-          return;
-        }
-
-        if (fecha === "") {
-          setTransferenciaError("Por favor, selecciona la fecha.");
-          setLoading(false);
-          return;
-        }
-
-        if (nroOperacion === "") {
-          setTransferenciaError("Por favor, ingresa el número de operación.");
-          setLoading(false);
-          return;
         }
       }
-
-      // Validar el método de pago
-
-      // Otras validaciones que consideres necesarias...
-
-      // Si se llega a este punto, todas las validaciones han pasado, proceder con la llamada a la API
-
+  
+      // Preparar el cuerpo de la solicitud según el nuevo formato del endpoint
       const requestBody = {
+        fechaIngreso: new Date().toISOString(),
         idUsuario: userData.codigoUsuario,
-        codigoClienteSucursal: selectedCodigoClienteSucursal, // Ajustar según la lógica de tu aplicación
-        codigoCliente: selectedCodigoCliente, // Ajustar según la lógica de tu aplicación
+        codigoClienteSucursal: selectedCodigoClienteSucursal || 0,
+        codigoCliente: selectedCodigoCliente || 0,
+        codigoUsuarioVenta: userData.codigoUsuario,
         total: cantidadPagada,
-        products: salesData.map((producto) => ({
-          codProducto: producto.idProducto, // Ajustar la propiedad según el nombre real en tus datos
-          cantidad: producto.quantity, // Ajustar la propiedad según el nombre real en tus datos
-          precioUnidad: producto.precio, // Ajustar la propiedad según el nombre real en tus datos
-          descripcion: producto.descripcion, // Ajustar la propiedad según el nombre real en tus datos
-        })),
+        products: [],
         metodoPago: metodoPago,
-        transferencias: {
-          idCuentaCorrientePago: 0,
-          nombre: nombre,
-          rut: rut,
-          banco: selectedBanco,
-          tipoCuenta: tipoCuenta,
-          nroCuenta: nroCuenta,
-          fecha: fecha,
-          nroOperacion: nroOperacion,
-        },
+        transferencias:
+          metodoPago === "TRANSFERENCIA"
+            ? {
+                idCuentaCorrientePago: 0,
+                nombre: nombre,
+                rut: rut,
+                banco: selectedBanco,
+                tipoCuenta: tipoCuenta,
+                nroCuenta: nroCuenta,
+                fecha: fecha,
+                nroOperacion: nroOperacion,
+              }
+            : null,
+        codigoSucursal: "string",
+        puntoVenta: "string",
+        preVentaID: "string",
       };
-
+  
       console.log("Request Body:", requestBody);
-
-      const response = await axios.post(endpoint, requestBody);
-
-      console.log("Response:", response.data);
-
-      if (response.status === 200) {
-        // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
-        setSnackbarOpen(true);
-        setSnackbarMessage(response.data.descripcion);
-        clearSalesData();
-        setSelectedUser(null);
-        setSelectedChipIndex([]);
-        setSearchResults([]);
-        setSelectedCodigoCliente(0);
-        setSearchText(""),
-          setTimeout(() => {
-            onCloseTicket();
-          }, 1000);
-      } else {
-        console.error("Error al realizar el pago");
+  
+      try {
+        const filteredProducts = salesData.filter((producto) => {
+          if (!Number.isInteger(producto.idProducto)) {
+            console.warn(`Warning: Non-integer product ID found: ${producto.idProducto}`);
+            return false;
+          }
+          return true;
+        });
+  
+        requestBody.products = filteredProducts.map((producto) => ({
+          codProducto: producto.idProducto.toString(), // Ensure it's a string
+          cantidad: producto.quantity,
+          precioUnidad: producto.precio,
+          descripcion: producto.descripcion,
+          codBarra: producto.codBara || "", // Handle potential undefined values
+        }));
+  
+        const response = await axios.post(endpoint, requestBody);
+        console.log("Response:", response.data);
+  
+        if (response.status === 200) {
+          // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
+          setSnackbarOpen(true);
+          setSnackbarMessage(response.data.descripcion);
+          clearSalesData();
+          setSelectedUser(null);
+          setSelectedChipIndex([]);
+          setSearchResults([]);
+          setSelectedCodigoCliente(0);
+          setSearchText("");
+  
+          // setTimeout(() => {
+          //   onCloseTicket();
+          // }, 1000);
+        } else {
+          console.error("Error al realizar el pago");
+        }
+      } catch (error) {
+        console.error("Error al generar pago ticket:", error);
+      } finally {
+        setLoading(false);
       }
     } catch (error) {
-      console.error("Error al generar la factura electrónica:", error);
-    } finally {
-      setLoading(false);
+      console.error("Error en handleGenerarTicket:", error);
+      setError(error.message || "Ocurrió un error al intentar generar el pago.");
     }
   };
+  
+
+  // const handleGenerarTicket = async () => {
+  //   try {
+  //     if (!userData.codigoUsuario) {
+  //       setError("Por favor, ingresa el código de vendedor para continuar.");
+  //       return;
+  //     }
+
+  //     if (cantidadPagada < grandTotal) {
+  //       setError("Cantidad pagada no puede ser menor que el monto a pagar.");
+  //       return;
+  //     }
+
+  //     if (grandTotal - cantidadPagada > 0) {
+  //       setError("Cantidad pagada no puede ser menor que 0, ni estar vacía.");
+  //       return;
+  //     }
+
+  //     if (cantidadPagada <= 0) {
+  //       setError(
+  //         "No se puede generar la boleta de pago porque el total es cero."
+  //       );
+  //       return;
+  //     }
+
+  //     if (!metodoPago || cantidadPagada <= 0) {
+  //       setError("Por favor, ingresa un monto válido para el pago.");
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     if (!metodoPago) {
+  //       setError("Por favor, selecciona un método de pago.");
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     // Validaciones adicionales para el código de usuario
+  //     if (
+  //       typeof userData.codigoUsuario !== "number" ||
+  //       userData.codigoUsuario <= 0
+  //     ) {
+  //       setError("El código de usuario no es válido.");
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     setLoading(true);
+
+  //     let endpoint =
+  //       "https://www.easypos.somee.com/api/Imprimir/RedelcomImprimirTicket?nfolio=1";
+
+  //     // Si el método de pago es TRANSFERENCIA, validar los datos de la transferencia
+  //     if (metodoPago === "TRANSFERENCIA") {
+  //       if (
+  //         nombre === "" ||
+  //         rut === "" ||
+  //         selectedBanco === "" ||
+  //         tipoCuenta === "" ||
+  //         nroCuenta === "" ||
+  //         fecha === "" ||
+  //         nroOperacion === ""
+  //       ) {
+  //         setTransferenciaError(
+  //           "Por favor, completa todos los campos necesarios para la transferencia."
+  //         );
+  //         setLoading(false);
+  //         return;
+  //       }
+
+  //       if (!validarRutChileno(rut)) {
+  //         setTransferenciaError("El RUT ingresado NO es válido.");
+  //         setLoading(false);
+  //         return;
+  //       }
+  //     }
+
+      
+  //     // Preparar el cuerpo de la solicitud según el nuevo formato del endpoint
+  //     // const requestBody = {
+  //     //   fechaIngreso: new Date().toISOString(), // Fecha actual
+  //     //   idUsuario: userData.codigoUsuario,
+  //     //   codigoClienteSucursal: selectedCodigoClienteSucursal || 0, // Ajustar según la lógica
+  //     //   codigoCliente: selectedCodigoCliente || 0, // Ajustar según la lógica
+  //     //   codigoUsuarioVenta: userData.codigoUsuario,
+  //     //   total: cantidadPagada,
+  //     //   products: salesData.map((producto) => ({
+  //     //     codProducto: producto.idProducto,
+  //     //     cantidad: producto.quantity,
+  //     //     precioUnidad: producto.precio,
+  //     //     descripcion: producto.descripcion,
+  //     //     codBarra: producto.codBara,
+  //     //   })),
+  //     //   metodoPago: metodoPago,
+  //     //   transferencias:
+  //     //     metodoPago === "TRANSFERENCIA"
+  //     //       ? {
+  //     //           idCuentaCorrientePago: 0,
+  //     //           nombre: nombre,
+  //     //           rut: rut,
+  //     //           banco: selectedBanco,
+  //     //           tipoCuenta: tipoCuenta,
+  //     //           nroCuenta: nroCuenta,
+  //     //           fecha: fecha,
+  //     //           nroOperacion: nroOperacion,
+  //     //         }
+  //     //       : null,
+  //     //   codigoSucursal: "string", // Ajustar según los datos reales
+  //     //   puntoVenta: "string", // Ajustar según los datos reales
+  //     //   preVentaID: "string", // Ajustar según los datos reales
+  //     // };
+
+  //     console.log("Request Body:", requestBody);
+
+  //     const response = await axios.post(endpoint, requestBody);
+
+  //     console.log("Response:", response.data);
+
+  //     if (response.status === 200) {
+  //       // Restablecer estados y cerrar diálogos después de realizar el pago exitosamente
+  //       setSnackbarOpen(true);
+  //       setSnackbarMessage(response.data.descripcion);
+  //       clearSalesData();
+  //       setSelectedUser(null);
+  //       setSelectedChipIndex([]);
+  //       setSearchResults([]);
+  //       setSelectedCodigoCliente(0);
+  //       setSearchText("");
+
+  //       // setTimeout(() => {
+  //       //   onCloseTicket();
+  //       // }, 1000);
+  //     } else {
+  //       console.error("Error al realizar el pago");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error al generar pago ticket:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const validarRutChileno = (rut) => {
     if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rut)) {
       // Si el formato del RUT no es válido, retorna false
@@ -387,15 +478,17 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         event.preventDefault();
       }
     }
-    if (field === "nombre" ) {
-      const regex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9\s]+$/;// Al menos un carácter alfanumérico
+    if (field === "nombre") {
+      const regex = /^(?=.*[a-zA-Z0-9])[a-zA-Z0-9\s]+$/; // Al menos un carácter alfanumérico
       if (
         !regex.test(event.key) &&
         event.key !== "Backspace" &&
         event.key !== " "
       ) {
         event.preventDefault();
-        setEmptyFieldsMessage("El nombre no puede consistir únicamente en espacios en blanco.");
+        setEmptyFieldsMessage(
+          "El nombre no puede consistir únicamente en espacios en blanco."
+        );
         setSnackbarOpen(true);
       }
     }
@@ -424,14 +517,13 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
         event.preventDefault(); // Prevenir la entrada de un monto menor al grandTotal
       }
     }
-    
   };
 
   return (
     <>
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} lg={6}>
-        <Typography variant="h4" sx={{ marginBottom: "2%" }}>
+          <Typography variant="h4" sx={{ marginBottom: "2%" }}>
             Pagar Ticket
           </Typography>
           {error && (
@@ -508,7 +600,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
               </Typography>
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
-            <Button
+              <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 fullWidth
@@ -521,27 +613,28 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             </Grid>
 
             <Grid item xs={12} sm={12} md={12}>
-            <Button
+              <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "DEBITO" ? "contained" : "outlined"}
                 onClick={() => {
                   setMetodoPago("DEBITO");
                   setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
-              }}                fullWidth
+                }}
+                fullWidth
               >
                 Débito
               </Button>
             </Grid>
             <Grid item xs={12} sm={12} md={12}>
-            <Button
+              <Button
                 id={`${metodoPago}-btn`}
                 sx={{ height: "100%" }}
                 variant={metodoPago === "CREDITO" ? "contained" : "outlined"}
                 onClick={() => {
                   setMetodoPago("CREDITO");
                   setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
-              }}               
+                }}
                 fullWidth
               >
                 Crédito
@@ -549,7 +642,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
             </Grid>
 
             <Grid item xs={12} sm={12} md={12}>
-            <Button
+              <Button
                 sx={{ height: "100%" }}
                 id={`${metodoPago}-btn`}
                 fullWidth
@@ -559,7 +652,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
                 onClick={() => {
                   setMetodoPago("CUENTACORRIENTE");
                   setCantidadPagada(grandTotal); // Establecer el valor de cantidad pagada como grandTotal
-              }}   
+                }}
               >
                 Cuenta Corriente
               </Button>
@@ -714,7 +807,7 @@ const BoxPagoTicket = ({ onCloseTicket }) => {
 
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                    format="DD-MM-YYYY"
+                  format="DD-MM-YYYY"
                   label="Ingresa Fecha"
                   value={fecha}
                   onChange={handleDateChange}

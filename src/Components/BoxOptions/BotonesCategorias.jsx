@@ -71,7 +71,7 @@ const BotonesCategorias = ({ onClose }) => {
     setOpen(true);
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${categoryId}`
+        `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${categoryId}`
       );
       if (response.data.subCategorias.length > 0) {
         setSubCategories(response.data.subCategorias);
@@ -110,7 +110,7 @@ const BotonesCategorias = ({ onClose }) => {
       if (selectedCategoryId !== "") {
         try {
           const response = await axios.get(
-            `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${selectedCategoryId}`
+            `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${selectedCategoryId}`
           );
 
           console.log("Subcategories Response:", response.data.subCategorias);
@@ -129,7 +129,7 @@ const BotonesCategorias = ({ onClose }) => {
     setOpen(false); // Cerrar el diálogo de subcategorías
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${subCategoryId}`
+        `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${subCategoryId}`
       );
       console.log("Respuesta familias:", response.data.familias);
       if (response.data.familias.length > 0) {
@@ -140,7 +140,7 @@ const BotonesCategorias = ({ onClose }) => {
           "No se encontraron familias. Realizando nueva búsqueda de productos."
         );
         const noFamiliesResponse = await axios.get(
-          `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=1&idsubcategoria=${subCategoryId}&idfamilia=0&idsubfamilia=0`
+          `https://www.easypos.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=1&idsubcategoria=${subCategoryId}&idfamilia=0&idsubfamilia=0`
         );
         console.log(
           "Respuesta de búsqueda de productos:",
@@ -166,7 +166,7 @@ const BotonesCategorias = ({ onClose }) => {
   //   setOpen(false); // Close the subcategory dialog
   //   // Fetch the families for the clicked subcategory
   //   const response = await axios.get(
-  //     `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${subCategoryId}`
+  //     `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${subCategoryId}`
   //   );
   //   setFamilies(response.data.familias);
   //   setOpenFamily(true); // Open the family dialog
@@ -189,7 +189,7 @@ const BotonesCategorias = ({ onClose }) => {
     async function fetchCategories() {
       try {
         const response = await axios.get(
-          "https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetAllCategorias"
+          "https://www.easypos.somee.com/api/NivelMercadoLogicos/GetAllCategorias"
         );
         console.log("API response:", response.data.categorias); // Add this line
         setCategories(response.data.categorias);
@@ -208,7 +208,7 @@ const BotonesCategorias = ({ onClose }) => {
     // Fetch the subfamilies for the clicked family
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetSubFamiliaByIdFamilia?FamiliaID=${familyId}`
+        `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetSubFamiliaByIdFamilia?FamiliaID=${familyId}`
       );
 
       // Set the selected family in state
@@ -251,7 +251,7 @@ const BotonesCategorias = ({ onClose }) => {
     // Fetch productos data based on the selected subfamily
     try {
       const productosResponse = await axios.get(
-        `https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=${idCategoria}&idsubcategoria=${idSubcategoria}&idfamilia=${idFamilia}&idsubfamilia=${idSubFamilia}`
+        `https://www.easypos.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=${idCategoria}&idsubcategoria=${idSubcategoria}&idfamilia=${idFamilia}&idsubfamilia=${idSubFamilia}`
       );
 
       // Handle the fetched productos data as needed

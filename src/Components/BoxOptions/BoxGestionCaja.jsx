@@ -27,6 +27,7 @@ import MuiAlert from "@mui/material/Alert";
 import { createTheme } from "@mui/material/styles";
 
 import axios from "axios";
+import BotonesFuncionales from "../BoxBotones/BotonesFuncionales";
 import BotonesCategorias from "./BotonesCategorias";
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 import BoxRecuperarVenta from "./BoxRecuperarVenta";
@@ -613,11 +614,7 @@ const BoxGestionCaja = () => {
           justifyContent="center"
           sx={{ marginBottom: 2 }}
         >
-          <Grid item xs={6} sm={6} md={4} lg={2}>
-            <Button fullWidth sx={buttonStyles} onClick={handleClearSalesData}>
-              Borrar Ventas
-            </Button>
-          </Grid>
+         
           <Grid item xs={6} sm={6} md={4} lg={2}>
             <Button fullWidth sx={buttonStyles} onClick={handleOpenCategoria}>
               Familias
@@ -632,11 +629,7 @@ const BoxGestionCaja = () => {
               Crear Producto
             </Button>
           </Grid>
-          <Grid item xs={6} sm={6} md={4} lg={2}>
-            <Button fullWidth sx={buttonStyles} onClick={handleOpenIngreso}>
-              Crear Cliente
-            </Button>
-          </Grid>
+        
           <Grid item xs={6} sm={6} md={4} lg={2}>
             <Button
               fullWidth
@@ -656,6 +649,8 @@ const BoxGestionCaja = () => {
             </Button>
           </Grid>
         </Grid>
+        <BotonesFuncionales/>
+
 
         {/* Total */}
         <Grid

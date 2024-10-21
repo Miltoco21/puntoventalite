@@ -59,7 +59,7 @@ const BoxCtaCorriente = ({ onClose }) => {
   const fetchDeudaData = async () => {
     try {
       const response = await axios.get(
-        `https://www.easyposdev.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${selectedCodigoClienteSucursal}&codigoCliente=${selectedCodigoCliente}`
+        `https://www.easypos.somee.com/api/Clientes/GetClientesDeudasByIdCliente?codigoClienteSucursal=${selectedCodigoClienteSucursal}&codigoCliente=${selectedCodigoCliente}`
       );
 
       console.log("Nuevas Deudas:", response.data);
