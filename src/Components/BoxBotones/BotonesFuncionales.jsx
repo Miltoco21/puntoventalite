@@ -3,6 +3,7 @@ import { Grid, Button } from "@mui/material";
 import BotonCrearCliente from "../Botones/BotonCrearCliente"; // Importa el botón de crear cliente
 import BotonBorrarVentas from "../Botones/BotonBorrarVentas";
 import BotonDeudas from "../Botones/BotonDeudas";
+import BotonFamilias from "../Botones/BotonFamilias";
 const BotonesFuncionales = () => {
   return (
     <Grid container spacing={2} sx={{ padding: "2%" }}>
@@ -15,7 +16,7 @@ const BotonesFuncionales = () => {
         <BotonCrearCliente />
       </Grid>
       <Grid item xs={12} md={4}>
-        <BotonDeudas/>
+        <BotonFamilias/>
       </Grid>
 
     

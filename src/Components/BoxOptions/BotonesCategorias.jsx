@@ -1,491 +1,304 @@
-/* eslint-disable no-undef */
-/* eslint-disable react/prop-types */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
-
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
-  Box,
-  Paper,
-  Grid,
-  Typography,
-  List,
-  Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
-  DialogActions,
+  Button,
+  Grid,
+  Snackbar,
+  Alert,
+  Breadcrumbs,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
-import BoxSumaProd from "./BoxSumaProd";
-import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import { estilosBoton } from "../Botones/estilosBotones"; // Estilos
+import NavigateNextIcon from "@mui/icons-material/NavigateNext"; // Icono para breadcrumbs
 import { SelectedOptionsContext } from "../Context/SelectedOptionsProvider";
 
-const BotonesCategorias = ({ onClose }) => {
-  const { selectedOptions, setSelectedOptions } = useContext(
-    SelectedOptionsContext
-  );
-  const { addToSalesData } = useContext(SelectedOptionsContext);
-  const [value, setValue] = useState(0);
+const BASE_API_URL = import.meta.env.VITE_URL_API2;
+
+const BotonesCategorias = ({ openDialog, onClose, onPreviousStep }) => {
+  const {
+    // userData,
+    // salesData,
+    addToSalesData,
+    // setPrecioData,
+    // grandTotal,
+    // ventaData,
+    // setVentaData,
+    // searchResults,
+    // setSearchResults,
+    // updateSearchResults,
+    // selectedUser,
+    // setSelectedUser,
+    // selectedCodigoCliente,
+    // setSelectedCodigoCliente,
+    // selectedCodigoClienteSucursal,
+    // setSelectedCodigoClienteSucursal,
+    // setSelectedChipIndex,
+    // selectedChipIndex,
+    // searchText,
+    // setSearchText,
+    // clearSalesData,
+  } = useContext(SelectedOptionsContext);
+
   const [categories, setCategories] = useState([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  const [selectedSubCategoryId, setSelectedSubCategoryId] = useState("");
-  const [selectedFamilyId, setSelectedFamilyId] = useState("");
   const [subcategories, setSubCategories] = useState([]);
   const [families, setFamilies] = useState([]);
   const [subfamilies, setSubFamilies] = useState([]);
+  const [products, setProducts] = useState([]); // Nuevo estado para productos
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Estado del snackbar
+  const [step, setStep] = useState("categoria"); // Paso actual
+  const [stepHistory, setStepHistory] = useState([]); // Historial de pasos
+  const [breadcrumb, setBreadcrumb] = useState([]); // Para mostrar selección
 
-  const [openFamily, setOpenFamily] = useState(false);
-  const [openSubFamily, setOpenSubFamily] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [selectedFamily, setSelectedFamily] = useState(null);
+  const [selectedSubfamily, setSelectedSubfamily] = useState(null);
 
-  const [openProductDialog, setOpenProductDialog] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState([]);
-  const [openNoProductDialog, setOpenNoProductDialog] = useState(false);
+  const handleSnackbarClose = () => setSnackbarOpen(false);
 
-  ////data para enviar a componente
-
-  const handleCategorySelect = (categoryId) => {
-    setSelectedOptions((prevOptions) => ({
-      ...prevOptions,
-      category: categoryId,
-    }));
+  const handleNextStep = (newStep, label) => {
+    setStepHistory([...stepHistory, step]); // Almacena el paso actual en el historial
+    setStep(newStep); // Cambia al nuevo paso
+    setBreadcrumb([...breadcrumb, label]); // Actualiza el breadcrumb con la nueva selección
   };
 
-  const [open, setOpen] = useState(false);
-
-  const handleCloseAddProduct = () => {
-    // Add logic to handle the selectedProduct, for example:
-    // You can set the selectedProduct to the context
-    setSelectedOptions((prevOptions) => ({
-      ...prevOptions,
-      selectedProduct: selectedProduct,
-    }));
-
-    // You can also perform additional logic based on the selectedProduct
-
-    // Finally, close the product dialog
-    setOpenProductDialog(false);
-  };
-  const handleOpenDialog = async (categoryId) => {
-    setOpen(true);
-    try {
-      const response = await axios.get(
-        `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${categoryId}`
-      );
-      if (response.data.subCategorias.length > 0) {
-        setSubCategories(response.data.subCategorias);
-        console.log("subCategorias:", response.data.subCategorias);
-      } else {
-        const noSubcategoriesResponse = await axios.get(
-          "https://www.easyposdev.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=1&idsubcategoria=0&idfamilia=0&idsubfamilia=0"
-        );
-        console.log("noSubcategoriesResponse:", noSubcategoriesResponse);
-        if (noSubcategoriesResponse.data.subCategorias.length > 0) {
-          setSubCategories(noSubcategoriesResponse.data.subCategorias);
-        } else {
-          // No subcategories found even with default values
-          // You can handle this scenario as needed
-          console.log("No subcategories found.");
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching subcategories:", error);
+  const handlePreviousStep = () => {
+    if (stepHistory.length > 0) {
+      const previousStep = stepHistory.pop(); // Retrocede al paso anterior
+      setStep(previousStep);
+      setStepHistory([...stepHistory]); // Actualiza el historial
+      breadcrumb.pop(); // Elimina el último elemento del breadcrumb
+      setBreadcrumb([...breadcrumb]);
     }
   };
-  // const handleOpenDialog = async (categoryId) => {
-  //   setOpen(true);
-  //   // Fetch the subcategories for the clicked category
-  //   const response = await axios.get(
-  //     `https://www.easyposdev.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${categoryId}`
-  //   );
-  //   setSubCategories(response.data.subCategorias);
-  // };
-  // const handleCloseDialog = () => {
-  //   setOpen(false);
-  // };
 
+  // Fetch de categorías
   useEffect(() => {
-    const fetchSubCategories = async () => {
-      if (selectedCategoryId !== "") {
-        try {
-          const response = await axios.get(
-            `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetSubCategoriaByIdCategoria?CategoriaID=${selectedCategoryId}`
-          );
-
-          console.log("Subcategories Response:", response.data.subCategorias);
-          setSubCategories(response.data.subCategorias);
-        } catch (error) {
-          console.error("Error fetching subcategories:", error);
-        }
-      }
-    };
-
-    fetchSubCategories();
-  }, [selectedCategoryId]);
-
-  const handleOpenFamilyDialog = async (subCategoryId) => {
-    console.log("Abrir diálogo de familias - Subcategoría ID:", subCategoryId);
-    setOpen(false); // Cerrar el diálogo de subcategorías
-    try {
-      const response = await axios.get(
-        `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${subCategoryId}`
-      );
-      console.log("Respuesta familias:", response.data.familias);
-      if (response.data.familias.length > 0) {
-        setFamilies(response.data.familias);
-        setOpenFamily(true); // Abrir el diálogo de familias
-      } else {
-        console.log(
-          "No se encontraron familias. Realizando nueva búsqueda de productos."
-        );
-        const noFamiliesResponse = await axios.get(
-          `https://www.easypos.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=1&idsubcategoria=${subCategoryId}&idfamilia=0&idsubfamilia=0`
-        );
-        console.log(
-          "Respuesta de búsqueda de productos:",
-          noFamiliesResponse.data.productos
-        );
-        if (noFamiliesResponse.data.cantidadRegistros > 0) {
-          // Mostrar los productos obtenidos
-          setSelectedProduct(noFamiliesResponse.data.productos);
-          console.log("selectedProduct:", selectedProduct);
-          setOpenProductDialog(true);
-        } else {
-          console.log("No se encontraron productos.");
-          // Aquí puedes manejar la situación en la que no se encuentran productos.
-        }
-      }
-    } catch (error) {
-      console.error("Error al obtener familias:", error);
+    if (step === "categoria") {
+      axios
+        .get(`${BASE_API_URL}/NivelMercadoLogicos/GetAllCategorias`)
+        .then((response) => {
+          if (response.data.categorias.length === 0) {
+            setSnackbarOpen(true); // Si no hay categorías, mostrar el snackbar
+          }
+          setCategories(response.data.categorias || []);
+        })
+        .catch((error) => console.error("Error fetching categories:", error));
     }
-  };
+  }, [step]);
 
-  // const handleOpenFamilyDialog = async (subCategoryId) => {
-  //   console.log("subCategoryId:", subCategoryId);
-  //   setOpen(false); // Close the subcategory dialog
-  //   // Fetch the families for the clicked subcategory
-  //   const response = await axios.get(
-  //     `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetFamiliaByIdSubCategoria?SubCategoriaID=${subCategoryId}`
-  //   );
-  //   setFamilies(response.data.familias);
-  //   setOpenFamily(true); // Open the family dialog
-  // };
-
-  const handleCloseFamilyDialog = () => {
-    setOpenFamily(false);
-  };
-
-  const handleNavigationChange = (event, newValue) => {
-    console.log(`Button ${newValue} clicked`);
-    setValue(newValue);
-  };
-
-  const handleCloseCategoria = () => {
-    onClose(true);
-  };
-
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const response = await axios.get(
-          "https://www.easypos.somee.com/api/NivelMercadoLogicos/GetAllCategorias"
-        );
-        console.log("API response:", response.data.categorias); // Add this line
-        setCategories(response.data.categorias);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    fetchCategories();
+  const handleCategorySelect = useCallback((category) => {
+    setSelectedCategory(category);
+    axios
+      .get(`${BASE_API_URL}/NivelMercadoLogicos/GetSubCategoriaByIdCategoria`, {
+        params: { CategoriaID: category.idCategoria },
+      })
+      .then((response) => {
+        if (response.data.subCategorias.length === 0) setSnackbarOpen(true);
+        setSubCategories(response.data.subCategorias || []);
+        handleNextStep("subcategoria", `Categoria: ${category.descripcion}`);
+      })
+      .catch((error) => console.error("Error fetching subcategories:", error));
   }, []);
 
-  const handleOpenSubFamilyDialog = async (familyId) => {
-    console.log("familyId:", familyId);
-    setOpenFamily(false); // Close the family dialog
+  const handleSubCategorySelect = useCallback(
+    (subcategory) => {
+      setSelectedSubcategory(subcategory);
+      axios
+        .get(`${BASE_API_URL}/NivelMercadoLogicos/GetFamiliaByIdSubCategoria`, {
+          params: {
+            SubCategoriaID: subcategory.idSubcategoria,
+            CategoriaID: selectedCategory.idCategoria,
+          },
+        })
+        .then((response) => {
+          if (response.data.familias.length === 0) setSnackbarOpen(true);
+          setFamilies(response.data.familias || []);
+          handleNextStep("familia", `Subcategoria: ${subcategory.descripcion}`);
+        })
+        .catch((error) => console.error("Error fetching families:", error));
+    },
+    [selectedCategory]
+  );
 
-    // Fetch the subfamilies for the clicked family
+  const handleFamilySelect = useCallback(
+    (family) => {
+      setSelectedFamily(family);
+      axios
+        .get(`${BASE_API_URL}/NivelMercadoLogicos/GetSubFamiliaByIdFamilia`, {
+          params: {
+            FamiliaID: family.idFamilia,
+            SubCategoriaID: selectedSubcategory.idSubcategoria,
+            CategoriaID: selectedCategory.idCategoria,
+          },
+        })
+        .then((response) => {
+          if (response.data.subFamilias.length === 0) setSnackbarOpen(true);
+          setSubFamilies(response.data.subFamilias || []);
+          handleNextStep("subfamilia", `Familia: ${family.descripcion}`);
+        })
+        .catch((error) => console.error("Error fetching subfamilies:", error));
+    },
+    [selectedCategory, selectedSubcategory]
+  );
+
+  ///Busqueda Producto/////
+  const handleSubfamilySelect = useCallback(
+    (subfamily) => {
+      setSelectedSubfamily(subfamily);
+      axios
+        .get(`${BASE_API_URL}/ProductosTmp/GetProductosByIdNML`, {
+          params: {
+            idcategoria: selectedCategory.idCategoria,
+            idsubcategoria: selectedSubcategory.idSubcategoria,
+            idfamilia: selectedFamily.idFamilia,
+            idsubfamilia: subfamily.idSubFamilia,
+          },
+        })
+        .then((response) => {
+          setProducts(response.data.productos || []);
+          console.log('ProductoNML',response.data.productos)
+          handleNextStep("productos", `Subfamilia: ${subfamily.descripcion}`);
+        })
+        .catch((error) => console.error("Error fetching products:", error));
+    },
+    [selectedCategory, selectedSubcategory, selectedFamily]
+  );
+
+  //Agregar producto //
+  const handleAddProductToSales = (product) => {
     try {
-      const response = await axios.get(
-        `https://www.easypos.somee.com/api/NivelMercadoLogicos/GetSubFamiliaByIdFamilia?FamiliaID=${familyId}`
-      );
-
-      // Set the selected family in state
-      setSelectedFamilyId(familyId);
-
-      // Set the fetched subfamilies in the state
-      setSubFamilies(response.data.subFamilias);
-
-      // Open the subfamily dialog
-      setOpenSubFamily(true);
+      // Add the selected product to the sales data using the context method
+      addToSalesData(product);
+  
+      // Optionally, log the product or trigger a success notification
+      console.log("Product added to sales:", product);
+  
+      // If needed, you can also trigger any additional logic like closing the dialog
+      // onClose(); // Uncomment this if you want to close the dialog after adding the product
+  
     } catch (error) {
-      console.error("Error fetching subfamilies:", error);
+      // Handle any potential errors that might occur
+      console.error("Error adding product to sales:", error);
     }
   };
+  
 
-  const handleCloseSubFamilyDialog = () => {
-    setOpenSubFamily(false);
-  };
-  ///consumo de prodcutos por ids
-
-  const handleSubfamilyClick = async (subfamily) => {
-    console.log("Subfamily selected:", subfamily);
-
-    // Log IDs of the selected subfamily
-    const {
-      idCategoria,
-      idSubcategoria,
-      idFamilia,
-      idSubFamilia,
-      descripcion,
-    } = subfamily;
-    console.log("IDs:", {
-      idCategoria,
-      idSubcategoria,
-      idFamilia,
-      idSubFamilia,
-      descripcion,
-    });
-
-    // Fetch productos data based on the selected subfamily
-    try {
-      const productosResponse = await axios.get(
-        `https://www.easypos.somee.com/api/ProductosTmp/GetProductosByIdNML?idcategoria=${idCategoria}&idsubcategoria=${idSubcategoria}&idfamilia=${idFamilia}&idsubfamilia=${idSubFamilia}`
-      );
-
-      // Handle the fetched productos data as needed
-      console.log("Productos Response:", productosResponse.data);
-
-      if (productosResponse.data.cantidadRegistros > 0) {
-        // Create and display a map of products
-        setSelectedProduct(productosResponse.data.productos);
-        setOpenProductDialog(true);
-
-        // Display the map of products (you may use a Dialog or any other UI component)
-        console.log("Products Map:", productosResponse.data.productos[0]);
-      } else {
-        setOpenNoProductDialog(true);
-      }
-    } catch (error) {
-      console.error("Error fetching productos:", error);
-    }
-  };
-  const handleCloseProductDialog = () => {
-    setOpenProductDialog(false);
-  };
-
-  const handleCloseNoProductDialog = () => {
-    setOpenNoProductDialog(false);
-  };
-  const handleProductClick = (product) => {
-    console.log("Product clicked:", product);
-    setSelectedOptions((prevOptions) => ({
-      ...prevOptions,
-      selectedProduct: product,
-    }));
-    addToSalesData(product);
-    // You can also perform additional logic based on the selected product
-
-    // Finally, close the product dialog
-    setOpenProductDialog(false);
-  };
-
-  // const handleProductSelection = (selectedProduct) => {
-  //   // Assuming you have access to addToSalesData function from the context
-  //   // Add selected product to sales list
-  //   addToSalesData(selectedProduct, 1);
-  // };
-
-  ///////////////////Manejo de Productos sin Subfamilia////
-  const [showFamilies, setShowFamilies] = useState(false);
-
-  const handleShowFamilies = () => {
-    setShowFamilies(true);
-  };
-
-  const handleShowProducts = () => {
-    setShowFamilies(false);
-  };
-  ///////////////////Manejo de Productos sin Subfamilia////
-
-  return (
-    <SelectedOptionsContext.Provider value={{}}>
-      <Paper elevation={13}>
-        <Box p={2}>
-          <Typography variant="h5">Categorias</Typography>
-          <Grid container spacing={2}>
-            {categories.map((category) => (
-              <Grid
-                item
-                key={category.idCategoria}
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-              >
-                <Button
-                
-                sx={{
-                  margin: 1,
-                  width: "100%",
-                 
-                  backgroundColor: "lightSalmon",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "coral",
-                    color: "white",
-                  },
-                }}
-                  onClick={() => {
-                    handleOpenDialog(category.idCategoria);
-                    setSelectedOptions((prevOptions) => ({
-                      ...prevOptions,
-                      category: category.idCategoria,
-                    }));
-                  }}
-                  fullWidth
-                  variant="contained"
-                >
-                  {category.descripcion}
-                </Button>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      </Paper>
-
-      <Dialog open={open} onClose={onClose}>
-        <DialogTitle> Selecciona Subcategorias</DialogTitle>
-        <DialogContent>
-          {subcategories.map((subcategory) => (
+  const renderStepContent = () => {
+    switch (step) {
+      case "categoria":
+        return categories.map((category) => (
+          <Grid item key={category.idCategoria} xs={12}>
             <Button
-              key={subcategory.idSubcategoria}
-              onClick={() => handleOpenFamilyDialog(subcategory.idSubcategoria)}
-              sx={{
-                margin: 1,
-                width: "90px",
-                height: "60px",
-                backgroundColor: "lightSalmon",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "coral",
-                  color: "white",
-                },
-              }}
+              sx={estilosBoton}
+              onClick={() => handleCategorySelect(category)}
+              fullWidth
+            >
+              {category.descripcion}
+            </Button>
+          </Grid>
+        ));
+      case "subcategoria":
+        return subcategories.map((subcategory) => (
+          <Grid item key={subcategory.idSubcategoria} xs={12}>
+            <Button
+              sx={estilosBoton}
+              onClick={() => handleSubCategorySelect(subcategory)}
+              fullWidth
             >
               {subcategory.descripcion}
             </Button>
-          ))}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={openFamily || openProductDialog}
-        onClose={handleCloseProductDialog}
-      >
-        <DialogTitle>{showFamilies ? "Familias" : "Productos"}</DialogTitle>
-        <DialogContent>
-          {showFamilies ? (
-            <List>
-              {families.map((family) => (
-                <Button
-                  key={family.idFamilia}
-                  onClick={() => handleOpenSubFamilyDialog(family.idFamilia)}
-                  sx={{
-                    margin: 1,
-                    width: "90px",
-                    height: "60px",
-                    backgroundColor: "lightSalmon",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "coral",
-                      color: "white",
-                    },
-                  }}
-                >
-                  {family.descripcion}
-                </Button>
-              ))}
-            </List>
-          ) : (
-            <List>
-              {selectedProduct.map((product) => (
-                <Button
-                  key={product.idProducto}
-                  onClick={() => {
-                    addToSalesData(product);
-                    handleCloseProductDialog();
-                    handleCloseFamilyDialog();
-                    onClose();
-                  }}
-                  sx={{
-                    margin: 1,
-                    width: "90px",
-                    height: "60px",
-                    backgroundColor: "lightSalmon",
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "coral",
-                      color: "white",
-                    },
-                  }}
-                >
-                  {product.nombre}
-                </Button>
-              ))}
-            </List>
-          )}
-          {/* <Button onClick={handleShowFamilies}>Mostrar Familias</Button>
-          <Button onClick={handleShowProducts}>Mostrar Productos</Button> */}
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              handleCloseProductDialog();
-              handleCloseFamilyDialog();
-            }}
-          >
-            Cerrar
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={openSubFamily} onClose={handleCloseSubFamilyDialog}>
-        <DialogTitle>Subfamilias</DialogTitle>
-        <DialogContent>
-          {subfamilies.map((subfamily) => (
+          </Grid>
+        ));
+      case "familia":
+        return families.map((family) => (
+          <Grid item key={family.idFamilia} xs={12}>
             <Button
-              key={subfamily.idSubFamilia}
-              onClick={() => handleSubfamilyClick(subfamily)}
-              // onClick={() => {
-              //   console.log("Subfamily selected:", subfamily);
-              //   setSelectedOptions((prevOptions) => ({
-              //     ...prevOptions,
-              //     subFamily: subfamily,
-              //   }));
-              // }}
-              sx={{
-                margin: 1,
-                width: "90px",
-                height: "60px",
-                backgroundColor: "lightSalmon",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "coral",
-                  color: "white",
-                },
-              }}
+              sx={estilosBoton}
+              onClick={() => handleFamilySelect(family)}
+              fullWidth
+            >
+              {family.descripcion}
+            </Button>
+          </Grid>
+        ));
+      case "subfamilia":
+        return subfamilies.map((subfamily) => (
+          <Grid item key={subfamily.idSubFamilia} xs={12}>
+            <Button
+              sx={estilosBoton}
+              onClick={() => handleSubfamilySelect(subfamily)}
+              fullWidth
             >
               {subfamily.descripcion}
             </Button>
-          ))}
+          </Grid>
+        ));
+      case "productos":
+        return products.map((product) => (
+          <Grid item key={product.idProducto} xs={12}>
+            <Button
+              sx={estilosBoton}
+              fullWidth
+              onClick={() => handleAddProductToSales(product)}
+            >
+              {product.nombre}
+            </Button>
+          </Grid>
+        ));
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <>
+      <Dialog open={openDialog} onClose={onClose}>
+        <DialogContent>
+          {/* Breadcrumb */}
+          <Breadcrumbs
+            separator={<NavigateNextIcon fontSize="small" />}
+            aria-label="breadcrumb"
+          >
+            {breadcrumb.map((item, index) => (
+              <Typography key={index} color="text.primary">
+                {item}
+              </Typography>
+            ))}
+          </Breadcrumbs>
+
+          {/* Renderizado dinámico basado en el paso actual */}
+          <Grid container spacing={2}>
+            {renderStepContent()}
+          </Grid>
+
+          {/* Botón 'Atrás' */}
+          {step !== "categoria" && (
+            <Button sx={{ mt: 2 }} onClick={handlePreviousStep}>
+              Atrás
+            </Button>
+          )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseSubFamilyDialog}>Cerrar</Button>
-        </DialogActions>
       </Dialog>
-    </SelectedOptionsContext.Provider>
+
+      {/* Snackbar para alertar sobre errores */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          No hay elementos disponibles.
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
